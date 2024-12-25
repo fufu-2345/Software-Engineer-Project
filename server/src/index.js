@@ -14,4 +14,4 @@ app.get("/test",(req,res)=>{
     res.json('test1 test2 test3');
 });
 
-app.listen(port,()=>{console.log(`backend port: ${port} is started/updated`)})
+app.listen(port,()=>{console.log(`http://localhost:${port}/ is started/updated`)})

@@ -1,1 +1,12 @@
-node_modules
+# Node.js dependencies
+/node_modules/
+
+# dotenv environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# VSCodium settings (or any other editor settings)
+.vscode/
