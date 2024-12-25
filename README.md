@@ -1,7 +1,7 @@
 **วิธี install หลัง git clone**  
-**1.**change directory to System-Engineer-Project in command prompt  
-**2.**type setup  
-**3.**wait until done  
+**1.** change directory to System-Engineer-Project in command prompt  
+**2.** type setup  
+**3.** wait until done  
 
 ---
 
