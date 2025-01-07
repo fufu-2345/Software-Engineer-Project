@@ -6,6 +6,12 @@ const app=express();
 const port =5000;
 app.use(cors());
 
+const db= mysql.createConnection({  
+    host: process.env.HOST,
+    user: process.env.USER,
+    password: process.env.PASSWORD,
+})
+
 app.get('/', (req, res) => {  
     res.json('111111');
 });
