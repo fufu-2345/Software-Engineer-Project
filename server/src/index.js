@@ -34,6 +34,16 @@ app.get("/getPost", (req,res) =>{
     })
 })
 
+app.get("/getPost/Count", (req, res) => {
+    const query = `SELECT COUNT(*) FROM comment`;
+    pool.query(query, (err, data) => {
+        if (err) {
+            return res.json(err);
+        }
+        return res.json(data[0]);
+    });
+});
+
 app.get("/getComment", (req,res) =>{
     const a = `SELECT * FROM comment`;
     pool.query(a, (err, data) => {
@@ -43,5 +53,6 @@ app.get("/getComment", (req,res) =>{
         return res.json(data);
     })
 })
-  
+
+
 app.listen(port,()=>{console.log('\x1b[36m%s\x1b[0m is started/updated', `http://localhost:${port}`);})

@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "git clone https://github.com/fufu-2345/front-back_template cd front-back_template npm install",
   "main": "index.js",
-
   "scripts": {
     "start": "concurrently \"npm run client\" \"npm run server\"",
     "client": "cd client && npm run dev",
@@ -13,6 +12,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "concurrently": "^9.1.0"
+    "axios": "^1.7.9",
+    "concurrently": "^9.1.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.1.1"
   }
 }
