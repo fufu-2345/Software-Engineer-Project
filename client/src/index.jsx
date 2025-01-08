@@ -9,8 +9,13 @@ import {
 } from "react-router-dom";
 
 ///////  import pages
-import First from './pages/first';
-import Second from './pages/second';
+import Login from './pages/login.jsx';
+import Main from './pages/main.jsx';
+import PostDetail from './pages/postDetail.jsx';
+import Profile from './pages/profile.jsx';
+import RegisterClub from './pages/registerClub.jsx';
+import RegisterNonClub from './pages/registerNonClub.jsx';
+import SelectRegister from './pages/selectRegister.jsx';
 
 const router = createBrowserRouter([
   {
@@ -18,12 +23,32 @@ const router = createBrowserRouter([
     element: <App/>,
   },
   {
-    path: "/First",
-    element: <First/>,
+    path: "/Login",
+    element: <Login/>,
   },
   {
-    path: "/Second",
-    element: <Second/>,
+    path: "/Main",
+    element: <Main/>,
+  },
+  {
+    path: "/PostDetail",
+    element: <PostDetail/>,
+  },
+  {
+    path: "/Profile",
+    element: <Profile/>,
+  },
+  {
+    path: "/RegisterClub",
+    element: <RegisterClub/>,
+  },
+  {
+    path: "/RegisterNonClub",
+    element: <RegisterNonClub/>,
+  },
+  {
+    path: "/SelectRegister",
+    element: <SelectRegister/>,
   }
   
 ]);

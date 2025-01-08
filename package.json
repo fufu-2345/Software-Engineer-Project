@@ -7,7 +7,7 @@
   "scripts": {
     "start": "concurrently \"npm run client\" \"npm run server\"",
     "client": "cd client && npm run dev",
-    "server": "cd server && cd src && node index.js"
+    "server": "cd server && npm run dev"
   },
   "keywords": [],
   "author": "",

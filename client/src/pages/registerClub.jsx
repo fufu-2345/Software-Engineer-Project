@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
-const Second = () => {
+const RegisterClub = () => {
     return (
         <>
+            <h1>RegisterClub</h1><br/>
             <div><Link to="/"><h1>back</h1></Link></div>
             <br/><br/>
         </>
@@ -12,4 +13,4 @@ const Second = () => {
     
 }
 
-export default Second;
+export default RegisterClub;
