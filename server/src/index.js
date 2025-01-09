@@ -6,6 +6,7 @@ require('dotenv').config({ path: '../.env' });
 
 const port =5000;
 app.use(cors());
+app.use(express.json())
 
 
 const pool = mysql.createPool({
@@ -51,6 +52,20 @@ app.get("/getComment", (req,res) =>{
             return res.json(err);
         }
         return res.json(data);
+    })
+})
+
+//API for create new account in user database
+app.post('/registerNonClubMember',(req,res) =>{
+    const body = req.body
+    var queryCommand = 'insert into user(userName,passWord,accName,createTime) values(?,?,?,NOW())'
+    console.log(body)
+    pool.query(queryCommand,[body.username,body.password,body.accountName],(err,results) =>{
+        if(err){
+            console.log("failed")
+            return res.json('Failed')
+        }
+        return res.json('Register Success!')
     })
 })
 
