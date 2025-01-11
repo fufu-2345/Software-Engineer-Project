@@ -55,8 +55,25 @@ app.get("/getComment", (req,res) =>{
     })
 })
 
+//API for checking Username
+app.post('/checkUsername', (req,res) => {
+    const query = `select count(*) from customer where userName = '${req.body.username}'`;
+    pool.query(query, (err,data) =>{
+        if(err){
+            return res.json(err);
+        }
+
+        if(data[0]['count(*)'] != 0){
+            return res.json({"Status" : true})
+        }else{
+            return res.json({"Status" : false})
+        }
+    })
+})
+
 //For verifying email address(Spam Prevention)
 const nodemailer = require('nodemailer');
+const { data } = require('react-router-dom');
 
 //Setup the sender email: Email and Password config in env file
 const transporter =  nodemailer.createTransport({
@@ -100,27 +117,28 @@ async function sendOTP(transporter,email){
     return (otp)
 }
 
-app.post('/otpSendForClubMember' , async (req,res) =>{
-    var email = `s${req.body.studentID}@email.kmutnb.ac.th`
+app.post('/Sendotp' , async (req,res) =>{
     try {
-        const otp = await sendOTP(transporter, email); // Wait for the OTP to be sent
+        const otp = await sendOTP(transporter, req.body.email); // Wait for the OTP to be sent
         res.json({ success: true, otp }); // Send the OTP back to the client
     } catch (error) {
         res.status(500).json({ success: false, message: 'Failed to send OTP', error });
     }
 })
 
+
+
 //API for create new account in user database
 app.post('/registerNonClubMember',(req,res) =>{
     const body = req.body
-    var queryCommand = 'insert into user(userName,passWord,accName,createTime) values(?,?,?,NOW())'
+    var queryCommand = 'insert into customer(userName,passWord,accName,createTime) values(?,?,?,NOW())'
     console.log(body)
     pool.query(queryCommand,[body.username,body.password,body.accountName],(err,results) =>{
         if(err){
             console.log(err)
-            return res.json('Failed')
+            return res.json({success : false})
         }
-        return res.json('Register Success!')
+        return res.json({success : true})
     })
 })
 

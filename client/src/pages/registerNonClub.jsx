@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link , useNavigate} from 'react-router-dom';
 import axios from 'axios';
+import Popup from 'reactjs-popup'
+import { useRef } from 'react';
 
 const RegisterNonClub = () => {
     var [username,setUserName] = useState('')
@@ -21,14 +23,40 @@ const RegisterNonClub = () => {
         setName(e.target.value)
     }
 
-    function submitData(){
-        var api = `http://localhost:5000/registerNonClubMember/`
-        var body = {"username" : username, "password" : password, "accountName" : name}
-        axios.post(api,body)
-        .then(response =>{
-            console.log(body)
-            console.log(response)
-        })
+    const usernameError = useRef()
+    const otpSentError = useRef()
+    const registerError = useRef()
+    const registerSuccess = useRef()
+
+    const navigate = useNavigate()
+
+    async function submitData(){
+
+        var api = `http://localhost:5000/checkUsername`
+        var body = {"username" : username, "password" : password, "accountName" : name,"email" : email}
+        var response = await axios.post(api,body)
+        if(response.data == 'Failed'){
+          usernameError.current.open
+          return
+        }
+
+        api = `http://localhost:5000/Sendotp/`
+        response = await axios.post(api,body)
+        if(response.data.success == false){
+          otpSentError.current.open
+          return
+        }
+
+        api = `http://localhost:5000/registerNonClubMember/`
+        response = await axios.post(api,body)
+        if(response.data.success == false){
+          registerError.current.open
+          return
+        }
+        registerSuccess.current.open
+        setTimeout(() => { 
+        }, 1000);
+        navigate('/Main')
     }
 
     return (
@@ -47,6 +75,18 @@ const RegisterNonClub = () => {
       <input value={name} onChange={nameChange}></input>
       <br></br>
       <button onClick={submitData}> Tset</button>
+      <Popup ref={usernameError}>
+        This Username is already in used.
+      </Popup>
+      <Popup ref={otpSentError}>
+        Cannot send OTP to this Email, Please try again later
+      </Popup>
+      <Popup ref={registerError}>
+        Cannot register, Please try again later
+      </Popup>
+      <Popup ref={registerSuccess}>
+        Register Success
+      </Popup>
         </>
     );
     
