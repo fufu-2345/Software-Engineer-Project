@@ -55,6 +55,61 @@ app.get("/getComment", (req,res) =>{
     })
 })
 
+//For verifying email address(Spam Prevention)
+const nodemailer = require('nodemailer');
+
+//Setup the sender email: Email and Password config in env file
+const transporter =  nodemailer.createTransport({
+    service : 'gmail',
+    host : 'smtp.gmail.com',
+    port: 587,
+    secure: false,
+    auth :{
+        user : process.env.serverEmail,
+        pass : process.env.APP_PASSWORD
+    },
+})
+
+
+
+//Generate 6-digits OTP
+function generateOTP(){
+    return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+//The OTP sending function
+async function sendOTP(transporter,email){
+    const otp = generateOTP()
+
+    const mailOption = {
+        from:{
+            name : 'PAPHON',
+            address : process.env.serverEmail
+        },
+        to : email,
+        subject : 'Verify Your Registration',
+        text : `SYSTEM ENGINEERING TESTING\nPlease Verify your Registration from our website\n Your OTP is ${otp} .`,
+    }
+
+    try{
+        await transporter.sendMail(mailOption)
+    }catch(error){
+        console.error(error)
+        return error
+    }
+    return (otp)
+}
+
+app.post('/otpSendForClubMember' , async (req,res) =>{
+    var email = `s${req.body.studentID}@email.kmutnb.ac.th`
+    try {
+        const otp = await sendOTP(transporter, email); // Wait for the OTP to be sent
+        res.json({ success: true, otp }); // Send the OTP back to the client
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Failed to send OTP', error });
+    }
+})
+
 //API for create new account in user database
 app.post('/registerNonClubMember',(req,res) =>{
     const body = req.body
@@ -62,7 +117,7 @@ app.post('/registerNonClubMember',(req,res) =>{
     console.log(body)
     pool.query(queryCommand,[body.username,body.password,body.accountName],(err,results) =>{
         if(err){
-            console.log("failed")
+            console.log(err)
             return res.json('Failed')
         }
         return res.json('Register Success!')
