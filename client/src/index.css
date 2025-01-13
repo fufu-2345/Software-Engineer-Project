@@ -2,13 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body {
-  
+html,
+body {
 }
 
 /*               .= class   #=id                  */
- 
-body{
-   @apply bg-[#ffd1dd];
 
+body {
+  @apply bg-[#ffd1dd];
 }
