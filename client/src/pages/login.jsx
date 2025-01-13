@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link,useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const Login = () => {
@@ -8,18 +8,19 @@ const Login = () => {
     const handleGoMain = () => {
         const data = { test: 'AAA', userId: 20 };
         navigate('/Main', { state: data });
-      };
+    };
 
     return (
         <>
-            <h1 className='font-bold text-4xl'>Login</h1><br/>
-            <button onClick={handleGoMain}> Main </button>
+            <h1 className='font-bold text-4xl'>Login</h1><br /><br />
+            <button onClick={handleGoMain}> Main </button><br /><br />
 
-            <br/><br/>
+            <div><Link to="/RegisterClub"><h1>Reg</h1></Link></div>
+            <br /><br />
 
         </>
     );
-    
+
 }
 
 export default Login;
