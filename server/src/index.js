@@ -34,6 +34,7 @@ app.get("/getPost", (req,res) =>{
     })
 })
 
+
 app.get("/getPost/Count", (req, res) => {
     const query = `SELECT COUNT(*) FROM comment`;
     pool.query(query, (err, data) => {
