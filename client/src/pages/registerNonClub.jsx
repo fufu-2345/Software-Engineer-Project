@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 import { Link , useNavigate} from 'react-router-dom';
 import axios from 'axios';
 import Popup from 'reactjs-popup'
@@ -25,6 +25,19 @@ const RegisterNonClub = () => {
 
     const usernameError = useRef()
     const otpSentError = useRef()
+
+    const enterOTP = useRef()
+    const [otpPopupStatus, setPopupStatus] = useState(false)
+    const [otp , setOTP] = useState('')
+
+    const otpChange = (e) =>{
+      setOTP(e.target.value)
+    }
+
+    async function submitOTP(){
+
+    }
+
     const registerError = useRef()
     const registerSuccess = useRef()
 
@@ -46,6 +59,8 @@ const RegisterNonClub = () => {
           otpSentError.current.open
           return
         }
+
+        setPopupStatus(true)
 
         api = `http://localhost:5000/registerNonClubMember/`
         response = await axios.post(api,body)
@@ -75,6 +90,13 @@ const RegisterNonClub = () => {
       <input value={name} onChange={nameChange}></input>
       <br></br>
       <button onClick={submitData}> Tset</button>
+      {isPopupOpen && (
+            <Popup ref = {enterOTP}>
+              <input value={otp} onChange={otpChange}></input>
+              <button onClick={submitOTP}>Submit</button>
+              <button onClick={closeOTP}>Close</button>
+            </Popup>
+      )}
       <Popup ref={usernameError}>
         This Username is already in used.
       </Popup>

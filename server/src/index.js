@@ -120,9 +120,9 @@ async function sendOTP(transporter,email){
 app.post('/Sendotp' , async (req,res) =>{
     try {
         const otp = await sendOTP(transporter, req.body.email); // Wait for the OTP to be sent
-        res.json({ success: true, otp }); // Send the OTP back to the client
+        res.json({ success: true, OTP : otp }); // Send the OTP back to the client
     } catch (error) {
-        res.status(500).json({ success: false, message: 'Failed to send OTP', error });
+        res.status(500).json({ success: false, message: 'Failed to send OTP'});
     }
 })
 
