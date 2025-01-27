@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
+import './style.css';
 import './index.css';
 
 import {
@@ -18,15 +19,39 @@ import RegisterNonClub from './pages/registerNonClub.jsx';
 import SelectRegister from './pages/selectRegister.jsx';
 
 const router = createBrowserRouter([
-  { path: "/",element: <App/>,},
-  { path: "/Login",element: <Login/>,},
-  { path: "/Main",element: <Main/>,},
-  { path: "/PostDetail",element: <PostDetail/>,},
-  { path: "/Profile",element: <Profile/>,},
-  { path: "/RegisterClub",element: <RegisterClub/>,},
-  { path: "/RegisterNonClub",element: <RegisterNonClub/>,},
-  { path: "/SelectRegister",element: <SelectRegister/>,}
-  
+  {
+    path: "/",
+    element: <App />,
+  },
+  {
+    path: "/Login",
+    element: <Login />,
+  },
+  {
+    path: "/Main",
+    element: <Main />,
+  },
+  {
+    path: "/PostDetail",
+    element: <PostDetail />,
+  },
+  {
+    path: "/Profile",
+    element: <Profile />,
+  },
+  {
+    path: "/RegisterClub",
+    element: <RegisterClub />,
+  },
+  {
+    path: "/RegisterNonClub",
+    element: <RegisterNonClub />,
+  },
+  {
+    path: "/SelectRegister",
+    element: <SelectRegister />,
+  }
+
 ]);
 
 ////// https://reactrouter.com/en/main/routers/router-provider <-- router

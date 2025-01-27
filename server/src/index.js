@@ -6,7 +6,6 @@ require('dotenv').config({ path: '../.env' });
 
 const port = 5000;
 app.use(cors());
-app.use(express.json())
 
 
 const pool = mysql.createPool({
@@ -34,7 +33,6 @@ app.get("/getPost", (req, res) => {
         return res.json(data);
     })
 })
-
 
 app.get("/getPost/Count", (req, res) => {
     const query = `SELECT COUNT(*) FROM comment`;

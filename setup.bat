@@ -9,8 +9,8 @@ cd ..
 cd server
 call npm install
 
+code ..
 cd ..
-code .
 
 echo .
 echo .
