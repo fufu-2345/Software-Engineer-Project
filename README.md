@@ -17,7 +17,15 @@ npm start
 
 ---
 
-- git remote set-url origin "new url" for change  
-- git remote add origin "new url" for add  
-- git push --force origin main  
+git branch -r
+git fetch origin
+git checkout -b branchName(local) origin/branchName(from origin)
+
+---
+
+for branch in $(git branch --list | grep -v 'main' ); do
+    git checkout $branch
+    git merge main
+done
+
  
