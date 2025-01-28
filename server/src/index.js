@@ -1,7 +1,9 @@
 const express = require('express');
 const cors = require('cors');
+const multer = require('multer');
 const mysql = require('mysql2');
 const app = express();
+const path = require('path');
 require('dotenv').config({ path: '../.env' });
 
 const port = 5000;
@@ -24,6 +26,8 @@ app.get("/test", (req, res) => {
     res.json('test1 test2 test3');
 });
 
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
 app.get("/getPost", (req, res) => {
     const a = `SELECT * FROM post`;
     pool.query(a, (err, data) => {
@@ -53,6 +57,28 @@ app.get("/getComment", (req, res) => {
         return res.json(data);
     })
 })
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, path.join(__dirname, '../imgs/'));
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname));
+    }
+});
+
+const upload = multer({ storage });
+
+app.post('/upload', upload.single('image'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ success: false, message: 'No file uploaded' });
+    }
+    res.json({ success: true, filePath: `../img/${req.file.filename}` });
+});
+
+///////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+
 
 //API for checking Username
 app.post('/checkUsername', (req, res) => {
