@@ -15,17 +15,17 @@ npm start
 - front : 3000  
 - back : 5000  
 
----
+---  
 
-git branch -r
-git fetch origin
-git checkout -b branchName(local) origin/branchName(from origin)
+git branch -r  
+git fetch origin  
+git checkout -b branchName(local) origin/branchName(from origin)  
 
----
+---  
 
-for branch in $(git branch --list | grep -v 'main' ); do
-    git checkout $branch
-    git merge main
-done
+for branch in $(git branch --list | grep -v 'main' ); do  
+    git checkout $branch  
+    git merge main  
+done  
 
  
