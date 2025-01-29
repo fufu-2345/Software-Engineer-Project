@@ -29,9 +29,14 @@ const Main = () => {
 
     const handleUpload = async () => {
         if (!file) return;
-
         const formData = new FormData();
         formData.append('image', file);
+        formData.append('userId', state.userId);
+
+        console.log("formData: ");
+        formData.forEach((value, key) => {
+            console.log(key, value);
+        });
 
         try {
             const response = await axios.post('http://localhost:5000/upload', formData, {
@@ -39,13 +44,16 @@ const Main = () => {
             });
 
             if (response.data.success) {
-                alert('Upload successful!');
+                setIsAdding(false);
+                setFile(null);
+                console.log('Upload successful!');
             } else {
-                alert('Upload failed.');
+                //alert('Upload failed.');
+                console.log('Upload failed 1');
             }
         } catch (error) {
-            console.error(error);
-            alert('Error uploading file.');
+            //alert('Error uploading file.');
+            console.log('Upload failed 2');
         }
     };
 
@@ -65,7 +73,7 @@ const Main = () => {
         }
     };
 
-    //////// ดัก login ผิดวิธี
+    //////// ดัก login มั่ว
     useEffect(() => {
         if (!state) {
             navigate('/');
@@ -92,7 +100,6 @@ const Main = () => {
                 <div className='flex justify-center items-center bg-grey-300 bg-clip-padding p-3'>
                     {file && (
                         <>
-
                             <img src={file.preview} alt="Uploaded Preview"
                                 className='w-auto h-auto min-w-[100px] max-w-[300px] min-h-[100px] max-h-[300px] block my-4' />
 
