@@ -67,6 +67,22 @@ app.get("/getPost/Count", (req, res) => {
     });
 });
 
+app.get("/getPost/max", (req, res) => {
+    const query = `SELECT MAX(postID) FROM post`;
+    pool.query(query, (err, data) => {
+        if (err) {
+            return res.json(err);
+        }
+        max = data[0]['MAX(postID)'];
+        if (max > 0) {
+            res.send(max.toString());
+        }
+        else {
+            res.send("0");
+        }
+
+    });
+});
 
 
 ///////////////////////////////////////////////////////////
@@ -88,6 +104,9 @@ app.post('/upload', upload.single('image'), (req, res) => {
     if (!req.file) { return res.status(400).json({ success: false, message: 'No file uploaded' }); };
 
     const userId = req.body.userId;
+    const postName = req.body.postName;
+    const postDescription = req.body.postDescription;
+
     const query = `SELECT MAX(postID) FROM post`;
     pool.query(query, (err, data) => {
         if (err) { console.error(err); return res.status(500).json({ success: false, message: 'Database error' }); };
@@ -102,12 +121,13 @@ app.post('/upload', upload.single('image'), (req, res) => {
             (err) => {
                 if (err) return res.status(500).json({ success: false, message: 'File rename error' });
 
-                const insertQuery = `INSERT INTO post (postName, postDescription, userID, photoPath, postTime, avgRating) 
-                                     VALUES (?, ?, ?, ?, NOW(), ?)`;
+                const insertQuery = `INSERT INTO post (postID, postName, postDescription, userID, photoPath, postTime, avgRating) 
+                                     VALUES (?, ?, ?, ?, ?, NOW(), ?)`;
 
                 const values = [
-                    req.body.postName || 'a',
-                    req.body.postDescription || 'b',
+                    newPostID,
+                    postName,
+                    postDescription,
                     userId,
                     newFilePath,
                     req.body.avgRating || 0
