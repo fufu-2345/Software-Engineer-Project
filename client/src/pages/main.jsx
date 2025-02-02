@@ -18,6 +18,7 @@ const Main = () => {
     const [title, setTitle] = useState('');                     // ชื่อ post
     const [description, setDescription] = useState('');         // post detail
     const [postCount, setPostCount] = useState(0);
+    const [postImgs, setPostImgs] = useState([]);
 
 
     const handleTitle = (event) => {
@@ -150,24 +151,56 @@ const Main = () => {
                 setPostCount(parseInt(response.data));
             })
             .catch(error => {
-                console.error("Error fetching post count:", error);
+                console.error("Error getPost/Count(useEffect): ", error);
             });
+
+
+        axios.get("http://localhost:5000/getPost/imgs")
+            .then(response => {
+                setPostImgs(response.data);
+            })
+            .catch(error => {
+                console.error("Error getPost/imgs(useEffect): ", error);
+            });
+        console.log(postImgs);
+
     }, []);
 
-    const BoxGrid = () => {
-        const columns = 5;   /// cap จำนวน post ใน 1 row
-        const rows = Math.ceil(postCount / columns);
-
+    const ShowPosts = () => {
+        const columns = 5; // จำนวนคอลัมน์ต่อแถว
         return (
-            <div className='bg-black w-[80%] h-[400px] mx-auto flex flex-wrap '>
-                {Array.from({ length: postCount }).map((_, index) => (
-                    <div key={index} className='w-[20%] h-[80px] bg-white border border-gray-400 flex justify-center items-center cursor-pointer'>
-                        {index + 1}
-                    </div>
-                ))}
+            <div className='bg-black w-[100%] p-3'>
+                <div className='grid grid-cols-5 gap-3'>
+                    {Array.from({ length: postCount }).map((_, index) => (
+                        <div key={index} className='bg-white border border-gray-400 flex justify-center items-center h-[200px] cursor-pointer'>
+                            <img src={`http://localhost:5000/imgs/${postImgs[index]}`} alt="postImg" className='max-w-[100%] max-h-[100%]' />
+                        </div>
+                    ))}
+                </div>
+                <br /><br />
             </div>
         );
     };
+
+    const Refresh = () => {
+        axios.get("http://localhost:5000/getPost/Count")
+            .then(response => {
+                setPostCount(parseInt(response.data));
+            })
+            .catch(error => {
+                console.error("Error getPost/Count(Refresh): ", error);
+            });
+
+
+        axios.get("http://localhost:5000/getPost/imgs")
+            .then(response => {
+                setPostImgs(response.data);
+            })
+            .catch(error => {
+                console.error("Error getPost/imgs(Refresh): ", error);
+            });
+    };
+
 
     return (
         <div className="min-h-screen bg-bgColor">
@@ -252,10 +285,19 @@ const Main = () => {
 
             </div>}
             <br />
-
             <br />
 
-            <BoxGrid />
+            <div className='relative bg-yellow-300 w-[90%] mx-auto'>
+                <button className='absolute top-0 right-0 bg-red-400 rounded-2xl p-2.5' onClick={Refresh}>
+                    Refresh
+                </button>
+                <br /><br />
+                <ShowPosts />
+            </div>
+
+
+            <br />
+            <br />
         </div>
     );
 }

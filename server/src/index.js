@@ -30,11 +30,22 @@ app.get("/test", (req, res) => {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+app.use('/imgs', express.static(path.join(__dirname, '../imgs')));
 
 ///////////////////////////////////////////////////////////
 //                    API TEST                           //
 ///////////////////////////////////////////////////////////
 
+
+app.get("/getComment", (req, res) => {
+    const a = `SELECT * FROM comment`;
+    pool.query(a, (err, data) => {
+        if (err) {
+            return res.json(err);
+        }
+        return res.json(data);
+    })
+})
 
 app.get("/getPost", (req, res) => {
     const a = `SELECT * FROM post`;
@@ -46,15 +57,17 @@ app.get("/getPost", (req, res) => {
     })
 })
 
-app.get("/getComment", (req, res) => {
-    const a = `SELECT * FROM comment`;
+app.get("/getPost/imgs", (req, res) => {
+    const a = `select photoPath from post ORDER BY postID DESC;`;
     pool.query(a, (err, data) => {
         if (err) {
             return res.json(err);
         }
-        return res.json(data);
+        const photoPaths = data.map(item => item.photoPath);
+        return res.json(photoPaths);
     })
 })
+
 
 app.get("/getPost/Count", (req, res) => {
     const query = `SELECT COUNT(*) FROM post`;
@@ -112,7 +125,7 @@ app.post('/upload', upload.single('image'), (req, res) => {
         if (err) { console.error(err); return res.status(500).json({ success: false, message: 'Database error' }); };
         const newPostID = data[0]['MAX(postID)'] + 1;
         const newFilename = `${newPostID}${path.extname(req.file.originalname)}`;
-        const newFilePath = `../imgs/${newFilename}`;
+        //const newFilePath = `../imgs/${newFilename}`;
 
         fs.rename(
             path.join(uploadFolder, req.file.filename),
@@ -129,7 +142,7 @@ app.post('/upload', upload.single('image'), (req, res) => {
                     postName,
                     postDescription,
                     userId,
-                    newFilePath,
+                    newFilename,
                     req.body.avgRating || 0
                 ];
 
@@ -139,7 +152,7 @@ app.post('/upload', upload.single('image'), (req, res) => {
                         return res.status(500).json({ success: false, message: 'Insert error' });
                     }
 
-                    res.json({ success: true, filePath: newFilePath, postID: newPostID, userId });
+                    res.json({ success: true, filePath: newFilename, postID: newPostID, userId });
                 });
             }
         );
