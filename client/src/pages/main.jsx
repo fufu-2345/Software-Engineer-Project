@@ -216,7 +216,7 @@ const Main = () => {
     }
 
     const ShowPosts = () => {
-        const column = 5; // จำนวนคอลัมน์ต่อแถว
+        const column = 5; // จำนวนคอลัมน์ต่อแถว 
         const postPerPage = column * 10;
 
         const start = (currentPage - 1) * postPerPage;
