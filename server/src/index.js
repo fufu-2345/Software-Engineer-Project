@@ -1,7 +1,10 @@
 const express = require('express');
 const cors = require('cors');
+const multer = require('multer');
 const mysql = require('mysql2');
 const app = express();
+const fs = require('fs');
+const path = require('path');
 require('dotenv').config({ path: '../.env' });
 
 const port = 5000;
@@ -24,25 +27,15 @@ app.get("/test", (req, res) => {
     res.json('test1 test2 test3');
 });
 
-app.get("/getPost", (req, res) => {
-    const a = `SELECT * FROM post`;
-    pool.query(a, (err, data) => {
-        if (err) {
-            return res.json(err);
-        }
-        return res.json(data);
-    })
-})
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-app.get("/getPost/Count", (req, res) => {
-    const query = `SELECT COUNT(*) FROM comment`;
-    pool.query(query, (err, data) => {
-        if (err) {
-            return res.json(err);
-        }
-        return res.json(data[0]);
-    });
-});
+app.use('/imgs', express.static(path.join(__dirname, '../imgs')));
+
+///////////////////////////////////////////////////////////
+//                    API TEST                           //
+///////////////////////////////////////////////////////////
+
 
 app.get("/getComment", (req, res) => {
     const a = `SELECT * FROM comment`;
@@ -53,6 +46,124 @@ app.get("/getComment", (req, res) => {
         return res.json(data);
     })
 })
+
+app.get("/getPost", (req, res) => {
+    const a = `SELECT * FROM post`;
+    pool.query(a, (err, data) => {
+        if (err) {
+            return res.json(err);
+        }
+        return res.json(data);
+    })
+})
+
+app.get("/getPost/imgs", (req, res) => {
+    const a = `select photoPath from post ORDER BY postID DESC;`;
+    pool.query(a, (err, data) => {
+        if (err) {
+            return res.json(err);
+        }
+        const photoPaths = data.map(item => item.photoPath);
+        return res.json(photoPaths);
+    })
+})
+
+
+app.get("/getPost/Count", (req, res) => {
+    const query = `SELECT COUNT(*) FROM post`;
+    pool.query(query, (err, data) => {
+        if (err) {
+            return res.json(err);
+        }
+        count = data[0]['COUNT(*)'];
+        res.send(count.toString());
+    });
+});
+
+app.get("/getPost/max", (req, res) => {
+    const query = `SELECT MAX(postID) FROM post`;
+    pool.query(query, (err, data) => {
+        if (err) {
+            return res.json(err);
+        }
+        max = data[0]['MAX(postID)'];
+        if (max > 0) {
+            res.send(max.toString());
+        }
+        else {
+            res.send("0");
+        }
+
+    });
+});
+
+
+///////////////////////////////////////////////////////////
+//                 UPLOAD IMAGE API                      //
+///////////////////////////////////////////////////////////
+
+
+const uploadFolder = path.join(__dirname, '../imgs/');
+const storage = multer.diskStorage({
+    destination: uploadFolder,
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname));
+    }
+});
+
+const upload = multer({ storage });
+
+app.post('/upload', upload.single('image'), (req, res) => {
+    if (!req.file) { return res.status(400).json({ success: false, message: 'No file uploaded' }); };
+
+    const userId = req.body.userId;
+    const postName = req.body.postName;
+    const postDescription = req.body.postDescription;
+
+    const query = `SELECT MAX(postID) FROM post`;
+    pool.query(query, (err, data) => {
+        if (err) { console.error(err); return res.status(500).json({ success: false, message: 'Database error' }); };
+        const newPostID = data[0]['MAX(postID)'] + 1;
+        const newFilename = `${newPostID}${path.extname(req.file.originalname)}`;
+        //const newFilePath = `../imgs/${newFilename}`;
+
+        fs.rename(
+            path.join(uploadFolder, req.file.filename),
+            path.join(uploadFolder, newFilename),
+
+            (err) => {
+                if (err) return res.status(500).json({ success: false, message: 'File rename error' });
+
+                const insertQuery = `INSERT INTO post (postID, postName, postDescription, userID, photoPath, postTime, avgRating) 
+                                     VALUES (?, ?, ?, ?, ?, NOW(), ?)`;
+
+                const values = [
+                    newPostID,
+                    postName,
+                    postDescription,
+                    userId,
+                    newFilename,
+                    req.body.avgRating || 0
+                ];
+
+                pool.query(insertQuery, values, (err, result) => {
+                    if (err) {
+                        console.error(err);
+                        return res.status(500).json({ success: false, message: 'Insert error' });
+                    }
+
+                    res.json({ success: true, filePath: newFilename, postID: newPostID, userId });
+                });
+            }
+        );
+    });
+});
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 //API for checking Username
 app.post('/checkUsername', (req, res) => {
