@@ -19,7 +19,9 @@ const Main = () => {
     const [description, setDescription] = useState('');         // post detail
     const [postCount, setPostCount] = useState(0);
     const [postImgs, setPostImgs] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
 
+    const maxVisitPage = 5;
 
     const handleTitle = (event) => {
         setTitle(event.target.value);
@@ -89,7 +91,9 @@ const Main = () => {
     });
 
     const handleUpload = async () => {
-        if (!file) return;
+        /*************      เพิ่มขึ้น text เตือน     ************ */
+        if (!file || !title) return;
+
         const formData = new FormData();
         formData.append('image', file);
         formData.append('userId', state.userId);
@@ -139,8 +143,9 @@ const Main = () => {
         }
     };
 
-    //////// ดัก login มั่ว
+
     useEffect(() => {
+        //////// ดัก login มั่ว
         if (!state) {
             navigate('/');
         }
@@ -166,18 +171,70 @@ const Main = () => {
 
     }, []);
 
+    const PageNAV = () => {
+        const maxVisiblePages = 5;
+        const totalPage = Math.ceil(postCount / 50);
+
+        const startPage = Math.max(1, currentPage - maxVisiblePages);
+        const endPage = Math.min(totalPage, currentPage + maxVisiblePages);
+
+        const changePage = (page) => {
+            if (page >= 1 && page <= totalPage) {
+                setCurrentPage(page);
+            }
+        };
+
+        return (
+            <div className="flex items-center justify-center space-x-2 bg-black py-2">
+                <button onClick={() => changePage(1)} className="text-white text-lg rounded-full hover:bg-gray-500 w-7 h-7 flex items-center justify-center leading-none">
+                    <span className="flex items-center justify-center">{'<<'}</span>
+                </button>
+
+                <button onClick={() => changePage(currentPage - 1)} className="text-white text-lg rounded-full hover:bg-gray-500 w-7 h-7 flex items-center justify-center leading-none">
+                    <span className="flex items-center justify-center">{'<'}</span>
+                </button>
+
+                {Array.from({ length: endPage - startPage + 1 }, (_, index) => {
+                    const page = startPage + index;
+                    return (
+                        <button key={page} onClick={() => changePage(page)} className={`text-white px-3 py-1 rounded-full ${page === currentPage ? "bg-gray-600 text-white" : "hover:bg-gray-500"}`}>
+                            {page}
+                        </button>
+                    );
+                })}
+
+                <button onClick={() => changePage(currentPage + 1)} className="text-white text-lg rounded-full hover:bg-gray-500 w-7 h-7 flex items-center justify-center leading-none">
+                    <span className="flex items-center justify-center">{'>'}</span>
+                </button>
+
+                <button onClick={() => changePage(totalPage)} className="text-white text-lg rounded-full hover:bg-gray-500 w-7 h-7 flex items-center justify-center leading-none">
+                    <span className="flex items-center justify-center">{'>>'}</span>
+                </button>
+
+            </div>
+        );
+    }
+
     const ShowPosts = () => {
-        const columns = 5; // จำนวนคอลัมน์ต่อแถว
+        const column = 5; // จำนวนคอลัมน์ต่อแถว
+        const postPerPage = column * 10;
+
+        const start = (currentPage - 1) * postPerPage;
+        const stop = start + postPerPage - 1;
+
         return (
             <div className='bg-black w-[100%] p-3'>
                 <div className='grid grid-cols-5 gap-3'>
-                    {Array.from({ length: postCount }).map((_, index) => (
+
+                    {postImgs.slice(start, stop + 1).map((img, index) => (
                         <div key={index} className='bg-white border border-gray-400 flex justify-center items-center h-[200px] cursor-pointer'>
-                            <img src={`http://localhost:5000/imgs/${postImgs[index]}`} alt="postImg" className='max-w-[100%] max-h-[100%]' />
+                            <img src={`http://localhost:5000/imgs/${img}`} alt="postImg" className='max-w-[100%] max-h-[100%]' title={img} />
                         </div>
                     ))}
                 </div>
-                <br /><br />
+                <br />
+                <PageNAV />
+
             </div>
         );
     };
@@ -200,6 +257,8 @@ const Main = () => {
                 console.error("Error getPost/imgs(Refresh): ", error);
             });
     };
+
+
 
 
     return (
@@ -237,7 +296,7 @@ const Main = () => {
                 )}
 
                 <div className='flex flex-col items-center bg-grey-300 bg-clip-padding p-3 w-full'>
-                    {/* input ชื่อ post */}
+                    {/* input post ชื่อ */}
                     <div className="relative w-full max-w-lg">
                         <textarea value={title} onChange={handleTitle} placeholder='Enter your post name'
                             className='w-full p-2 border rounded-md resize-none h-[80px] overflow-y-auto mt-3'
@@ -252,7 +311,7 @@ const Main = () => {
 
                     <br />
 
-                    {/* input description */}
+                    {/* input post description */}
                     <div className="relative w-full max-w-lg">
                         <textarea value={description} onChange={handleDescription} placeholder='Enter the description'
                             className='w-full p-2 border rounded-md resize-none h-[225px] overflow-y-auto mt-1'
