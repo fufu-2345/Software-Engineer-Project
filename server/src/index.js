@@ -6,6 +6,7 @@ require('dotenv').config({ path: '../.env' });
 
 const port = 5000;
 app.use(cors());
+app.use(express.json())
 
 
 const pool = mysql.createPool({
@@ -14,7 +15,6 @@ const pool = mysql.createPool({
     password: process.env.PASSWORD,
     database: process.env.DATABASE
 });
-
 
 app.get('/', (req, res) => {
     res.json('111111');
@@ -56,7 +56,25 @@ app.get("/getComment", (req, res) => {
 
 //API for checking Username
 app.post('/checkUsername', (req, res) => {
+    console.log(req.body)
     const query = `select count(*) from customer where userName = '${req.body.username}'`;
+    pool.query(query, (err, data) => {
+        if (err) {
+            return res.json(err);
+        }
+
+        if (data[0]['count(*)'] != 0) {
+            return res.json({ "Status": true })
+        } else {
+            return res.json({ "Status": false })
+        }
+    })
+})
+
+//API for checking accName
+app.post('/checkAccname', (req, res) => {
+    console.log(req.body)
+    const query = `select count(*) from customer where accName = '${req.body.accountName}'`;
     pool.query(query, (err, data) => {
         if (err) {
             return res.json(err);

@@ -7,7 +7,6 @@ const Login = () => {
         <>
             <h1>Login</h1><br />
             <div><Link to="/main"><h1>back</h1></Link></div>
-
             <br /><br />
         </>
     );
