@@ -5,10 +5,12 @@ const mysql = require('mysql2');
 const app = express();
 const fs = require('fs');
 const path = require('path');
+const { check, validationResult } = require('express-validator');
 require('dotenv').config({ path: '../.env' });
 
 const port = 5000;
 app.use(cors());
+app.use(express.json());
 
 
 const pool = mysql.createPool({
@@ -57,8 +59,18 @@ app.get("/getPost", (req, res) => {
     })
 })
 
-app.get("/getPost/imgs", (req, res) => {
-    const a = `select photoPath from post ORDER BY postID DESC;`;
+app.get("/getPost/imgs/", (req, res) => {
+    const { sortMode, mode } = req.query;
+
+    console.log(sortMode, mode);
+
+    const order = sortMode === 'DESC' ? 'DESC' : 'ASC';
+    const column = mode === 'postID' ? 'postID' : 'avgRating';
+
+
+    const a = `select photoPath from post ORDER BY ${column} ${order};`;
+    console.log(a);
+
     pool.query(a, (err, data) => {
         if (err) {
             return res.json(err);
@@ -112,8 +124,31 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
+const checkedPost = [
+    check('userId')
+        .isString().withMessage('User ID must be a string')
+        .isLength({ min: 1 }).withMessage('User ID must have at least 1 character')
+        .notEmpty().withMessage('User ID is required'),
 
-app.post('/upload', upload.single('image'), (req, res) => {
+    check('postName').optional(),
+    check('postDescription').optional(),
+
+    check('image')
+        .custom((value, { req }) => {
+            if (!req.file) {
+                throw new Error('Image file is required');
+            }
+            if (req.files && req.files.length > 1) {
+                throw new Error('Only one image file is allowed');
+            }
+            return true;
+        })
+];
+
+//https://express-validator.github.io/docs/guides/getting-started
+app.post('/upload', upload.single('image'), checkedPost, (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) { return res.status(400).json({ success: false, errors: errors.array() }); };
     if (!req.file) { return res.status(400).json({ success: false, message: 'No file uploaded' }); };
 
     const userId = req.body.userId;
