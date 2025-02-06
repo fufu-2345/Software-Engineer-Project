@@ -20,8 +20,44 @@ const Main = () => {
     const [postCount, setPostCount] = useState(0);
     const [postImgs, setPostImgs] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
+    const [mode, setMode] = useState(true);
+    const [sortMode, setSortMode] = useState(true);
 
     const maxVisitPage = 5;
+
+    const [isOpen, setIsOpen] = useState(false);
+    const hoverTimeoutRef = useState(null);
+
+    const toggleDropdown = () => {
+        setIsOpen(!isOpen);
+    };
+
+    const handleMouseEnter = () => {
+        if (hoverTimeoutRef.current) {
+            clearTimeout(hoverTimeoutRef.current);
+        }
+        hoverTimeoutRef.current = setTimeout(() => {
+            setIsOpen(true);
+        }, 1000);
+    };
+
+    const handleMouseLeave = () => {
+        if (hoverTimeoutRef.current) {
+            clearTimeout(hoverTimeoutRef.current);
+        }
+        hoverTimeoutRef.current = setTimeout(() => {
+            setIsOpen(false);
+        }, 600);
+    };
+
+    const handleSetMode = () => {
+        setIsOpen(false);
+        setMode(!mode);
+    };
+
+    const handleSortMode = () => {
+        setSortMode(!sortMode);
+    };
 
     const handleTitle = (event) => {
         setTitle(event.target.value);
@@ -43,14 +79,6 @@ const Main = () => {
         event.stopPropagation();
         setErrorMessage("");
         setFile(null);
-    };
-
-    const handleClearTitle = (event) => {
-        setTitle("");
-    };
-
-    const handleClearFileDescription = (event) => {
-        setDescription("");
     };
 
     const onDrop = useCallback(acceptedFiles => {
@@ -92,7 +120,7 @@ const Main = () => {
 
     const handleUpload = async () => {
         /*************      เพิ่มขึ้น text เตือน     ************ */
-        if (!file || !title) return;
+        if (!file) return;
 
         const formData = new FormData();
         formData.append('image', file);
@@ -111,7 +139,6 @@ const Main = () => {
                 setErrorMessage("");
                 setTitle("");
                 setDescription("");
-
 
                 console.log('Upload successful!');
             } else {
@@ -132,6 +159,24 @@ const Main = () => {
             setDescription("");
         }
         setIsAdding(!isAdding);
+    };
+
+    const handleSearch = () => {
+        const params = {
+            sortMode: sortMode ? 'DESC' : 'ASC',
+            mode: mode ? 'postID' : 'avgRating'
+        };
+        console.log(params);
+
+        axios.get("http://localhost:5000/getPost/imgs", { params })
+            .then(response => {
+                setPostImgs(response.data);
+            })
+            .catch(error => {
+                console.error("Error getPost/imgs(useEffect): ", error);
+            });
+        console.log(postImgs);
+
     };
 
 
@@ -159,7 +204,6 @@ const Main = () => {
                 console.error("Error getPost/Count(useEffect): ", error);
             });
 
-
         axios.get("http://localhost:5000/getPost/imgs")
             .then(response => {
                 setPostImgs(response.data);
@@ -167,16 +211,14 @@ const Main = () => {
             .catch(error => {
                 console.error("Error getPost/imgs(useEffect): ", error);
             });
-        console.log(postImgs);
 
     }, []);
 
     const PageNAV = () => {
-        const maxVisiblePages = 5;
         const totalPage = Math.ceil(postCount / 50);
 
-        const startPage = Math.max(1, currentPage - maxVisiblePages);
-        const endPage = Math.min(totalPage, currentPage + maxVisiblePages);
+        const startPage = Math.max(1, currentPage - maxVisitPage);
+        const endPage = Math.min(totalPage, currentPage + maxVisitPage);
 
         const changePage = (page) => {
             if (page >= 1 && page <= totalPage) {
@@ -215,6 +257,26 @@ const Main = () => {
         );
     }
 
+
+
+    const Dropdown = () => {
+        return (
+            <div className="relative inline-block text-left"
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}>
+                <button onClick={toggleDropdown} className="px-4 py-2 bg-blue-500 text-white rounded-md">
+                    {mode ? 'newest' : 'score'}
+                </button>
+                {isOpen && (
+                    <div className="absolute left-0 mt-2 w-40 bg-white border rounded-lg shadow-lg">
+                        <button onClick={handleSetMode} className="block w-full px-4 py-2 text-left hover:bg-gray-200">newest</button>
+                        <button onClick={handleSetMode} className="block w-full px-4 py-2 text-left hover:bg-gray-200">score</button>
+                    </div>
+                )}
+            </div>
+        )
+    }
+
     const ShowPosts = () => {
         const column = 5; // จำนวนคอลัมน์ต่อแถว
         const postPerPage = column * 10;
@@ -222,15 +284,24 @@ const Main = () => {
         const start = (currentPage - 1) * postPerPage;
         const stop = start + postPerPage - 1;
 
+        ///// https://flowbite.com/docs/components/dropdowns/
+        ///// dropdown
+
         return (
             <div className='bg-black w-[100%] p-3'>
                 <div className='grid grid-cols-5 gap-3'>
 
-                    {postImgs.slice(start, stop + 1).map((img, index) => (
-                        <div key={index} className='bg-white border border-gray-400 flex justify-center items-center h-[200px] cursor-pointer'>
-                            <img src={`http://localhost:5000/imgs/${img}`} alt="postImg" className='max-w-[100%] max-h-[100%]' title={img} />
-                        </div>
-                    ))}
+                    {Array.isArray(postImgs) && postImgs.length > 0 ? (
+                        postImgs.slice(start, stop + 1).map((img, index) => (
+                            img ? ( // ตรวจสอบว่า img มีค่าหรือไม่
+                                <div key={index} className='bg-white border border-gray-400 flex justify-center items-center h-[200px] cursor-pointer'>
+                                    <img src={`http://localhost:5000/imgs/${img}`} alt="postImg" className='max-w-[100%] max-h-[100%]' title={img} />
+                                </div>
+                            ) : null
+                        ))
+                    ) : (
+                        <p className="text-gray-500">ไม่มีรูปภาพ</p>
+                    )}
                 </div>
                 <br />
                 <PageNAV />
@@ -258,15 +329,14 @@ const Main = () => {
             });
     };
 
-
-
-
     return (
         <div className="min-h-screen bg-bgColor">
             <h1 className='font-bold text-4xl'>Main</h1><br />
             <div><Link to="/"><h1>back</h1></Link></div>
             <button onClick={() => console.log(state.userId)}> show userId </button>
             <br /><br />
+
+
 
             <button onClick={handleIsAdding} className='border-2'> add img </button>
             {isAdding && <div
@@ -343,13 +413,27 @@ const Main = () => {
                 </div>
 
             </div>}
-            <br />
-            <br />
+            <br /><br />
 
             <div className='relative bg-yellow-300 w-[90%] mx-auto'>
-                <button className='absolute top-0 right-0 bg-red-400 rounded-2xl p-2.5' onClick={Refresh}>
-                    Refresh
-                </button>
+                <div className='absolute top-0 right-0'>
+                    <Dropdown />
+
+                    <button className='bg-blue-400 rounded-2xl p-2.5 ml-2' onClick={handleSortMode}>
+                        Sort
+                    </button>
+
+                    <button className='bg-blue-400 rounded-2xl p-2.5 ml-2 ' onClick={handleSearch}>
+                        Search
+                    </button>
+
+                    <button className='bg-red-400 rounded-2xl p-2.5 ml-2' onClick={Refresh}>
+                        Refresh
+                    </button>
+
+                </div>
+
+
                 <br /><br />
                 <ShowPosts />
             </div>
