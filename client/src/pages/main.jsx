@@ -215,7 +215,7 @@ const Main = () => {
     }, []);
 
     const PageNAV = () => {
-        const totalPage = Math.ceil(postCount / 50);
+        const totalPage = Math.ceil(postCount / 20);
 
         const startPage = Math.max(1, currentPage - maxVisitPage);
         const endPage = Math.min(totalPage, currentPage + maxVisitPage);
@@ -278,8 +278,8 @@ const Main = () => {
     }
 
     const ShowPosts = () => {
-        const column = 5; // จำนวนคอลัมน์ต่อแถว
-        const postPerPage = column * 10;
+        const column = 4; // จำนวนคอลัมน์ต่อแถว
+        const postPerPage = column * 5;
 
         const start = (currentPage - 1) * postPerPage;
         const stop = start + postPerPage - 1;
@@ -289,13 +289,13 @@ const Main = () => {
 
         return (
             <div className='bg-black w-[100%] p-3'>
-                <div className='grid grid-cols-5 gap-3'>
+                <div className='grid grid-cols-4 gap-3'>
 
                     {Array.isArray(postImgs) && postImgs.length > 0 ? (
                         postImgs.slice(start, stop + 1).map((img, index) => (
-                            img ? ( // ตรวจสอบว่า img มีค่าหรือไม่
-                                <div key={index} className='bg-white border border-gray-400 flex justify-center items-center h-[200px] cursor-pointer'>
-                                    <img src={`http://localhost:5000/imgs/${img}`} alt="postImg" className='max-w-[100%] max-h-[100%]' title={img} />
+                            img ? (
+                                <div key={index} className='bg-white border border-gray-400 flex justify-center items-center h-[300px] cursor-pointer'>
+                                    <img src={`http://localhost:5000/imgs/${img}`} alt="postImg" className='w-full h-full object-contain' title={img} />
                                 </div>
                             ) : null
                         ))
