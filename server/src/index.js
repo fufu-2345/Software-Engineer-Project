@@ -59,6 +59,7 @@ app.get("/getPost", (req, res) => {
     })
 })
 
+/*
 app.get("/getPost/imgs/", (req, res) => {
     const { sortMode, mode } = req.query;
 
@@ -69,6 +70,29 @@ app.get("/getPost/imgs/", (req, res) => {
 
 
     const a = `select photoPath from post ORDER BY ${column} ${order};`;
+    console.log(a);
+
+    pool.query(a, (err, data) => {
+        if (err) {
+            return res.json(err);
+        }
+        const photoPaths = data.map(item => item.photoPath);
+        return res.json(photoPaths);
+    })
+})*/
+
+app.get("/getPost/imgs/", (req, res) => {
+    const { sortMode, mode } = req.query;
+
+    const order = sortMode === 'DESC' ? 'DESC' : 'ASC';
+    const column = mode === 'postID' ? 'postID' : 'avgRating';
+    let search = "";
+    if (req.query.search != undefined) {
+        search = req.query.search;
+    }
+
+    const a = `select post.photoPath from post JOIN user ON post.userID = user.userID 
+    WHERE user.userName LIKE '%${search}%' ORDER BY ${column} ${order};`;
     console.log(a);
 
     pool.query(a, (err, data) => {

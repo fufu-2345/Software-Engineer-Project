@@ -22,6 +22,7 @@ const Main = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [mode, setMode] = useState(true);
     const [sortMode, setSortMode] = useState(true);
+    const [searchVal, setSearchVal] = useState("");
 
     const maxVisitPage = 5;
 
@@ -67,6 +68,10 @@ const Main = () => {
         setDescription(event.target.value);
     };
 
+    const handleSearchVal = (event) => {
+        setSearchVal(event.target.value);
+    };
+
     const handleCancle = (event) => {
         setFile(null);
         setErrorMessage("");
@@ -85,7 +90,6 @@ const Main = () => {
         setErrorMessage("");
         if (acceptedFiles?.length) {
             const getFile = acceptedFiles[0];
-            console.log(getFile);
             setFile(Object.assign(getFile, { preview: URL.createObjectURL(getFile) }));
         }
     }, []);
@@ -139,7 +143,6 @@ const Main = () => {
                 setErrorMessage("");
                 setTitle("");
                 setDescription("");
-
                 console.log('Upload successful!');
             } else {
                 //alert('Upload failed.');
@@ -164,18 +167,17 @@ const Main = () => {
     const handleSearch = () => {
         const params = {
             sortMode: sortMode ? 'DESC' : 'ASC',
-            mode: mode ? 'postID' : 'avgRating'
+            mode: mode ? 'postID' : 'avgRating',
+            search: searchVal
         };
-        console.log(params);
 
         axios.get("http://localhost:5000/getPost/imgs", { params })
             .then(response => {
                 setPostImgs(response.data);
             })
             .catch(error => {
-                console.error("Error getPost/imgs(useEffect): ", error);
+                console.error("Error getPost/imgs(handleSearch): ", error);
             });
-        console.log(postImgs);
 
     };
 
@@ -194,7 +196,6 @@ const Main = () => {
         if (!state) {
             navigate('/');
         }
-        console.log(`get data: ${state.test} , ${state.userId}`);
 
         axios.get("http://localhost:5000/getPost/Count")
             .then(response => {
@@ -204,13 +205,20 @@ const Main = () => {
                 console.error("Error getPost/Count(useEffect): ", error);
             });
 
-        axios.get("http://localhost:5000/getPost/imgs")
+        const params = {
+            sortMode: sortMode ? 'DESC' : 'ASC',
+            mode: mode ? 'postID' : 'avgRating',
+            search: searchVal
+        };
+
+        axios.get("http://localhost:5000/getPost/imgs", { params })
             .then(response => {
                 setPostImgs(response.data);
             })
             .catch(error => {
-                console.error("Error getPost/imgs(useEffect): ", error);
+                console.error("Error getPost/imgs(handleSearch): ", error);
             });
+
 
     }, []);
 
@@ -290,19 +298,19 @@ const Main = () => {
         return (
             <div className='bg-black w-[100%] p-3'>
                 <div className='grid grid-cols-4 gap-3'>
-
                     {Array.isArray(postImgs) && postImgs.length > 0 ? (
                         postImgs.slice(start, stop + 1).map((img, index) => (
                             img ? (
-                                <div key={index} className='bg-white border border-gray-400 flex justify-center items-center h-[300px] cursor-pointer'>
-                                    <img src={`http://localhost:5000/imgs/${img}`} alt="postImg" className='w-full h-full object-contain' title={img} />
+                                <div key={index} className='relative group bg-white border border-gray-400 flex justify-center items-center h-[300px] cursor-pointer'>
+                                    <img src={`http://localhost:5000/imgs/${img}`} alt="postImg" className='w-full h-full object-contain transition-transform duration-400 group-hover:scale-[1.25] group-hover:z-10' title={img} />
                                 </div>
                             ) : null
                         ))
                     ) : (
-                        <p className="text-gray-500">ไม่มีรูปภาพ</p>
+                        <p className="text-gray-500">no imgs rn</p>
                     )}
                 </div>
+
                 <br />
                 <PageNAV />
 
@@ -422,6 +430,8 @@ const Main = () => {
                     <button className='bg-blue-400 rounded-2xl p-2.5 ml-2' onClick={handleSortMode}>
                         Sort
                     </button>
+
+                    <input type="text" value={searchVal} onChange={handleSearchVal} placeholder="type for search here..." className="bg-white border-2 border-black focus:ring-2 focus:ring-gray-950 focus:outline-none rounded-2xl p-2.5 ml-2" />
 
                     <button className='bg-blue-400 rounded-2xl p-2.5 ml-2 ' onClick={handleSearch}>
                         Search
