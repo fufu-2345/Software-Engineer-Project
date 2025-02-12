@@ -4,6 +4,8 @@ import axios from "axios";
 import Popup from "reactjs-popup";
 import { useRef } from "react";
 
+import Navbar from "../components/navbar";
+
 import "../index.css";
 
 const RegisterNonClub = () => {
@@ -55,6 +57,10 @@ const RegisterNonClub = () => {
   const navigate = useNavigate();
 
   async function submitData() {
+    if (!username || !password || !name || !email) {
+      return;
+    }
+
     var api = `http://localhost:5000/checkUsername`;
     var body = {
       username: username,
@@ -119,21 +125,55 @@ const RegisterNonClub = () => {
 
   return (
     <>
-    <div className="registerBox">
-      Username
-      <input value={username} onChange={usernameChange}></input>
-      <br></br>
-      PWD
-      <input value={password} onChange={passwordChange}></input>
-      <br></br>
-      EMail
-      <input value={email} onChange={emailChange}></input>
-      <br></br>
-      Name
-      <input value={name} onChange={nameChange}></input>
-      <br></br>
-      <button onClick={submitData}> Tset</button>
-    </div>
+    <Navbar/>
+    <div className="registerPage">
+      <div className="registerBox">
+        Register Form
+        <div className="registerTopicInputBox">
+          Username
+          <br></br>
+          <input
+            className="registerInputBox"
+            value={username}
+            onChange={usernameChange}
+          />
+          <br></br>
+        </div>
+        <div className="registerTopicInputBox">
+          PWD
+          <br></br>
+          <input
+          type="password"
+            className="registerInputBox"
+            value={password}
+            onChange={passwordChange}
+          />
+          <br></br>
+        </div>
+        <div className="registerTopicInputBox">
+          Name
+          <br></br>
+          <input
+            className="registerInputBox"
+            value={name}
+            onChange={nameChange}
+          />
+          <br></br>
+        </div>
+        <div className="registerTopicInputBox">
+          Email
+          <br></br>
+          <input
+            className="registerInputBox"
+            value={email}
+            onChange={emailChange}
+          />
+          <br></br>
+        </div>
+        <button className="registerButton" onClick={submitData}>
+          Submit
+        </button>
+      </div>
       {/* Username error popup */}
       <Popup
         open={usernameErrorStatus}
@@ -190,6 +230,7 @@ const RegisterNonClub = () => {
       <Popup open={otpCorrect} onClose={() => setOtpCorrect(false)} modal>
         Register Success
       </Popup>
+    </div>
     </>
   );
 };

@@ -8,7 +8,6 @@ const port = 5000;
 app.use(cors());
 app.use(express.json())
 
-
 const pool = mysql.createPool({
     host: process.env.HOST,
     user: process.env.USER,
@@ -158,6 +157,5 @@ app.post('/registerNonClubMember', (req, res) => {
         return res.json({ success: true })
     })
 })
-
 
 app.listen(port, () => { console.log('\x1b[36m%s\x1b[0m is started/updated', `http://localhost:${port}`); })
