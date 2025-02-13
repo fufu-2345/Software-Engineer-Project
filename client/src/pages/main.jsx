@@ -173,6 +173,7 @@ const Main = () => {
 
         axios.get("http://localhost:5000/getPost/imgs", { params })
             .then(response => {
+                setPostCount(response.data.length);
                 setPostImgs(response.data);
             })
             .catch(error => {
@@ -197,14 +198,6 @@ const Main = () => {
             navigate('/');
         }
 
-        axios.get("http://localhost:5000/getPost/Count")
-            .then(response => {
-                setPostCount(parseInt(response.data));
-            })
-            .catch(error => {
-                console.error("Error getPost/Count(useEffect): ", error);
-            });
-
         const params = {
             sortMode: sortMode ? 'DESC' : 'ASC',
             mode: mode ? 'postID' : 'avgRating',
@@ -213,12 +206,12 @@ const Main = () => {
 
         axios.get("http://localhost:5000/getPost/imgs", { params })
             .then(response => {
+                setPostCount(response.data.length);
                 setPostImgs(response.data);
             })
             .catch(error => {
                 console.error("Error getPost/imgs(handleSearch): ", error);
             });
-
 
     }, []);
 
@@ -263,9 +256,7 @@ const Main = () => {
 
             </div>
         );
-    }
-
-
+    };
 
     const Dropdown = () => {
         return (
@@ -276,14 +267,14 @@ const Main = () => {
                     {mode ? 'newest' : 'score'}
                 </button>
                 {isOpen && (
-                    <div className="absolute left-0 mt-2 w-40 bg-white border rounded-lg shadow-lg">
+                    <div className="absolute left-0 mt-2 w-40 bg-white border rounded-lg shadow-lg z-10">
                         <button onClick={handleSetMode} className="block w-full px-4 py-2 text-left hover:bg-gray-200">newest</button>
                         <button onClick={handleSetMode} className="block w-full px-4 py-2 text-left hover:bg-gray-200">score</button>
                     </div>
                 )}
             </div>
         )
-    }
+    };
 
     const ShowPosts = () => {
         const column = 4; // จำนวนคอลัมน์ต่อแถว
@@ -327,9 +318,9 @@ const Main = () => {
                 console.error("Error getPost/Count(Refresh): ", error);
             });
 
-
         axios.get("http://localhost:5000/getPost/imgs")
             .then(response => {
+                setPostCount(response.data.length);
                 setPostImgs(response.data);
             })
             .catch(error => {

@@ -38,7 +38,7 @@ app.use('/imgs', express.static(path.join(__dirname, '../imgs')));
 //                    API TEST                           //
 ///////////////////////////////////////////////////////////
 
-
+/*
 app.get("/getComment", (req, res) => {
     const a = `SELECT * FROM comment`;
     pool.query(a, (err, data) => {
@@ -59,7 +59,6 @@ app.get("/getPost", (req, res) => {
     })
 })
 
-/*
 app.get("/getPost/imgs/", (req, res) => {
     const { sortMode, mode } = req.query;
 
@@ -86,22 +85,41 @@ app.get("/getPost/imgs/", (req, res) => {
 
     const order = sortMode === 'DESC' ? 'DESC' : 'ASC';
     const column = mode === 'postID' ? 'postID' : 'avgRating';
-    let search = "";
-    if (req.query.search != undefined) {
-        search = req.query.search;
+    const search = req.query.search;
+
+    let a;
+    if (column === 'avgRating') {
+        a = `select post.photoPath from post JOIN user ON post.userID = user.userID WHERE post.avgRating > 0 AND user.userName LIKE '%${search}%' ORDER BY ${column} ${order};`;
+
+        pool.query(a, (err, data) => {
+            if (err) {
+                return res.json(err);
+            }
+            a = `select post.photoPath from post JOIN user ON post.userID = user.userID WHERE post.avgRating = 0 AND user.userName LIKE '%${search}%' ORDER BY postID DESC`;
+            let photoPaths = data.map(item => item.photoPath);
+            pool.query(a, (err, data) => {
+                if (err) {
+                    return res.json(err);
+                }
+                photoPaths = photoPaths.concat(data.map(item => item.photoPath));
+                console.log(photoPaths);
+                return res.json(photoPaths);
+
+            })
+        })
     }
+    else {
+        a = `select post.photoPath from post JOIN user ON post.userID = user.userID WHERE user.userName LIKE '%${search}%' ORDER BY ${column} ${order}`;
 
-    const a = `select post.photoPath from post JOIN user ON post.userID = user.userID 
-    WHERE user.userName LIKE '%${search}%' ORDER BY ${column} ${order};`;
-    console.log(a);
-
-    pool.query(a, (err, data) => {
-        if (err) {
-            return res.json(err);
-        }
-        const photoPaths = data.map(item => item.photoPath);
-        return res.json(photoPaths);
-    })
+        pool.query(a, (err, data) => {
+            if (err) {
+                return res.json(err);
+            }
+            const photoPaths = data.map(item => item.photoPath);
+            console.log(photoPaths);
+            return res.json(photoPaths);
+        })
+    }
 })
 
 
