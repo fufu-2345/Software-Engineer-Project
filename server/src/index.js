@@ -33,6 +33,7 @@ app.get("/test", (req, res) => {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 app.use('/imgs', express.static(path.join(__dirname, '../imgs')));
+app.use('/news', express.static(path.join(__dirname, '../news')));
 
 ///////////////////////////////////////////////////////////
 //                    API TEST                           //
@@ -102,7 +103,7 @@ app.get("/getPost/imgs/", (req, res) => {
                     return res.json(err);
                 }
                 photoPaths = photoPaths.concat(data.map(item => item.photoPath));
-                console.log(photoPaths);
+                //console.log(photoPaths);
                 return res.json(photoPaths);
 
             })
@@ -151,6 +152,30 @@ app.get("/getPost/max", (req, res) => {
     });
 });
 
+///////////////////////////////////////////////////////////
+//                      GET NEWS                         //
+///////////////////////////////////////////////////////////
+
+
+app.get("/getNews", (req, res) => {
+    const NewsDir = path.join(__dirname, "../news");
+
+    fs.readdir(NewsDir, (err, files) => {
+        if (err) {
+            return res.json({ message: "Error reading directory" });
+        }
+
+        const imageFiles = files.filter(file => file !== ".gitkeep");
+
+        if (imageFiles.length === 0) {
+            return res.json({ news: null });
+        }
+
+        res.json({ news: imageFiles[0] });
+    });
+});
+
+
 
 ///////////////////////////////////////////////////////////
 //                 UPLOAD IMAGE API                      //
@@ -167,14 +192,9 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 const checkedPost = [
-    check('userId')
-        .isString().withMessage('User ID must be a string')
-        .isLength({ min: 1 }).withMessage('User ID must have at least 1 character')
-        .notEmpty().withMessage('User ID is required'),
-
+    check('userId').isString().withMessage('User ID must be a string').isLength({ min: 1 }).withMessage('User ID must have at least 1 character').notEmpty().withMessage('User ID is required'),
     check('postName').optional(),
     check('postDescription').optional(),
-
     check('image')
         .custom((value, { req }) => {
             if (!req.file) {

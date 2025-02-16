@@ -23,32 +23,15 @@ const Main = () => {
     const [mode, setMode] = useState(true);
     const [sortMode, setSortMode] = useState(true);
     const [searchVal, setSearchVal] = useState("");
+    const [role, setRole] = useState(null);
+    const [news, setNews] = useState(null);
 
     const maxVisitPage = 5;
 
     const [isOpen, setIsOpen] = useState(false);
-    const hoverTimeoutRef = useState(null);
 
     const toggleDropdown = () => {
         setIsOpen(!isOpen);
-    };
-
-    const handleMouseEnter = () => {
-        if (hoverTimeoutRef.current) {
-            clearTimeout(hoverTimeoutRef.current);
-        }
-        hoverTimeoutRef.current = setTimeout(() => {
-            setIsOpen(true);
-        }, 1000);
-    };
-
-    const handleMouseLeave = () => {
-        if (hoverTimeoutRef.current) {
-            clearTimeout(hoverTimeoutRef.current);
-        }
-        hoverTimeoutRef.current = setTimeout(() => {
-            setIsOpen(false);
-        }, 600);
     };
 
     const handleSetMode = () => {
@@ -114,11 +97,7 @@ const Main = () => {
             'image/jpeg': [],
             'image/png': [],
             'image/bmp': [],
-            'image/tiff': [],
-            'image/webp': [],
-            'image/heif': [],
-            'image/heic': [],
-            'image/x-raw': []
+            'image/webp': []
         }      /// img type fix
     });
 
@@ -213,6 +192,15 @@ const Main = () => {
                 console.error("Error getPost/imgs(handleSearch): ", error);
             });
 
+        axios.get("http://localhost:5000/getNews")
+            .then(response => {
+                if (response.data.news) {
+                    setNews(response.data.news);
+                } else {
+                    setNews(null);
+                }
+            })
+            .catch(error => console.error("Error fetching news:", error));
     }, []);
 
     const PageNAV = () => {
@@ -228,30 +216,30 @@ const Main = () => {
         };
 
         return (
-            <div className="flex items-center justify-center space-x-2 bg-black py-2">
-                <button onClick={() => changePage(1)} className="text-white text-lg rounded-full hover:bg-gray-500 w-7 h-7 flex items-center justify-center leading-none">
-                    <span className="flex items-center justify-center">{'<<'}</span>
+            <div className="flex items-center justify-center space-x-2 py-2">
+                <button onClick={() => changePage(1)} className="text-black text-lg rounded-full hover:bg-gray-500 w-7 h-7 flex items-center justify-center leading-none">
+                    <span className="flex items-center justify-center hover:text-white">{'<<'}</span>
                 </button>
 
-                <button onClick={() => changePage(currentPage - 1)} className="text-white text-lg rounded-full hover:bg-gray-500 w-7 h-7 flex items-center justify-center leading-none">
-                    <span className="flex items-center justify-center">{'<'}</span>
+                <button onClick={() => changePage(currentPage - 1)} className="text-black text-lg rounded-full hover:bg-gray-500 w-7 h-7 flex items-center justify-center leading-none">
+                    <span className="flex items-center justify-center hover:text-white">{'<'}</span>
                 </button>
 
                 {Array.from({ length: endPage - startPage + 1 }, (_, index) => {
                     const page = startPage + index;
                     return (
-                        <button key={page} onClick={() => changePage(page)} className={`text-white px-3 py-1 rounded-full ${page === currentPage ? "bg-gray-600 text-white" : "hover:bg-gray-500"}`}>
+                        <button key={page} onClick={() => changePage(page)} className={`text-black px-3 py-1 rounded-full ${page === currentPage ? "bg-gray-600 text-white" : "hover:bg-gray-500"}`}>
                             {page}
                         </button>
                     );
                 })}
 
-                <button onClick={() => changePage(currentPage + 1)} className="text-white text-lg rounded-full hover:bg-gray-500 w-7 h-7 flex items-center justify-center leading-none">
-                    <span className="flex items-center justify-center">{'>'}</span>
+                <button onClick={() => changePage(currentPage + 1)} className="black-white text-lg rounded-full hover:bg-gray-500 w-7 h-7 flex items-center justify-center leading-none">
+                    <span className="flex items-center justify-center hover:text-white">{'>'}</span>
                 </button>
 
-                <button onClick={() => changePage(totalPage)} className="text-white text-lg rounded-full hover:bg-gray-500 w-7 h-7 flex items-center justify-center leading-none">
-                    <span className="flex items-center justify-center">{'>>'}</span>
+                <button onClick={() => changePage(totalPage)} className="black-white text-lg rounded-full hover:bg-gray-500 w-7 h-7 flex items-center justify-center leading-none">
+                    <span className="flex items-center justify-center hover:text-white">{'>>'}</span>
                 </button>
 
             </div>
@@ -260,9 +248,7 @@ const Main = () => {
 
     const Dropdown = () => {
         return (
-            <div className="relative inline-block text-left"
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}>
+            <div className="relative inline-block text-left">
                 <button onClick={toggleDropdown} className="px-4 py-2 bg-blue-500 text-white rounded-md">
                     {mode ? 'newest' : 'score'}
                 </button>
@@ -283,16 +269,13 @@ const Main = () => {
         const start = (currentPage - 1) * postPerPage;
         const stop = start + postPerPage - 1;
 
-        ///// https://flowbite.com/docs/components/dropdowns/
-        ///// dropdown
-
         return (
-            <div className='bg-black w-[100%] p-3'>
-                <div className='grid grid-cols-4 gap-3'>
+            <div className=' w-[100%] p-3'>
+                <div className='grid grid-cols-4 gap-3 pb-3'>
                     {Array.isArray(postImgs) && postImgs.length > 0 ? (
                         postImgs.slice(start, stop + 1).map((img, index) => (
                             img ? (
-                                <div key={index} className='relative group bg-white border border-gray-400 flex justify-center items-center h-[300px] cursor-pointer'>
+                                <div key={index} className='relative group flex justify-center items-center h-[300px] cursor-pointer'>
                                     <img src={`http://localhost:5000/imgs/${img}`} alt="postImg" className='w-full h-full object-contain transition-transform duration-400 group-hover:scale-[1.25] group-hover:z-10' title={img} />
                                 </div>
                             ) : null
@@ -301,10 +284,8 @@ const Main = () => {
                         <p className="text-gray-500">no imgs rn</p>
                     )}
                 </div>
-
                 <br />
                 <PageNAV />
-
             </div>
         );
     };
@@ -328,6 +309,27 @@ const Main = () => {
             });
     };
 
+    const News = () => {
+        axios.get("http://localhost:5000/getNews")
+            .then(response => {
+                if (response.data.news) {
+                    setNews(response.data.news);
+                } else {
+                    setNews(null);
+                }
+            })
+            .catch(error => console.error("Error fetching news:", error));
+        return (
+            <>
+                {news ? (
+                    <img src={`http://localhost:5000/news/${news}`} alt="News" />
+                ) : (
+                    <p>No news available</p>
+                )}
+            </>
+        );
+    }
+
     return (
         <div className="min-h-screen bg-bgColor">
             <h1 className='font-bold text-4xl'>Main</h1><br />
@@ -338,9 +340,9 @@ const Main = () => {
 
 
             <button onClick={handleIsAdding} className='border-2'> add img </button>
-            {isAdding && <div
-                className='flex flex-col justify-center items-center bg-blue-300 p-4  border-4  w-[80%] mx-auto rounded-lg'>
-                <div {...getRootProps()} className='flex flex-col justify-center items-center bg bg-red-300 w-[60%] h-[400px] border-2 border-dashed border-gray-500 p-4 cursor-pointer'>
+            {isAdding && <div className='fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center bg-blue-300 p-4 border-4 w-[80%] h-[90vh] overflow-y-auto mx-auto rounded-lg z-50'>
+
+                <div {...getRootProps()} className='flex flex-col justify-center items-center bg bg-red-300 w-[60%] min-h-[500px] border-2 border-dashed border-gray-500 p-4 cursor-pointer'>
                     <input {...getInputProps()} />
                     {isDragActive ?
                         <p className="mb-4 font-bold">Drop the files here ...</p> : <p className="mb-4 font-bold">Drag & drop your picture here</p>
@@ -350,16 +352,13 @@ const Main = () => {
                             <button onClick={handleClearFile} className="absolute top-2 right-2 w-8 h-8 bg-red-500 text-white text-lg font-bold rounded-full flex items-center justify-center shadow-md hover:bg-red-700">
                                 X
                             </button>
-                            <img src={file.preview} alt="Uploaded Preview"
-                                className='bg-blue-200 max-w-[300px] max-h-[300px] block p-3 border-3 border-black border-dashed' />
+                            <img src={file.preview} alt="Uploaded Preview" className='bg-blue-200 max-w-[300px] max-h-[300px] block p-3 border-3 border-black border-dashed' />
                         </div>
                     )}
-
-
                 </div>
 
                 {errorMessage && (
-                    <div className='text-red-500 text-[20px] mt-3 font-semibold cursor-default'>
+                    <div className='text-red-500 text-[20px] mt-4 font-semibold cursor-default'>
                         {errorMessage}
                     </div>
                 )}
@@ -367,12 +366,9 @@ const Main = () => {
                 <div className='flex flex-col items-center bg-grey-300 bg-clip-padding p-3 w-full'>
                     {/* input post ชื่อ */}
                     <div className="relative w-full max-w-lg">
-                        <textarea value={title} onChange={handleTitle} placeholder='Enter your post name'
-                            className='w-full p-2 border rounded-md resize-none h-[80px] overflow-y-auto mt-3'
-                        />
+                        <textarea value={title} onChange={handleTitle} placeholder='Enter your post name' className='w-full p-2 border rounded-md resize-none h-[80px] overflow-y-auto mt-3' />
                         {title && (
-                            <button onClick={() => setTitle("")}
-                                className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white text-lg font-bold rounded-full flex items-center justify-center shadow-md hover:bg-red-700">
+                            <button onClick={() => setTitle("")} className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white text-lg font-bold rounded-full flex items-center justify-center shadow-md hover:bg-red-700">
                                 X
                             </button>
                         )}
@@ -382,28 +378,25 @@ const Main = () => {
 
                     {/* input post description */}
                     <div className="relative w-full max-w-lg">
-                        <textarea value={description} onChange={handleDescription} placeholder='Enter the description'
-                            className='w-full p-2 border rounded-md resize-none h-[225px] overflow-y-auto mt-1'
-                        />
+                        <textarea value={description} onChange={handleDescription} placeholder='Enter the description' className='w-full p-2 border rounded-md resize-none h-[225px] overflow-y-auto mt-1' />
                         {description && (
-                            <button onClick={() => setDescription("")}
-                                className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white text-lg font-bold rounded-full flex items-center justify-center shadow-md hover:bg-red-700">
+                            <button onClick={() => setDescription("")} className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white text-lg font-bold rounded-full flex items-center justify-center shadow-md hover:bg-red-700">
                                 X
                             </button>
                         )}
                     </div>
                 </div>
 
-                <div className='flex flex-col items-center bg-grey-300 bg-clip-padding p-3'>
+                <div className='flex flex-col items-center bg-grey-300 bg-clip-padding'>
                     <div class="flex space-x-4 ">
                         <div className='w-full flex justify-center'>
-                            <button onClick={handleCancle} className='px-4 py-2 bg-red-500 text-white rounded block my-4'>
+                            <button onClick={handleCancle} className='px-4 py-2 bg-red-500 text-white rounded block my-2'>
                                 cancle
                             </button>
                         </div>
 
                         <div className='w-full flex justify-center'>
-                            <button onClick={handleUpload} className='px-4 py-2 bg-blue-500 text-white rounded block my-4'>
+                            <button onClick={handleUpload} className='px-4 py-2 bg-blue-500 text-white rounded block my-2'>
                                 confirm
                             </button>
                         </div>
@@ -414,7 +407,9 @@ const Main = () => {
             </div>}
             <br /><br />
 
-            <div className='relative bg-yellow-300 w-[90%] mx-auto'>
+            <News />
+
+            <div className='relative w-[90%] mx-auto'>
                 <div className='absolute top-0 right-0'>
                     <Dropdown />
 
@@ -434,13 +429,10 @@ const Main = () => {
 
                 </div>
 
-
-                <br /><br />
+                <br /><br /><br />
                 <ShowPosts />
             </div>
 
-
-            <br />
             <br />
         </div>
     );
