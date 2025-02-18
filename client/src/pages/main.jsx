@@ -12,6 +12,7 @@ const Main = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { state } = location;
+    const [isOpen, setIsOpen] = useState(false);
     const [isAdding, setIsAdding] = useState(false);
     const [file, setFile] = useState(null);                     // file
     const [errorMessage, setErrorMessage] = useState("");       // error message
@@ -23,12 +24,11 @@ const Main = () => {
     const [mode, setMode] = useState(true);
     const [sortMode, setSortMode] = useState(true);
     const [searchVal, setSearchVal] = useState("");
-    const [role, setRole] = useState(null);
     const [news, setNews] = useState(null);
+    const [role, setRole] = useState(0);
+    // 0=guest  1=externalUser  2=clubMember  3=admin
 
     const maxVisitPage = 5;
-
-    const [isOpen, setIsOpen] = useState(false);
 
     const toggleDropdown = () => {
         setIsOpen(!isOpen);
@@ -55,7 +55,7 @@ const Main = () => {
         setSearchVal(event.target.value);
     };
 
-    const handleCancle = (event) => {
+    const handleCancle = () => {
         setFile(null);
         setErrorMessage("");
         setTitle("");
@@ -158,7 +158,6 @@ const Main = () => {
             .catch(error => {
                 console.error("Error getPost/imgs(handleSearch): ", error);
             });
-
     };
 
 
@@ -270,8 +269,8 @@ const Main = () => {
         const stop = start + postPerPage - 1;
 
         return (
-            <div className=' w-[100%] p-3'>
-                <div className='grid grid-cols-4 gap-3 pb-3'>
+            <div className=' w-[100%] p-3 border'>
+                <div className={`grid grid-cols-${column} gap-3 pb-3`}>
                     {Array.isArray(postImgs) && postImgs.length > 0 ? (
                         postImgs.slice(start, stop + 1).map((img, index) => (
                             img ? (
@@ -310,6 +309,7 @@ const Main = () => {
     };
 
     const News = () => {
+        const [newFile, setNewFile] = useState(null);
         axios.get("http://localhost:5000/getNews")
             .then(response => {
                 if (response.data.news) {
@@ -319,27 +319,55 @@ const Main = () => {
                 }
             })
             .catch(error => console.error("Error fetching news:", error));
+
+        const handleDrop = (event) => {
+            event.preventDefault();
+            const file = event.dataTransfer.files[0];
+            if (file && file.type.startsWith("image/")) {
+                setNewFile(file);
+            }
+        };
+
+        const handleConfirm = () => {
+            if (!newFile) return;
+            const formData = new FormData();
+            formData.append("file", newFile);
+
+            axios.post("http://localhost:5000/uploadNews", formData)
+                .then(response => {
+                    setNews(response.data.filename);
+                    setNewFile(null);
+                })
+                .catch(error => console.error("Error uploading file: ", error));
+        };
+
         return (
             <>
-                {news ? (
-                    <img src={`http://localhost:5000/news/${news}`} alt="News" />
-                ) : (
-                    <p>No news available</p>
+                <div className='flex items-center justify-center bg-white w-[80%] h-[400px] mx-auto' onDragOver={(e) => e.preventDefault()} onDrop={handleDrop} >
+                    {newFile ? (
+                        <div className="text-center">
+                            <img src={URL.createObjectURL(newFile)} className='w-full h-[400px] object-cover' alt="New File" />
+                        </div>
+                    ) : news ? (
+                        <img src={`http://localhost:5000/news/${news}`} className='w-full h-full object-contain' alt="News" />
+                    ) : (
+                        <p className="text-white">no news rn</p>
+                    )}
+                </div>
+                {newFile && (
+                    <div className="mt-2 mx-auto flex items-center justify-center">
+                        <button className="bg-red-500 text-white px-4 py-2 m-2" onClick={() => setNewFile(null)}>Cancel</button>
+                        <button className="bg-green-500 text-white px-4 py-2 m-2" onClick={handleConfirm}>Confirm</button>
+                    </div>
                 )}
             </>
         );
-    }
+    };
 
     return (
         <div className="min-h-screen bg-bgColor">
-            <h1 className='font-bold text-4xl'>Main</h1><br />
             <div><Link to="/"><h1>back</h1></Link></div>
-            <button onClick={() => console.log(state.userId)}> show userId </button>
-            <br /><br />
 
-
-
-            <button onClick={handleIsAdding} className='border-2'> add img </button>
             {isAdding && <div className='fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center bg-blue-300 p-4 border-4 w-[80%] h-[90vh] overflow-y-auto mx-auto rounded-lg z-50'>
 
                 <div {...getRootProps()} className='flex flex-col justify-center items-center bg bg-red-300 w-[60%] min-h-[500px] border-2 border-dashed border-gray-500 p-4 cursor-pointer'>
@@ -409,8 +437,12 @@ const Main = () => {
 
             <News />
 
-            <div className='relative w-[90%] mx-auto'>
+            <div className='relative w-[90%] mx-auto mt-8'>
+                <div className='absolute top-0 left-0'>
+                    <button onClick={handleIsAdding} className='border-2'> add img </button>
+                </div>
                 <div className='absolute top-0 right-0'>
+
                     <Dropdown />
 
                     <button className='bg-blue-400 rounded-2xl p-2.5 ml-2' onClick={handleSortMode}>

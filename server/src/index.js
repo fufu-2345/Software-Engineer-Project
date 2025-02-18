@@ -153,14 +153,13 @@ app.get("/getPost/max", (req, res) => {
 });
 
 ///////////////////////////////////////////////////////////
-//                      GET NEWS                         //
+//                         NEWS                          //
 ///////////////////////////////////////////////////////////
 
+const newsDir = path.join(__dirname, "../news");
 
 app.get("/getNews", (req, res) => {
-    const NewsDir = path.join(__dirname, "../news");
-
-    fs.readdir(NewsDir, (err, files) => {
+    fs.readdir(newsDir, (err, files) => {
         if (err) {
             return res.json({ message: "Error reading directory" });
         }
@@ -175,7 +174,37 @@ app.get("/getNews", (req, res) => {
     });
 });
 
+const getNewsFilePath = () => {
+    const files = fs.readdirSync(newsDir).filter(file => file.startsWith("news."));
+    return files.length ? path.join(newsDir, files[0]) : null;
+}
 
+const upload = multer({ storage: multer.memoryStorage() });
+
+if (!fs.existsSync(newsDir)) {
+    fs.mkdirSync(newsDir, { recursive: true });
+}
+
+app.post("/uploadNews", upload.single("file"), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    const oldFilePath = getNewsFilePath();
+    if (oldFilePath && fs.existsSync(oldFilePath)) {
+        fs.unlinkSync(oldFilePath);
+    }
+
+    const fileExtension = path.extname(req.file.originalname);
+    const newFilePath = path.join(newsDir, `news${fileExtension}`);
+
+    fs.writeFile(newFilePath, req.file.buffer, (err) => {
+        if (err) {
+            return res.status(500).json({ error: "Error saving file" });
+        }
+        res.json({ filename: `news${fileExtension}` });
+    });
+});
 
 ///////////////////////////////////////////////////////////
 //                 UPLOAD IMAGE API                      //
@@ -190,7 +219,7 @@ const storage = multer.diskStorage({
     }
 });
 
-const upload = multer({ storage });
+const uploadNews = multer({ storage });
 const checkedPost = [
     check('userId').isString().withMessage('User ID must be a string').isLength({ min: 1 }).withMessage('User ID must have at least 1 character').notEmpty().withMessage('User ID is required'),
     check('postName').optional(),
