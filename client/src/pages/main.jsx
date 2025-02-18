@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useDropzone } from 'react-dropzone'
+//import { useDropzone } from 'react-dropzone'
 import axios from 'axios';
 //import PageNAV from './components/PageNAV';
 import ShowPosts from './components/ShowPost';
-
+import ProfileShowPost from './components/profileShowPost';
 
 ///// dropzoneDoc: https://react-dropzone.js.org/
 
@@ -14,70 +14,70 @@ const Main = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { state } = location;
-    const [isOpen, setIsOpen] = useState(false);
-    const [isAdding, setIsAdding] = useState(false);
-    const [file, setFile] = useState(null);                     // file
-    const [errorMessage, setErrorMessage] = useState("");       // error message
-    const [title, setTitle] = useState('');                     // ชื่อ post
-    const [description, setDescription] = useState('');         // post detail
-    const [postCount, setPostCount] = useState(0);
-    const [postImgs, setPostImgs] = useState([]);
+    //const [isOpen, setIsOpen] = useState(false);
+    //const [isAdding, setIsAdding] = useState(false);
+    //const [file, setFile] = useState(null);                     // file
+    //const [errorMessage, setErrorMessage] = useState("");       // error message
+    //const [title, setTitle] = useState('');                     // ชื่อ post
+    //const [description, setDescription] = useState('');         // post detail
+    //const [postCount, setPostCount] = useState(0);
+    //const [postImgs, setPostImgs] = useState([]);
     //const [currentPage, setCurrentPage] = useState(1);
-    const [mode, setMode] = useState(true);
-    const [sortMode, setSortMode] = useState(true);
-    const [searchVal, setSearchVal] = useState("");
+    //const [mode, setMode] = useState(true);
+    //const [sortMode, setSortMode] = useState(true);
+    //const [searchVal, setSearchVal] = useState("");
     const [news, setNews] = useState(null);
     const [role, setRole] = useState(0);
     // 0=guest  1=externalUser  2=clubMember  3=admin
 
-    const toggleDropdown = () => {
+    /*const toggleDropdown = () => {
         setIsOpen(!isOpen);
-    };
+    };*/
 
-    const handleSetMode = () => {
+    /*const handleSetMode = () => {
         setIsOpen(false);
         setMode(!mode);
-    };
+    };*/
 
-    const handleSortMode = () => {
+    /*const handleSortMode = () => {
         setSortMode(!sortMode);
-    };
+    };*/
 
-    const handleTitle = (event) => {
+    /*const handleTitle = (event) => {
         setTitle(event.target.value);
-    };
+    };*/
 
-    const handleDescription = (event) => {
+    /*const handleDescription = (event) => {
         setDescription(event.target.value);
-    };
+    };*/
 
-    const handleSearchVal = (event) => {
+    /*const handleSearchVal = (event) => {
         setSearchVal(event.target.value);
-    };
+    };*/
 
-    const handleCancle = () => {
+    /*const handleCancle = () => {
         setFile(null);
         setErrorMessage("");
         setTitle("");
         setDescription("");
         setIsAdding(false);
-    };
+    };*/
 
-    const handleClearFile = (event) => {
+    /*const handleClearFile = (event) => {
         event.stopPropagation();
         setErrorMessage("");
         setFile(null);
-    };
+    };*/
 
-    const onDrop = useCallback(acceptedFiles => {
+    /*const onDrop = useCallback(acceptedFiles => {
         setErrorMessage("");
         if (acceptedFiles?.length) {
             const getFile = acceptedFiles[0];
             setFile(Object.assign(getFile, { preview: URL.createObjectURL(getFile) }));
         }
-    }, []);
+    }, []);*/
 
-    const onDropRejected = useCallback(fileRejections => {
+    /*const onDropRejected = useCallback(fileRejections => {
         fileRejections.forEach(({ errors }) => {
             errors.forEach(error => {
                 if (error.code === "file-invalid-type") {
@@ -87,9 +87,9 @@ const Main = () => {
                 }
             });
         });
-    }, []);
+    }, []);*/
 
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    /*const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
         onDropRejected,
         maxFiles: 1,   /// img cap size
@@ -99,10 +99,10 @@ const Main = () => {
             'image/bmp': [],
             'image/webp': []
         }      /// img type fix
-    });
+    });*/
 
-    const handleUpload = async () => {
-        /*************      เพิ่มขึ้น text เตือน     ************ */
+    /*const handleUpload = async () => {
+        /*************      เพิ่มขึ้น text เตือน     ************ 
         if (!file) return;
 
         const formData = new FormData();
@@ -131,9 +131,9 @@ const Main = () => {
             //alert('Error uploading file.');
             console.log('Upload failed 2');
         }
-    };
+    };*/
 
-    const handleIsAdding = () => {
+    /*const handleIsAdding = () => {
         if (isAdding == true) {
             setFile(null);
             setErrorMessage("");
@@ -141,9 +141,9 @@ const Main = () => {
             setDescription("");
         }
         setIsAdding(!isAdding);
-    };
+    };*/
 
-    const handleSearch = () => {
+    /*const handleSearch = () => {
         const params = {
             sortMode: sortMode ? 'DESC' : 'ASC',
             mode: mode ? 'postID' : 'avgRating',
@@ -158,7 +158,7 @@ const Main = () => {
             .catch(error => {
                 console.error("Error getPost/imgs(handleSearch): ", error);
             });
-    };
+    };*/
 
 
     // ************** not done **************** 
@@ -176,7 +176,7 @@ const Main = () => {
             navigate('/');
         }
 
-        const params = {
+        /*const params = {
             sortMode: sortMode ? 'DESC' : 'ASC',
             mode: mode ? 'postID' : 'avgRating',
             search: searchVal
@@ -189,7 +189,7 @@ const Main = () => {
             })
             .catch(error => {
                 console.error("Error getPost/imgs(handleSearch): ", error);
-            });
+            });*/
 
         axios.get("http://localhost:5000/getNews")
             .then(response => {
@@ -245,7 +245,7 @@ const Main = () => {
         );
     };*/
 
-    const Dropdown = () => {
+    /*const Dropdown = () => {
         return (
             <div className="relative inline-block text-left">
                 <button onClick={toggleDropdown} className="px-4 py-2 bg-blue-500 text-white rounded-md">
@@ -259,7 +259,7 @@ const Main = () => {
                 )}
             </div>
         )
-    };
+    };*/
 
     /*const ShowPosts = () => {
         const column = 4; // จำนวนคอลัมน์ต่อแถว
@@ -369,7 +369,7 @@ const Main = () => {
         <div className="min-h-screen bg-bgColor">
             <div><Link to="/"><h1>back</h1></Link></div>
 
-            {isAdding && <div className='fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center bg-blue-300 p-4 border-4 w-[80%] h-[90vh] overflow-y-auto mx-auto rounded-lg z-50'>
+            {/*{isAdding && <div className='fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center bg-blue-300 p-4 border-4 w-[80%] h-[90vh] overflow-y-auto mx-auto rounded-lg z-50'>
 
                 <div {...getRootProps()} className='flex flex-col justify-center items-center bg bg-red-300 w-[60%] min-h-[500px] border-2 border-dashed border-gray-500 p-4 cursor-pointer'>
                     <input {...getInputProps()} />
@@ -393,7 +393,7 @@ const Main = () => {
                 )}
 
                 <div className='flex flex-col items-center bg-grey-300 bg-clip-padding p-3 w-full'>
-                    {/* input post ชื่อ */}
+                    {/* input post ชื่อ
                     <div className="relative w-full max-w-lg">
                         <textarea value={title} onChange={handleTitle} placeholder='Enter your post name' className='w-full p-2 border rounded-md resize-none h-[80px] overflow-y-auto mt-3' />
                         {title && (
@@ -404,7 +404,7 @@ const Main = () => {
                     </div>
                     <br />
 
-                    {/* input post description */}
+                    {/* input post description
                     <div className="relative w-full max-w-lg">
                         <textarea value={description} onChange={handleDescription} placeholder='Enter the description' className='w-full p-2 border rounded-md resize-none h-[225px] overflow-y-auto mt-1' />
                         {description && (
@@ -430,11 +430,12 @@ const Main = () => {
                         </div>
                     </div>
                 </div>
-            </div>}
+            </div >}*/}
             <br /><br />
 
             <News />
-
+            <ShowPosts userId={state.userId} />
+            {/*}            
             <div className='relative w-[90%] mx-auto mt-8'>
                 <div className='absolute top-0 left-0'>
                     <button onClick={handleIsAdding} className='border-2'> add img </button>
@@ -456,12 +457,12 @@ const Main = () => {
                 </div>
 
                 <br /><br /><br />
-                <ShowPosts postCount={postCount} postImgs={postImgs} />
+                <profileShowPost postCount={postCount} postImgs={postImgs} />
 
-            </div>
+            </div>*/}
 
             <br />
-        </div>
+        </div >
     );
 }
 
