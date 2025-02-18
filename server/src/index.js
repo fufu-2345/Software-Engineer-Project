@@ -117,7 +117,7 @@ app.get("/getPost/imgs/", (req, res) => {
                 return res.json(err);
             }
             const photoPaths = data.map(item => item.photoPath);
-            console.log(photoPaths);
+            //console.log(photoPaths);
             return res.json(photoPaths);
         })
     }
@@ -179,13 +179,12 @@ const getNewsFilePath = () => {
     return files.length ? path.join(newsDir, files[0]) : null;
 }
 
-const upload = multer({ storage: multer.memoryStorage() });
-
+const uploadNews = multer({ storage: multer.memoryStorage() });
 if (!fs.existsSync(newsDir)) {
     fs.mkdirSync(newsDir, { recursive: true });
 }
 
-app.post("/uploadNews", upload.single("file"), (req, res) => {
+app.post("/uploadNews", uploadNews.single("file"), (req, res) => {
     if (!req.file) {
         return res.status(400).json({ error: "No file uploaded" });
     }
@@ -219,7 +218,7 @@ const storage = multer.diskStorage({
     }
 });
 
-const uploadNews = multer({ storage });
+const upload = multer({ storage });
 const checkedPost = [
     check('userId').isString().withMessage('User ID must be a string').isLength({ min: 1 }).withMessage('User ID must have at least 1 character').notEmpty().withMessage('User ID is required'),
     check('postName').optional(),

@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone'
 import axios from 'axios';
+//import PageNAV from './components/PageNAV';
+import ShowPosts from './components/ShowPost';
 
 
 ///// dropzoneDoc: https://react-dropzone.js.org/
@@ -20,15 +22,13 @@ const Main = () => {
     const [description, setDescription] = useState('');         // post detail
     const [postCount, setPostCount] = useState(0);
     const [postImgs, setPostImgs] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
+    //const [currentPage, setCurrentPage] = useState(1);
     const [mode, setMode] = useState(true);
     const [sortMode, setSortMode] = useState(true);
     const [searchVal, setSearchVal] = useState("");
     const [news, setNews] = useState(null);
     const [role, setRole] = useState(0);
     // 0=guest  1=externalUser  2=clubMember  3=admin
-
-    const maxVisitPage = 5;
 
     const toggleDropdown = () => {
         setIsOpen(!isOpen);
@@ -202,7 +202,7 @@ const Main = () => {
             .catch(error => console.error("Error fetching news:", error));
     }, []);
 
-    const PageNAV = () => {
+    /*const PageNAV = () => {
         const totalPage = Math.ceil(postCount / 20);
 
         const startPage = Math.max(1, currentPage - maxVisitPage);
@@ -243,7 +243,7 @@ const Main = () => {
 
             </div>
         );
-    };
+    };*/
 
     const Dropdown = () => {
         return (
@@ -261,7 +261,7 @@ const Main = () => {
         )
     };
 
-    const ShowPosts = () => {
+    /*const ShowPosts = () => {
         const column = 4; // จำนวนคอลัมน์ต่อแถว
         const postPerPage = column * 5;
 
@@ -270,7 +270,7 @@ const Main = () => {
 
         return (
             <div className=' w-[100%] p-3 border'>
-                <div className={`grid grid-cols-${column} gap-3 pb-3`}>
+                <div className={`grid grid-cols-4 gap-3 pb-3`}>
                     {Array.isArray(postImgs) && postImgs.length > 0 ? (
                         postImgs.slice(start, stop + 1).map((img, index) => (
                             img ? (
@@ -284,12 +284,12 @@ const Main = () => {
                     )}
                 </div>
                 <br />
-                <PageNAV />
+                <PageNAV postCount={`${postCount}`} maxVisitPage={`${maxVisitPage}`} />
             </div>
         );
-    };
+    };*/
 
-    const Refresh = () => {
+    /*const Refresh = () => {
         axios.get("http://localhost:5000/getPost/Count")
             .then(response => {
                 setPostCount(parseInt(response.data));
@@ -306,7 +306,7 @@ const Main = () => {
             .catch(error => {
                 console.error("Error getPost/imgs(Refresh): ", error);
             });
-    };
+    };*/
 
     const News = () => {
         const [newFile, setNewFile] = useState(null);
@@ -340,16 +340,17 @@ const Main = () => {
                 })
                 .catch(error => console.error("Error uploading file: ", error));
         };
-
         return (
             <>
-                <div className='flex items-center justify-center bg-white w-[80%] h-[400px] mx-auto' onDragOver={(e) => e.preventDefault()} onDrop={handleDrop} >
+                <div className='flex items-center justify-center w-[80%] h-[400px] mx-auto' onDragOver={(e) => e.preventDefault()} onDrop={handleDrop} >
                     {newFile ? (
-                        <div className="text-center">
-                            <img src={URL.createObjectURL(newFile)} className='w-full h-[400px] object-cover' alt="New File" />
+                        <div className="text-center  group ">
+                            <img src={URL.createObjectURL(newFile)} className='w-full h-[400px] object-cover transition-transform duration-1000 group-hover:scale-[1.1]' alt="New File" />
                         </div>
                     ) : news ? (
-                        <img src={`http://localhost:5000/news/${news}`} className='w-full h-full object-contain' alt="News" />
+                        <div className='text-center group'>
+                            <img src={`http://localhost:5000/news/${news}`} className='w-full h-[400px] object-cover transition-transform duration-1000 group-hover:scale-[1.1]' alt="News" />
+                        </div>
                     ) : (
                         <p className="text-white">no news rn</p>
                     )}
@@ -401,7 +402,6 @@ const Main = () => {
                             </button>
                         )}
                     </div>
-
                     <br />
 
                     {/* input post description */}
@@ -429,9 +429,7 @@ const Main = () => {
                             </button>
                         </div>
                     </div>
-
                 </div>
-
             </div>}
             <br /><br />
 
@@ -455,14 +453,11 @@ const Main = () => {
                         Search
                     </button>
 
-                    <button className='bg-red-400 rounded-2xl p-2.5 ml-2' onClick={Refresh}>
-                        Refresh
-                    </button>
-
                 </div>
 
                 <br /><br /><br />
-                <ShowPosts />
+                <ShowPosts postCount={postCount} postImgs={postImgs} />
+
             </div>
 
             <br />
