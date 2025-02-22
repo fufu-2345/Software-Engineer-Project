@@ -4,6 +4,8 @@ const mysql = require('mysql2');
 const app = express();
 require('dotenv').config({ path: '../.env' });
 
+var bcrypt = require('bcryptjs')
+
 const port = 5000;
 app.use(cors());
 app.use(express.json())
@@ -104,10 +106,10 @@ app.post('/checkstdID', (req, res) => {
 app.post('/login', (req, res) => {
     const query = `select * from user where userName = '${req.body.username}'`;
     pool.query(query, (err, data) => {
-        if(data[0]['passWord'] == req.body.password){
-            return res.json({"ID" : data[0].userID , "Status" : true})
+        if(bcrypt.compareSync(req.body.password, data[0].passWord)){
+            return res.json({"ID" : data[0].ID, "Status": true })
         }else{
-            return res.json({"ID" : null , "Status" : false})
+            return res.json({"ID" : null, "Status": false })
         }
     })
     
@@ -168,6 +170,14 @@ app.post('/Sendotp', async (req, res) => {
     }
 })
 
+function createSalt(p){
+    var salt = bcrypt.genSaltSync(10)
+    var hash = bcrypt.hashSync(p,salt)
+
+    var ret = {s :salt , hp : hash}
+    return ret
+}
+
 
 
 //API for create new account in user database
@@ -175,7 +185,9 @@ app.post('/Sendotp', async (req, res) => {
 app.post('/registerNonClubMember', (req, res) => {
     const defaultProfilePicPath = "Insert Default Path Here"
     const body = req.body
-    var queryCommand = `insert into user(userName,passWord,accName,createTime,roleID,profilePic) values(?,?,?,NOW(),3,"${defaultProfilePicPath}")`
+    var ep = createSalt(req.body.password)
+    console.log(ep)
+    var queryCommand = `insert into user(userName,passWord,salt,accName,createTime,roleID,profilePic) values(?,"${ep.hp}","${ep.s}",?,NOW(),3,"${defaultProfilePicPath}")`
     pool.query(queryCommand, [body.username, body.password, body.accountName], (err, results) => {
         if (err) {
             console.log(err)
@@ -188,7 +200,8 @@ app.post('/registerNonClubMember', (req, res) => {
 app.post('/registerClubMember', (req, res) => {
     const defaultProfilePicPath = "Insert Default Path Here"
     const body = req.body
-    var queryCommand = `insert into user(userName,passWord,accName,createTime,roleID,profilePic) values(?,?,?,NOW(),2,"${defaultProfilePicPath}")`
+    var ep = createSalt(req.body.password)
+    var queryCommand = `insert into user(userName,passWord,salt,accName,createTime,roleID,profilePic) values(?,${ep.hp},${ep.s},?,NOW(),2,"${defaultProfilePicPath}")`
     pool.query(queryCommand, [body.username, body.password, body.accountName], (err, results) => {
         if (err) {
             console.log(err)
