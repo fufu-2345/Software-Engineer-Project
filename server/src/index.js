@@ -85,6 +85,21 @@ app.post('/checkAccname', (req, res) => {
     })
 })
 
+app.post('/checkstdID', (req, res) => {
+    const query = `select count(*) from clubmemberid where studentID = '${req.body.stdID}'`;
+    pool.query(query, (err, data) => {
+        if (err) {
+            return res.json(err);
+        }
+
+        if (data[0]['count(*)'] != 0) {
+            return res.json({ "Status": true })
+        } else {
+            return res.json({ "Status": false })
+        }
+    })
+})
+
 //For verifying email address(Spam Prevention)
 const nodemailer = require('nodemailer');
 const { data } = require('react-router-dom');

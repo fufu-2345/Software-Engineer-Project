@@ -148,7 +148,7 @@ const RegisterNonClub = () => {
             <br></br>
           </div>
           <div className="registerTopicInputBox">
-            PWD
+           Password
             <br></br>
             <input
               type="password"

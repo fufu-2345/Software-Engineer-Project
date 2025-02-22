@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 const Login = () => {
+    var [username,setusername] = useState("")
+    var [password,setpassword] = useState("")
     return (
         <>
             <h1>Login</h1><br />
