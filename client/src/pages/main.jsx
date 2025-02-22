@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-//import { useDropzone } from 'react-dropzone'
 import axios from 'axios';
-//import PageNAV from './components/PageNAV';
 import ShowPosts from './components/ShowPost';
+import News from './components/News';
 import ProfileShowPost from './components/profileShowPost';
 
 ///// dropzoneDoc: https://react-dropzone.js.org/
@@ -26,7 +25,7 @@ const Main = () => {
     //const [mode, setMode] = useState(true);
     //const [sortMode, setSortMode] = useState(true);
     //const [searchVal, setSearchVal] = useState("");
-    const [news, setNews] = useState(null);
+    //const [news, setNews] = useState(null);
     const [role, setRole] = useState(0);
     // 0=guest  1=externalUser  2=clubMember  3=admin
 
@@ -176,12 +175,26 @@ const Main = () => {
             navigate('/');
         }
 
+        console.log(state.userId)
+        axios.get("http://localhost:5000/getRole", { params: { userId: state.userId } })
+            .then(response => {
+                if (response.data) {
+                    setRole(response.data);
+                } else {
+                    navigate('/');
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching role:", error);
+                navigate('/'); // ไปหน้าอื่นถ้ามี error
+            });
+
         /*const params = {
             sortMode: sortMode ? 'DESC' : 'ASC',
             mode: mode ? 'postID' : 'avgRating',
             search: searchVal
         };
-
+    
         axios.get("http://localhost:5000/getPost/imgs", { params })
             .then(response => {
                 setPostCount(response.data.length);
@@ -191,7 +204,7 @@ const Main = () => {
                 console.error("Error getPost/imgs(handleSearch): ", error);
             });*/
 
-        axios.get("http://localhost:5000/getNews")
+        /*axios.get("http://localhost:5000/getNews")
             .then(response => {
                 if (response.data.news) {
                     setNews(response.data.news);
@@ -199,31 +212,31 @@ const Main = () => {
                     setNews(null);
                 }
             })
-            .catch(error => console.error("Error fetching news:", error));
+            .catch(error => console.error("Error fetching news:", error));*/
     }, []);
 
     /*const PageNAV = () => {
         const totalPage = Math.ceil(postCount / 20);
-
+    
         const startPage = Math.max(1, currentPage - maxVisitPage);
         const endPage = Math.min(totalPage, currentPage + maxVisitPage);
-
+    
         const changePage = (page) => {
             if (page >= 1 && page <= totalPage) {
                 setCurrentPage(page);
             }
         };
-
+    
         return (
             <div className="flex items-center justify-center space-x-2 py-2">
                 <button onClick={() => changePage(1)} className="text-black text-lg rounded-full hover:bg-gray-500 w-7 h-7 flex items-center justify-center leading-none">
                     <span className="flex items-center justify-center hover:text-white">{'<<'}</span>
                 </button>
-
+    
                 <button onClick={() => changePage(currentPage - 1)} className="text-black text-lg rounded-full hover:bg-gray-500 w-7 h-7 flex items-center justify-center leading-none">
                     <span className="flex items-center justify-center hover:text-white">{'<'}</span>
                 </button>
-
+    
                 {Array.from({ length: endPage - startPage + 1 }, (_, index) => {
                     const page = startPage + index;
                     return (
@@ -232,15 +245,15 @@ const Main = () => {
                         </button>
                     );
                 })}
-
+    
                 <button onClick={() => changePage(currentPage + 1)} className="black-white text-lg rounded-full hover:bg-gray-500 w-7 h-7 flex items-center justify-center leading-none">
                     <span className="flex items-center justify-center hover:text-white">{'>'}</span>
                 </button>
-
+    
                 <button onClick={() => changePage(totalPage)} className="black-white text-lg rounded-full hover:bg-gray-500 w-7 h-7 flex items-center justify-center leading-none">
                     <span className="flex items-center justify-center hover:text-white">{'>>'}</span>
                 </button>
-
+    
             </div>
         );
     };*/
@@ -264,10 +277,10 @@ const Main = () => {
     /*const ShowPosts = () => {
         const column = 4; // จำนวนคอลัมน์ต่อแถว
         const postPerPage = column * 5;
-
+    
         const start = (currentPage - 1) * postPerPage;
         const stop = start + postPerPage - 1;
-
+    
         return (
             <div className=' w-[100%] p-3 border'>
                 <div className={`grid grid-cols-4 gap-3 pb-3`}>
@@ -297,7 +310,7 @@ const Main = () => {
             .catch(error => {
                 console.error("Error getPost/Count(Refresh): ", error);
             });
-
+    
         axios.get("http://localhost:5000/getPost/imgs")
             .then(response => {
                 setPostCount(response.data.length);
@@ -308,7 +321,7 @@ const Main = () => {
             });
     };*/
 
-    const News = () => {
+    /*const News = () => {
         const [newFile, setNewFile] = useState(null);
         axios.get("http://localhost:5000/getNews")
             .then(response => {
@@ -363,12 +376,11 @@ const Main = () => {
                 )}
             </>
         );
-    };
+    };*/
 
     return (
         <div className="min-h-screen bg-bgColor">
-            <div><Link to="/"><h1>back</h1></Link></div>
-
+            <h1>{role ? role.roleID : "Loading..."}</h1>
             {/*{isAdding && <div className='fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center bg-blue-300 p-4 border-4 w-[80%] h-[90vh] overflow-y-auto mx-auto rounded-lg z-50'>
 
                 <div {...getRootProps()} className='flex flex-col justify-center items-center bg bg-red-300 w-[60%] min-h-[500px] border-2 border-dashed border-gray-500 p-4 cursor-pointer'>
@@ -433,8 +445,8 @@ const Main = () => {
             </div >}*/}
             <br /><br />
 
-            <News />
-            <ShowPosts userId={state.userId} />
+            <News role={role} />
+            <ShowPosts userId={state.userId} role={role} />
             {/*}            
             <div className='relative w-[90%] mx-auto mt-8'>
                 <div className='absolute top-0 left-0'>

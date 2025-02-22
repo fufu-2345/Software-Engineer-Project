@@ -123,6 +123,19 @@ app.get("/getPost/imgs/", (req, res) => {
     }
 })
 
+app.get("/getRole", (req, res) => {
+    const { userId } = req.query;
+    const query = `SELECT roleID FROM user WHERE userId = ?`;
+    pool.query(query, [userId], (err, data) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        if (data.length === 0) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        res.json({ roleID: data[0].roleID });
+    });
+});
 
 app.get("/getPost/Count", (req, res) => {
     const query = `SELECT COUNT(*) FROM post`;

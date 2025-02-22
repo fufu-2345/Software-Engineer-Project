@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useDropzone } from 'react-dropzone'
 
-const ShowPost = ({ userId }) => {
+const ShowPost = ({ userId, role }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [postCount, setPostCount] = useState(0);
     const [postImgs, setPostImgs] = useState([]);
@@ -11,12 +11,10 @@ const ShowPost = ({ userId }) => {
     const [sortMode, setSortMode] = useState(true);
     const [isOpen, setIsOpen] = useState(false);
     const [isAdding, setIsAdding] = useState(false);
-    ////////////// ยังไม่ได้ลบจาก main
     const [errorMessage, setErrorMessage] = useState("");
     const [file, setFile] = useState(null);
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
-    ////////////////
 
     const maxVisitPage = 5;
     const column = 4; // จำนวนคอลัมน์ต่อแถว
@@ -55,7 +53,11 @@ const ShowPost = ({ userId }) => {
     }, []);
 
     const handleUpload = async () => {
-        /*************      เพิ่มขึ้น text เตือน     ************ */
+        if (role !== 1 && role !== 2) {
+            console.log('คุณไม่มีสิทธิ์ในการอัปโหลดรูปภาพ');
+            return;
+        }
+
         if (!file) return;
 
         const formData = new FormData();
@@ -263,7 +265,9 @@ const ShowPost = ({ userId }) => {
             </div>}
             <div className='relative w-[90%] mx-auto mt-8'>
                 <div className='absolute top-0 left-0'>
-                    <button onClick={handleIsAdding} className='border-2'> add img </button>
+                    {(role.roleID == 1 || role.roleID == 2) &&
+                        <button onClick={handleIsAdding} className='border-2'> add img </button>
+                    }
                 </div>
                 <div className='absolute top-0 right-0'>
 

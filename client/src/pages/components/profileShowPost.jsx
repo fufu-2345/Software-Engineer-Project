@@ -158,9 +158,6 @@ const ProfileShowPost = ({ userId }) => {
 
             </div>
 
-
-
-
         </div>
 
     );
