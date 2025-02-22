@@ -55,8 +55,7 @@ app.get("/getComment", (req, res) => {
 
 //API for checking Username
 app.post('/checkUsername', (req, res) => {
-    console.log(req.body)
-    const query = `select count(*) from customer where userName = '${req.body.username}'`;
+    const query = `select count(*) from user where userName = '${req.body.username}'`;
     pool.query(query, (err, data) => {
         if (err) {
             return res.json(err);
@@ -72,8 +71,7 @@ app.post('/checkUsername', (req, res) => {
 
 //API for checking accName
 app.post('/checkAccname', (req, res) => {
-    console.log(req.body)
-    const query = `select count(*) from customer where accName = '${req.body.accountName}'`;
+    const query = `select count(*) from user where accName = '${req.body.accountName}'`;
     pool.query(query, (err, data) => {
         if (err) {
             return res.json(err);
@@ -145,10 +143,11 @@ app.post('/Sendotp', async (req, res) => {
 
 
 //API for create new account in user database
+//Insert Profile Pic Path Later to be default
 app.post('/registerNonClubMember', (req, res) => {
+    const defaultProfilePicPath = "Insert Default Path Here"
     const body = req.body
-    var queryCommand = 'insert into customer(userName,passWord,accName,createTime) values(?,?,?,NOW())'
-    console.log(body)
+    var queryCommand = `insert into user(userName,passWord,accName,createTime,roleID,profilePic) values(?,?,?,NOW(),3,"${defaultProfilePicPath}")`
     pool.query(queryCommand, [body.username, body.password, body.accountName], (err, results) => {
         if (err) {
             console.log(err)

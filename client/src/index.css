@@ -226,3 +226,74 @@ body {
 .registerButton:hover {
    background-color: #6a4564;
 }
+
+/* Popup Background */
+.popup-overlay {
+   background: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+   backdrop-filter: blur(5px); /* Blurred background */
+}
+
+/* Popup Box */
+.popup-content {
+   background: white;
+   width: 500px;
+   padding: 20px;
+   border-radius: 12px;
+   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+   text-align: center;
+   position: relative;
+   animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Close Button */
+.popup-close {
+   position: absolute;
+   top: 10px;
+   right: 10px;
+   background: transparent;
+   border: none;
+   font-size: 20px;
+   cursor: pointer;
+   color: #333;
+}
+
+/* Button Styles */
+.popup-button {
+   background: #ff5e78;
+   color: white;
+   border: none;
+   padding: 10px 15px;
+   margin-top: 10px;
+   border-radius: 6px;
+   cursor: pointer;
+   font-size: 16px;
+   transition: 0.3s;
+}
+
+.popup-button:hover {
+   background: #e04b65;
+}
+
+.otpInputBox {
+   width: 50%;
+   margin: 1rem;
+   padding: 8px;
+   border: 1px solid #000;
+   border-radius: 5px;
+   font-size: 16px;
+   text-align: center;
+   outline: none;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+   from {
+       opacity: 0;
+       transform: translateY(-10px);
+   }
+   to {
+       opacity: 1;
+       transform: translateY(0);
+   }
+}
+

@@ -5,6 +5,7 @@ import Popup from "reactjs-popup";
 import { useRef } from "react";
 
 import Navbar from "../components/navbar";
+import Loader from "../components/loader";
 
 import "../index.css";
 
@@ -51,8 +52,8 @@ const RegisterNonClub = () => {
     setReOTP("");
     setPopupStatus(false);
   };
-  const registerError = useRef();
-  const registerSuccess = useRef();
+
+  var [isLoading,setIsLoading] = useState(false)
 
   const navigate = useNavigate();
 
@@ -60,6 +61,8 @@ const RegisterNonClub = () => {
     if (!username || !password || !name || !email) {
       return;
     }
+
+    setIsLoading(true)
 
     var api = `http://localhost:5000/checkUsername`;
     var body = {
@@ -71,6 +74,7 @@ const RegisterNonClub = () => {
     var response = await axios.post(api, body);
     if (response.data.Status == true) {
       setUserNameErrorStatus(true);
+      setIsLoading(false)
       return;
     }
 
@@ -78,6 +82,7 @@ const RegisterNonClub = () => {
     response = await axios.post(api, body);
     if (response.data.Status == true) {
       setAccNameErrorStatus(true);
+      setIsLoading(false)
       return;
     }
 
@@ -85,24 +90,28 @@ const RegisterNonClub = () => {
     response = await axios.post(api, body);
     if (response.data.success == false) {
       setotpSentErrorStatus(true);
+      setIsLoading(false)
       return;
     }
 
     setReOTP(response.data.OTP);
     setotpEnterStatus(true);
+    setIsLoading(false)
     return;
   }
 
   const [otpIncorrect, setOtpIncorrect] = useState(false);
-  const [otpCorrect, setOtpCorrect] = useState(false);
+  const [createAccError, setCreateAccError] = useState(false);
+  const [createAccSuccess, setCreateAccSuccess] = useState(false);
 
   async function submitOTP() {
     setotpEnterStatus(false);
     if (userOtp != recievedOtp) {
       setOtpIncorrect(true);
+      setuserOtp("");
       return;
     }
-
+    setuserOtp("");
     var api = `http://localhost:5000/registerNonClubMember/`;
     var body = {
       username: username,
@@ -112,11 +121,11 @@ const RegisterNonClub = () => {
     };
     var response = await axios.post(api, body);
     if (response.data.success == false) {
-      setOtpIncorrect(true);
+      setCreateAccError(true);
       return;
     }
 
-    setOtpCorrect(true);
+    setCreateAccSuccess(true);
 
     setTimeout(() => {
       navigate("/Main");
@@ -125,112 +134,156 @@ const RegisterNonClub = () => {
 
   return (
     <>
-    <Navbar/>
-    <div className="registerPage">
-      <div className="registerBox">
-        Register Form
-        <div className="registerTopicInputBox">
-          Username
-          <br></br>
-          <input
-            className="registerInputBox"
-            value={username}
-            onChange={usernameChange}
-          />
-          <br></br>
+      <div className="registerPage">
+        <div className="registerBox">
+          Register Form
+          <div className="registerTopicInputBox">
+            Username
+            <br></br>
+            <input
+              className="registerInputBox"
+              value={username}
+              onChange={usernameChange}
+            />
+            <br></br>
+          </div>
+          <div className="registerTopicInputBox">
+            PWD
+            <br></br>
+            <input
+              type="password"
+              className="registerInputBox"
+              value={password}
+              onChange={passwordChange}
+            />
+            <br></br>
+          </div>
+          <div className="registerTopicInputBox">
+            Name
+            <br></br>
+            <input
+              className="registerInputBox"
+              value={name}
+              onChange={nameChange}
+            />
+            <br></br>
+          </div>
+          <div className="registerTopicInputBox">
+            Email
+            <br></br>
+            <input
+              className="registerInputBox"
+              value={email}
+              onChange={emailChange}
+            />
+            <br></br>
+          </div>
+          <button className="registerButton" onClick={submitData}>
+            Submit
+          </button>
+          {isLoading && <Loader/>}
         </div>
-        <div className="registerTopicInputBox">
-          PWD
-          <br></br>
-          <input
-          type="password"
-            className="registerInputBox"
-            value={password}
-            onChange={passwordChange}
-          />
-          <br></br>
-        </div>
-        <div className="registerTopicInputBox">
-          Name
-          <br></br>
-          <input
-            className="registerInputBox"
-            value={name}
-            onChange={nameChange}
-          />
-          <br></br>
-        </div>
-        <div className="registerTopicInputBox">
-          Email
-          <br></br>
-          <input
-            className="registerInputBox"
-            value={email}
-            onChange={emailChange}
-          />
-          <br></br>
-        </div>
-        <button className="registerButton" onClick={submitData}>
-          Submit
-        </button>
+        {/* Username error popup */}
+        <Popup
+          open={usernameErrorStatus}
+          onClose={() => setUserNameErrorStatus(false)}
+          modal
+          className="popup-content"
+        >
+          <div>
+            <p>This Username is already in use.</p>
+            <button onClick={() => setUserNameErrorStatus(false)}>Close</button>
+          </div>
+        </Popup>
+        <Popup
+          open={accnameErrorStatus}
+          onClose={() => setAccNameErrorStatus(false)}
+          modal
+          className="popup-content"
+        >
+          <div>
+            <p>This Account Name is already in use.</p>
+            <button onClick={() => setAccNameErrorStatus(false)}>Close</button>
+          </div>
+        </Popup>
+        {/* OTP sent error popup */}
+        <Popup
+          open={otpSentErrorStatus}
+          onClose={() => setOtpSentErrorStatus(false)}
+          modal
+          className="popup-content"
+        >
+          <div>
+            <p>Cannot send OTP to this Email, Please try again.</p>
+            <button onClick={() => setOtpSentErrorStatus(false)}>Close</button>
+          </div>
+        </Popup>
+        {/* OTP entry popup */}
+        <Popup
+          open={otpEnterStatus}
+          onClose={() =>{ setotpEnterStatus(false); setuserOtp("")}}
+          modal
+          className="popup-content"
+        >
+          <div>
+            <button
+              className="popup-close"
+              onClick={() => setotpEnterStatus(false)}
+            >
+              x
+            </button>
+            We have send an OTP Verification to your email
+            <br/>
+            <br></br>
+            Please Enter OTP
+            <br></br>
+            <input className="otpInputBox" value={userOtp} onChange={otpChange} />
+            <br />
+            <button className="popup-button" onClick={submitOTP}>
+              Submit OTP
+            </button>
+          </div>
+        </Popup>
+        <Popup
+          open={otpIncorrect}
+          onClose={() => setOtpIncorrect(false)}
+          modal
+          className="popup-content"
+        >
+          <div>
+            <p>Wrong OTP</p>
+            <button onClick={() => setOtpIncorrect(false)}>Close</button>
+          </div>
+        </Popup>
+        <Popup
+          open={createAccError}
+          onClose={() => setCreateAccError(false)}
+          modal
+          className="popup-content"
+        >
+          <button
+            className="popup-close"
+            onClick={() => setotpEnterStatus(false)}
+          >
+            x
+          </button>
+          Cannot register, Please try again later
+        </Popup>
+        <Popup
+          open={createAccSuccess}
+          onClose={() => setCreateAccSuccess(false)}
+          modal
+          className="popup-content"
+        >
+          <button
+            className="popup-close"
+            onClick={() => setotpEnterStatus(false)}
+          >
+            x
+          </button>
+          Register Success
+        </Popup>
       </div>
-      {/* Username error popup */}
-      <Popup
-        open={usernameErrorStatus}
-        onClose={() => setUserNameErrorStatus(false)}
-        modal
-      >
-        <div>
-          <p>This Username is already in use.</p>
-          <button onClick={() => setUserNameErrorStatus(false)}>Close</button>
-        </div>
-      </Popup>
-      <Popup
-        open={accnameErrorStatus}
-        onClose={() => setAccNameErrorStatus(false)}
-        modal
-      >
-        <div>
-          <p>This Account Name is already in use.</p>
-          <button onClick={() => setAccNameErrorStatus(false)}>Close</button>
-        </div>
-      </Popup>
-      {/* OTP sent error popup */}
-      <Popup
-        open={otpSentErrorStatus}
-        onClose={() => setOtpSentErrorStatus(false)}
-        modal
-      >
-        <div>
-          <p>Cannot send OTP to this Email, Please try again.</p>
-          <button onClick={() => setOtpSentErrorStatus(false)}>Close</button>
-        </div>
-      </Popup>
-      {/* OTP entry popup */}
-      <Popup
-        open={otpEnterStatus}
-        onClose={() => setotpEnterStatus(false)}
-        modal
-      >
-        <div>
-          <input value={userOtp} onChange={otpChange} />
-          <button onClick={submitOTP}>Submit</button>
-          <button onClick={() => setotpEnterStatus(false)}>Close</button>
-        </div>
-      </Popup>
-      <Popup open={otpIncorrect} onClose={() => setOtpIncorrect(false)} modal>
-        <div>
-          <p>Wrong OTP</p>
-          <button onClick={() => setOtpIncorrect(false)}>Close</button>
-        </div>
-      </Popup>
-      <Popup open={otpIncorrect} onClose={() => setOtpIncorrect(false)} modal>
-        Cannot register, Please try again later
-      </Popup>
-      <Popup open={otpCorrect} onClose={() => setOtpCorrect(false)} modal>
-        Register Success
-      </Popup>
-    </div>
     </>
   );
 };
