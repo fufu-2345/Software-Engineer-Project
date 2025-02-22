@@ -100,6 +100,19 @@ app.post('/checkstdID', (req, res) => {
     })
 })
 
+//Check both username and password
+app.post('/login', (req, res) => {
+    const query = `select * from user where userName = '${req.body.username}'`;
+    pool.query(query, (err, data) => {
+        if(data[0]['passWord'] == req.body.password){
+            return res.json({"ID" : data[0].userID , "Status" : true})
+        }else{
+            return res.json({"ID" : null , "Status" : false})
+        }
+    })
+    
+})
+
 //For verifying email address(Spam Prevention)
 const nodemailer = require('nodemailer');
 const { data } = require('react-router-dom');
@@ -163,6 +176,19 @@ app.post('/registerNonClubMember', (req, res) => {
     const defaultProfilePicPath = "Insert Default Path Here"
     const body = req.body
     var queryCommand = `insert into user(userName,passWord,accName,createTime,roleID,profilePic) values(?,?,?,NOW(),3,"${defaultProfilePicPath}")`
+    pool.query(queryCommand, [body.username, body.password, body.accountName], (err, results) => {
+        if (err) {
+            console.log(err)
+            return res.json({ success: false })
+        }
+        return res.json({ success: true })
+    })
+})
+
+app.post('/registerClubMember', (req, res) => {
+    const defaultProfilePicPath = "Insert Default Path Here"
+    const body = req.body
+    var queryCommand = `insert into user(userName,passWord,accName,createTime,roleID,profilePic) values(?,?,?,NOW(),2,"${defaultProfilePicPath}")`
     pool.query(queryCommand, [body.username, body.password, body.accountName], (err, results) => {
         if (err) {
             console.log(err)

@@ -68,10 +68,12 @@ const RegisterNonClub = () => {
     setIsLoading(true)
 
     var api = `http://localhost:5000/checkUsername`;
+    var email = `s${stdID}@email.kmutnb.ac.th`
     var body = {
       username: username,
       accountName: name,
       stdID: stdID,
+      email : email
     };
     var response = await axios.post(api, body);
     if (response.data.Status == true) {
@@ -122,12 +124,11 @@ const RegisterNonClub = () => {
       return;
     }
     setuserOtp("");
-    var api = `http://localhost:5000/registerNonClubMember/`;
+    var api = `http://localhost:5000/registerClubMember/`;
     var body = {
       username: username,
       password: password,
-      accountName: name,
-      email: email,
+      accountName: name
     };
     var response = await axios.post(api, body);
     if (response.data.success == false) {
@@ -139,7 +140,7 @@ const RegisterNonClub = () => {
 
     setTimeout(() => {
       navigate("/Main");
-    }, 2000);
+    }, 1500);
   }
 
   return (
