@@ -447,6 +447,8 @@ const Main = () => {
 
             <News role={role} />
             <ShowPosts userId={state.userId} role={role} />
+            {/*<ProfileShowPost userId={state.userId} />*/}
+
             {/*}            
             <div className='relative w-[90%] mx-auto mt-8'>
                 <div className='absolute top-0 left-0'>

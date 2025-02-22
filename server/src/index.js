@@ -123,6 +123,49 @@ app.get("/getPost/imgs/", (req, res) => {
     }
 })
 
+app.get("/getPost/imgs2/", (req, res) => {
+    const { sortMode, mode } = req.query;
+
+    const order = sortMode === 'DESC' ? 'DESC' : 'ASC';
+    const column = mode === 'postID' ? 'postID' : 'avgRating';
+    const search = req.query.search;
+    const userId = req.query.userId;
+
+    let a;
+    if (column === 'avgRating') {
+        a = `select post.photoPath from post JOIN user ON post.userID = user.userID WHERE post.userID = ${userId} AND post.avgRating > 0 AND user.userName LIKE '%${search}%' ORDER BY ${column} ${order};`;
+
+        pool.query(a, (err, data) => {
+            if (err) {
+                return res.json(err);
+            }
+            a = `select post.photoPath from post JOIN user ON post.userID = user.userID WHERE post.avgRating = 0 AND user.userName LIKE '%${search}%' ORDER BY postID DESC`;
+            let photoPaths = data.map(item => item.photoPath);
+            pool.query(a, (err, data) => {
+                if (err) {
+                    return res.json(err);
+                }
+                photoPaths = photoPaths.concat(data.map(item => item.photoPath));
+                //console.log(photoPaths);
+                return res.json(photoPaths);
+
+            })
+        })
+    }
+    else {
+        a = `select post.photoPath from post JOIN user ON post.userID = user.userID WHERE post.userID = ${userId} AND user.userName LIKE '%${search}%' ORDER BY ${column} ${order}`;
+
+        pool.query(a, (err, data) => {
+            if (err) {
+                return res.json(err);
+            }
+            const photoPaths = data.map(item => item.photoPath);
+            //console.log(photoPaths);
+            return res.json(photoPaths);
+        })
+    }
+})
+
 app.get("/getRole", (req, res) => {
     const { userId } = req.query;
     const query = `SELECT roleID FROM user WHERE userId = ?`;

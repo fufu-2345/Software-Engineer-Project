@@ -39,10 +39,11 @@ const ProfileShowPost = ({ userId }) => {
         const params = {
             sortMode: sortMode ? 'DESC' : 'ASC',
             mode: mode ? 'postID' : 'avgRating',
-            search: searchVal
+            search: searchVal,
+            userId: userId
         };
 
-        axios.get("http://localhost:5000/getPost/imgs", { params })
+        axios.get("http://localhost:5000/getPost/imgs2", { params })
             .then(response => {
                 setPostCount(response.data.length);
                 setPostImgs(response.data);
@@ -80,10 +81,11 @@ const ProfileShowPost = ({ userId }) => {
         const params = {
             sortMode: sortMode ? 'DESC' : 'ASC',
             mode: mode ? 'postID' : 'avgRating',
-            search: searchVal
+            search: searchVal,
+            userId: userId
         };
 
-        axios.get("http://localhost:5000/getPost/imgs", { params })
+        axios.get("http://localhost:5000/getPost/imgs2", { params })
             .then(response => {
                 setPostCount(response.data.length);
                 setPostImgs(response.data);

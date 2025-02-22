@@ -6,7 +6,7 @@ const Login = () => {
     const navigate = useNavigate();
 
     const handleGoMain = () => {
-        const data = { test: 'AAA', userId: 10 };
+        const data = { test: 'AAA', userId: 20 };
         navigate('/Main', { state: data });
     };
 
