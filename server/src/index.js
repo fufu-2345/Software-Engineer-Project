@@ -398,13 +398,13 @@ app.post('/checkstdID', (req, res) => {
 app.post('/login', (req, res) => {
     const query = `select * from user where userName = '${req.body.username}'`;
     pool.query(query, (err, data) => {
-        if(bcrypt.compareSync(req.body.password, data[0].passWord)){
-            return res.json({"ID" : data[0].ID, "Status": true })
-        }else{
-            return res.json({"ID" : null, "Status": false })
+        if (bcrypt.compareSync(req.body.password, data[0].passWord)) {
+            return res.json({ "ID": data[0].userID, "Status": true })
+        } else {
+            return res.json({ "ID": null, "Status": false })
         }
     })
-    
+
 })
 
 //For verifying email address(Spam Prevention)
@@ -462,11 +462,11 @@ app.post('/Sendotp', async (req, res) => {
     }
 })
 
-function createSalt(p){
+function createSalt(p) {
     var salt = bcrypt.genSaltSync(10)
-    var hash = bcrypt.hashSync(p,salt)
+    var hash = bcrypt.hashSync(p, salt)
 
-    var ret = {s :salt , hp : hash}
+    var ret = { s: salt, hp: hash }
     return ret
 }
 

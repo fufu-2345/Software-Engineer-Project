@@ -193,7 +193,7 @@ const Main = () => {
             navigate('/');
         }
 
-        console.log(state.userId)
+        console.log(state)
         axios.get("http://localhost:5000/getRole", { params: { userId: state.userId } })
             .then(response => {
                 if (response.data) {
@@ -201,11 +201,11 @@ const Main = () => {
                 } else {
                     navigate('/');
                 }
-            })
+            })/*
             .catch(error => {
                 console.error("Error fetching role:", error);
                 navigate('/'); // ไปหน้าอื่นถ้ามี error
-            });
+            });*/
 
         /*const params = {
             sortMode: sortMode ? 'DESC' : 'ASC',
