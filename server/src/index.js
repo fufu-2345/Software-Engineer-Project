@@ -33,12 +33,13 @@ app.get("/test", (req, res) => {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 app.use('/imgs', express.static(path.join(__dirname, '../imgs')));
+app.use('/news', express.static(path.join(__dirname, '../news')));
 
 ///////////////////////////////////////////////////////////
 //                    API TEST                           //
 ///////////////////////////////////////////////////////////
 
-
+/*
 app.get("/getComment", (req, res) => {
     const a = `SELECT * FROM comment`;
     pool.query(a, (err, data) => {
@@ -78,8 +79,106 @@ app.get("/getPost/imgs/", (req, res) => {
         const photoPaths = data.map(item => item.photoPath);
         return res.json(photoPaths);
     })
+})*/
+
+app.get("/getPost/imgs/", (req, res) => {
+    const { sortMode, mode } = req.query;
+
+    const order = sortMode === 'DESC' ? 'DESC' : 'ASC';
+    const column = mode === 'postID' ? 'postID' : 'avgRating';
+    const search = req.query.search;
+
+    let a;
+    if (column === 'avgRating') {
+        a = `select post.photoPath from post JOIN user ON post.userID = user.userID WHERE post.avgRating > 0 AND user.userName LIKE '%${search}%' ORDER BY ${column} ${order};`;
+
+        pool.query(a, (err, data) => {
+            if (err) {
+                return res.json(err);
+            }
+            a = `select post.photoPath from post JOIN user ON post.userID = user.userID WHERE post.avgRating = 0 AND user.userName LIKE '%${search}%' ORDER BY postID DESC`;
+            let photoPaths = data.map(item => item.photoPath);
+            pool.query(a, (err, data) => {
+                if (err) {
+                    return res.json(err);
+                }
+                photoPaths = photoPaths.concat(data.map(item => item.photoPath));
+                //console.log(photoPaths);
+                return res.json(photoPaths);
+
+            })
+        })
+    }
+    else {
+        a = `select post.photoPath from post JOIN user ON post.userID = user.userID WHERE user.userName LIKE '%${search}%' ORDER BY ${column} ${order}`;
+
+        pool.query(a, (err, data) => {
+            if (err) {
+                return res.json(err);
+            }
+            const photoPaths = data.map(item => item.photoPath);
+            //console.log(photoPaths);
+            return res.json(photoPaths);
+        })
+    }
 })
 
+app.get("/getPost/imgs2/", (req, res) => {
+    const { sortMode, mode } = req.query;
+
+    const order = sortMode === 'DESC' ? 'DESC' : 'ASC';
+    const column = mode === 'postID' ? 'postID' : 'avgRating';
+    const search = req.query.search;
+    const userId = req.query.userId;
+
+    let a;
+    if (column === 'avgRating') {
+        a = `select post.photoPath from post JOIN user ON post.userID = user.userID WHERE post.userID = ${userId} AND post.avgRating > 0 AND user.userName LIKE '%${search}%' ORDER BY ${column} ${order};`;
+
+        pool.query(a, (err, data) => {
+            if (err) {
+                return res.json(err);
+            }
+            a = `select post.photoPath from post JOIN user ON post.userID = user.userID WHERE post.avgRating = 0 AND user.userName LIKE '%${search}%' ORDER BY postID DESC`;
+            let photoPaths = data.map(item => item.photoPath);
+            pool.query(a, (err, data) => {
+                if (err) {
+                    return res.json(err);
+                }
+                photoPaths = photoPaths.concat(data.map(item => item.photoPath));
+                //console.log(photoPaths);
+                return res.json(photoPaths);
+
+            })
+        })
+    }
+    else {
+        a = `select post.photoPath from post JOIN user ON post.userID = user.userID WHERE post.userID = ${userId} AND user.userName LIKE '%${search}%' ORDER BY ${column} ${order}`;
+
+        pool.query(a, (err, data) => {
+            if (err) {
+                return res.json(err);
+            }
+            const photoPaths = data.map(item => item.photoPath);
+            //console.log(photoPaths);
+            return res.json(photoPaths);
+        })
+    }
+})
+
+app.get("/getRole", (req, res) => {
+    const { userId } = req.query;
+    const query = `SELECT roleID FROM user WHERE userId = ?`;
+    pool.query(query, [userId], (err, data) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        if (data.length === 0) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        res.json({ roleID: data[0].roleID });
+    });
+});
 
 app.get("/getPost/Count", (req, res) => {
     const query = `SELECT COUNT(*) FROM post`;
@@ -109,6 +208,58 @@ app.get("/getPost/max", (req, res) => {
     });
 });
 
+///////////////////////////////////////////////////////////
+//                         NEWS                          //
+///////////////////////////////////////////////////////////
+
+const newsDir = path.join(__dirname, "../news");
+
+app.get("/getNews", (req, res) => {
+    fs.readdir(newsDir, (err, files) => {
+        if (err) {
+            return res.json({ message: "Error reading directory" });
+        }
+
+        const imageFiles = files.filter(file => file !== ".gitkeep");
+
+        if (imageFiles.length === 0) {
+            return res.json({ news: null });
+        }
+
+        res.json({ news: imageFiles[0] });
+    });
+});
+
+const getNewsFilePath = () => {
+    const files = fs.readdirSync(newsDir).filter(file => file.startsWith("news."));
+    return files.length ? path.join(newsDir, files[0]) : null;
+}
+
+const uploadNews = multer({ storage: multer.memoryStorage() });
+if (!fs.existsSync(newsDir)) {
+    fs.mkdirSync(newsDir, { recursive: true });
+}
+
+app.post("/uploadNews", uploadNews.single("file"), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    const oldFilePath = getNewsFilePath();
+    if (oldFilePath && fs.existsSync(oldFilePath)) {
+        fs.unlinkSync(oldFilePath);
+    }
+
+    const fileExtension = path.extname(req.file.originalname);
+    const newFilePath = path.join(newsDir, `news${fileExtension}`);
+
+    fs.writeFile(newFilePath, req.file.buffer, (err) => {
+        if (err) {
+            return res.status(500).json({ error: "Error saving file" });
+        }
+        res.json({ filename: `news${fileExtension}` });
+    });
+});
 
 ///////////////////////////////////////////////////////////
 //                 UPLOAD IMAGE API                      //
@@ -125,14 +276,9 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 const checkedPost = [
-    check('userId')
-        .isString().withMessage('User ID must be a string')
-        .isLength({ min: 1 }).withMessage('User ID must have at least 1 character')
-        .notEmpty().withMessage('User ID is required'),
-
+    check('userId').isString().withMessage('User ID must be a string').isLength({ min: 1 }).withMessage('User ID must have at least 1 character').notEmpty().withMessage('User ID is required'),
     check('postName').optional(),
     check('postDescription').optional(),
-
     check('image')
         .custom((value, { req }) => {
             if (!req.file) {
