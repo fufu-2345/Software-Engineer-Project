@@ -8,10 +8,12 @@ const path = require('path');
 const { check, validationResult } = require('express-validator');
 require('dotenv').config({ path: '../.env' });
 
+var bcrypt = require('bcryptjs')
+
 const port = 5000;
 app.use(cors());
-app.use(express.json());
 
+app.use(express.json());
 
 const pool = mysql.createPool({
     host: process.env.HOST,
@@ -19,7 +21,6 @@ const pool = mysql.createPool({
     password: process.env.PASSWORD,
     database: process.env.DATABASE
 });
-
 
 app.get('/', (req, res) => {
     res.json('111111');
@@ -348,7 +349,7 @@ app.post('/upload', upload.single('image'), checkedPost, (req, res) => {
 
 //API for checking Username
 app.post('/checkUsername', (req, res) => {
-    const query = `select count(*) from customer where userName = '${req.body.username}'`;
+    const query = `select count(*) from user where userName = '${req.body.username}'`;
     pool.query(query, (err, data) => {
         if (err) {
             return res.json(err);
@@ -360,6 +361,50 @@ app.post('/checkUsername', (req, res) => {
             return res.json({ "Status": false })
         }
     })
+})
+
+//API for checking accName
+app.post('/checkAccname', (req, res) => {
+    const query = `select count(*) from user where accName = '${req.body.accountName}'`;
+    pool.query(query, (err, data) => {
+        if (err) {
+            return res.json(err);
+        }
+
+        if (data[0]['count(*)'] != 0) {
+            return res.json({ "Status": true })
+        } else {
+            return res.json({ "Status": false })
+        }
+    })
+})
+
+app.post('/checkstdID', (req, res) => {
+    const query = `select count(*) from clubmemberid where studentID = '${req.body.stdID}'`;
+    pool.query(query, (err, data) => {
+        if (err) {
+            return res.json(err);
+        }
+
+        if (data[0]['count(*)'] != 0) {
+            return res.json({ "Status": true })
+        } else {
+            return res.json({ "Status": false })
+        }
+    })
+})
+
+//Check both username and password
+app.post('/login', (req, res) => {
+    const query = `select * from user where userName = '${req.body.username}'`;
+    pool.query(query, (err, data) => {
+        if(bcrypt.compareSync(req.body.password, data[0].passWord)){
+            return res.json({"ID" : data[0].ID, "Status": true })
+        }else{
+            return res.json({"ID" : null, "Status": false })
+        }
+    })
+    
 })
 
 //For verifying email address(Spam Prevention)
@@ -417,13 +462,24 @@ app.post('/Sendotp', async (req, res) => {
     }
 })
 
+function createSalt(p){
+    var salt = bcrypt.genSaltSync(10)
+    var hash = bcrypt.hashSync(p,salt)
+
+    var ret = {s :salt , hp : hash}
+    return ret
+}
+
 
 
 //API for create new account in user database
+//Insert Profile Pic Path Later to be default
 app.post('/registerNonClubMember', (req, res) => {
+    const defaultProfilePicPath = "Insert Default Path Here"
     const body = req.body
-    var queryCommand = 'insert into customer(userName,passWord,accName,createTime) values(?,?,?,NOW())'
-    console.log(body)
+    var ep = createSalt(req.body.password)
+    console.log(ep)
+    var queryCommand = `insert into user(userName,passWord,salt,accName,createTime,roleID,profilePic) values(?,"${ep.hp}","${ep.s}",?,NOW(),3,"${defaultProfilePicPath}")`
     pool.query(queryCommand, [body.username, body.password, body.accountName], (err, results) => {
         if (err) {
             console.log(err)
@@ -433,5 +489,18 @@ app.post('/registerNonClubMember', (req, res) => {
     })
 })
 
+app.post('/registerClubMember', (req, res) => {
+    const defaultProfilePicPath = "Insert Default Path Here"
+    const body = req.body
+    var ep = createSalt(req.body.password)
+    var queryCommand = `insert into user(userName,passWord,salt,accName,createTime,roleID,profilePic) values(?,${ep.hp},${ep.s},?,NOW(),2,"${defaultProfilePicPath}")`
+    pool.query(queryCommand, [body.username, body.password, body.accountName], (err, results) => {
+        if (err) {
+            console.log(err)
+            return res.json({ success: false })
+        }
+        return res.json({ success: true })
+    })
+})
 
 app.listen(port, () => { console.log('\x1b[36m%s\x1b[0m is started/updated', `http://localhost:${port}`); })
