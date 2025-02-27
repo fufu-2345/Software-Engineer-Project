@@ -107,10 +107,36 @@ app.post('/login', (req, res) => {
     const query = `select * from user where userName = '${req.body.username}'`;
     pool.query(query, (err, data) => {
         if(bcrypt.compareSync(req.body.password, data[0].passWord)){
-            return res.json({"ID" : data[0].ID, "Status": true })
+            return res.json({"ID" : data[0].userID, "Status": true })
         }else{
             return res.json({"ID" : null, "Status": false })
         }
+    })
+    
+})
+
+app.post('/getData', (req, res) => {
+    const query = `select roleName from role where roleID = (select roleID from user where userID = ${req.body.userID})`;
+    pool.query(query, (err, data) => {
+        if(data[0]){
+            return res.json({"Role" : data[0].roleName, "Status" : true})
+        }else{
+            return res.json({"Role" : null, "Status" : false})
+        }
+        
+    })
+    
+})
+
+app.post('/getData2', (req, res) => {
+    const query = `select accName,profilePic from user where userID = ${req.body.userID}`;
+    pool.query(query, (err, data) => {
+        if(data[0]){
+            return res.json({"accName" : data[0].accName,"profilePath" : data[0].profilePic, "Status" : true})
+        }else{
+            return res.json({"accName" : null,"profilePath" : null, "Status" : false})
+        }
+        
     })
     
 })

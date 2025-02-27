@@ -139,8 +139,9 @@ const RegisterNonClub = () => {
     setCreateAccSuccess(true);
 
     setTimeout(() => {
-      navigate("/Main");
-    }, 1500);
+      navigate("/");
+  }, 1000);
+  return
   }
 
   return (

@@ -284,6 +284,25 @@ body {
    text-align: center;
    outline: none;
 }
+.selectRegisterBox{
+   background-color: rgb(216, 182, 203);
+   border-radius: 10px;
+   width: 400px;
+   padding: 20px;
+   display: flex;
+
+   align-items: center;
+   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+   font-size: 1.5rem;
+   font-weight: bold;
+   gap: 10px; /* Adds spacing between items */
+}
+ .userType {
+   padding: 10px;
+   background-color: #f0eaea;
+   border-radius: 5px;
+ }
+ 
 
 /* Fade-in animation */
 @keyframes fadeIn {

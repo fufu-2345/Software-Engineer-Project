@@ -6,6 +6,7 @@ import Popup from "reactjs-popup";
 import Loader from "../components/loader";
 
 import "../index.css";
+import Navbar from "../components/navbar";
 
 const Login = () => {
   var [username, setusername] = useState("");
@@ -41,7 +42,8 @@ const Login = () => {
     setSignInSuccess(true)
 
     setTimeout(() => {
-        navigate("/Main");
+        const data = {userId : response.data.ID}
+        navigate("/Main", {state : data});
     }, 1000);
     return
 
@@ -50,6 +52,7 @@ const Login = () => {
 
   return (
     <>
+    <Navbar />
       <div className="registerPage">
         <div className="registerBox">
           Sign In
