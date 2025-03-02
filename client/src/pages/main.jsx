@@ -158,7 +158,7 @@ const Main = () => {
                 console.error("Error getPost/imgs(handleSearch): ", error);
             });
     };*/
-
+    /*
     const handleSearch = () => {
         const params = {
             sortMode: sortMode ? 'DESC' : 'ASC',
@@ -175,7 +175,7 @@ const Main = () => {
             });
         console.log(postImgs);
 
-    };
+    };*/
 
 
     // ************** not done **************** 
@@ -399,6 +399,7 @@ const Main = () => {
     return (
         <div className="min-h-screen bg-bgColor">
             <h1>{role ? role.roleID : "Loading..."}</h1>
+            <h3 onClick={() => navigate('/')}>back</h3>
             {/*{isAdding && <div className='fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center bg-blue-300 p-4 border-4 w-[80%] h-[90vh] overflow-y-auto mx-auto rounded-lg z-50'>
 
                 <div {...getRootProps()} className='flex flex-col justify-center items-center bg bg-red-300 w-[60%] min-h-[500px] border-2 border-dashed border-gray-500 p-4 cursor-pointer'>

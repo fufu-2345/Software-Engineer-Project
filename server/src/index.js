@@ -35,6 +35,7 @@ app.get("/test", (req, res) => {
 
 app.use('/imgs', express.static(path.join(__dirname, '../imgs')));
 app.use('/news', express.static(path.join(__dirname, '../news')));
+app.use('/profilePicture', express.static(path.join(__dirname, '../profilePicture')));
 
 ///////////////////////////////////////////////////////////
 //                    API TEST                           //
@@ -106,7 +107,6 @@ app.get("/getPost/imgs/", (req, res) => {
                 photoPaths = photoPaths.concat(data.map(item => item.photoPath));
                 //console.log(photoPaths);
                 return res.json(photoPaths);
-
             })
         })
     }
@@ -122,6 +122,20 @@ app.get("/getPost/imgs/", (req, res) => {
             return res.json(photoPaths);
         })
     }
+})
+
+app.get("/getProfile/imgs", (req, res) => {
+    const search = req.query.search;
+
+    a = `select profilePic from user WHERE userName LIKE '%${search}%'`;
+    pool.query(a, (err, data) => {
+        if (err) {
+            return res.json(err);
+        }
+        const profilePaths = data.map(item => item.profilePic).filter(photoPath => photoPath !== 'Insert Default Path Here');;
+        console.log(profilePaths);
+        return res.json(profilePaths);
+    })
 })
 
 app.get("/getPost/imgs2/", (req, res) => {

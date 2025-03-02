@@ -15,6 +15,7 @@ const ShowPost = ({ userId, role }) => {
     const [file, setFile] = useState(null);
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
+    const [picOrProfile, setPicOrProfile] = useState(true);
 
     const maxVisitPage = 5;
     const column = 4; // จำนวนคอลัมน์ต่อแถว
@@ -120,20 +121,40 @@ const ShowPost = ({ userId, role }) => {
     };
 
     const handleSearch = () => {
-        const params = {
-            sortMode: sortMode ? 'DESC' : 'ASC',
-            mode: mode ? 'postID' : 'avgRating',
-            search: searchVal
-        };
+        if (searchVal == "") {
+            const params = {
+                sortMode: sortMode ? 'DESC' : 'ASC',
+                mode: mode ? 'postID' : 'avgRating',
+                search: searchVal
+            };
 
-        axios.get("http://localhost:5000/getPost/imgs", { params })
-            .then(response => {
-                setPostCount(response.data.length);
-                setPostImgs(response.data);
-            })
-            .catch(error => {
-                console.error("Error getPost/imgs(handleSearch): ", error);
-            });
+            axios.get("http://localhost:5000/getPost/imgs", { params })
+                .then(response => {
+                    setPostCount(response.data.length);
+                    setPostImgs(response.data);
+                    setPicOrProfile(true);
+                })
+                .catch(error => {
+                    console.error("Error getPost/imgs(handleSearch): ", error);
+                });
+        }
+        else {
+            const params = {
+                search: searchVal
+            };
+            //                               getProfile
+            axios.get("http://localhost:5000/getProfile/imgs", { params })
+                .then(response => {
+                    setPostCount(response.data.length);
+                    setPostImgs(response.data);
+                    console.log(postCount);
+                    console.log(postImgs);
+                    setPicOrProfile(false);
+                })
+                .catch(error => {
+                    console.error("Error getPost/imgs(handleSearch): ", error);
+                });
+        }
     };
 
     const handleSearchVal = (event) => {
@@ -193,6 +214,7 @@ const ShowPost = ({ userId, role }) => {
             .then(response => {
                 setPostCount(response.data.length);
                 setPostImgs(response.data);
+                setPicOrProfile(true);
             })
             .catch(error => {
                 console.error("Error getPost/imgs(handleSearch): ", error);
@@ -288,18 +310,32 @@ const ShowPost = ({ userId, role }) => {
                 <br /><br /><br />
                 <div className=' w-[100%] p-3 border'>
                     <div className={`grid grid-cols-4 gap-3 pb-3`}>
-                        {Array.isArray(postImgs) && postImgs.length > 0 ? (
-                            postImgs.slice(start, stop + 1).map((img, index) => (
-                                img ? (
-                                    <div key={index} className='relative group flex justify-center items-center h-[300px] cursor-pointer'>
-                                        <img src={`http://localhost:5000/imgs/${img}`} alt="postImg" className='w-full h-full object-contain transition-transform duration-400 group-hover:scale-[1.25] group-hover:z-10' title={img} />
-                                    </div>
-                                ) : null < img
-
-                            ))
+                        {picOrProfile ? (
+                            Array.isArray(postImgs) && postImgs.length > 0 ? (
+                                postImgs.slice(start, stop + 1).map((img, index) => (
+                                    img ? (
+                                        <div key={index} className='relative group flex justify-center items-center h-[300px] cursor-pointer'>
+                                            <img src={`http://localhost:5000/imgs/${img}`} alt="postImg" className='w-full h-full object-contain transition-transform duration-400 group-hover:scale-[1.25] group-hover:z-10' title={img} />
+                                        </div>
+                                    ) : null
+                                ))
+                            ) : (
+                                <p className="text-gray-500">no imgs rn</p>
+                            )
                         ) : (
-                            <p className="text-gray-500">no imgs rn</p>
+                            Array.isArray(postImgs) && postImgs.length > 0 ? (
+                                postImgs.slice(start, stop + 1).map((img, index) => (
+                                    img ? (
+                                        <div key={index} className='relative group flex justify-center items-center h-[300px] cursor-pointer'>
+                                            <img src={`http://localhost:5000/profilePicture/${img}`} alt="postImg" className='w-full h-full object-contain transition-transform duration-400 group-hover:scale-[1.25] group-hover:z-10' title={img} />
+                                        </div>
+                                    ) : null
+                                ))
+                            ) : (
+                                <p className="text-gray-500">no imgs rn</p>
+                            )
                         )}
+
                     </div>
                     <br />
 
