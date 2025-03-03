@@ -9,17 +9,27 @@ html, body {
 /*               .= class   #=id                  */
  
 body{
-   @apply bg-[#ffd1dd];
-
+   background-color: #ffd1dd !important ;
+   
 }
 
 
 
 /*--------------------------------------PART(1)--------------------------------------------------------------*/
+
+.pagePro{
+
+   color: #ff5a86;
+   font-weight: bold;
+   font-size: 18px;
+
+}
+
 .pro_r1{
    margin: 0.5rem;
    padding: 1rem;
-   border: solid 1px rgb(210, 210, 210);
+
+
 }
 
 .pro_main{
@@ -36,7 +46,7 @@ body{
 .pro_contract .contact-row {
    display: flex;
    align-items: left;
-   margin-bottom: 8px; /* เพิ่มช่องว่างระหว่างแต่ละแถว */
+   margin-bottom: 8px; 
    padding-top: 1.5rem;
 }
 
@@ -45,9 +55,13 @@ body{
 
 }
 .contract_box{
-   border: solid 1px rgb(210, 210, 210);
-   width: 200px;
+   border: solid 3px #ff5a86;
+   border-radius: 15px;
+   width: 300px;
    padding-left: 0.5rem;
+   background-color: #ffffff  ;
+   height: 35px;
+   
 
 }
 
@@ -57,34 +71,20 @@ body{
 .pro_r2{
    margin: 0.5rem;
    padding: 1rem;
-   border: solid 1px rgb(210, 210, 210);
+
 }
 /*---------------------------------PART(3)-----------------------------------------*/
 
 .pro_r3{
    margin: 0.5rem;
    padding: 1rem;
-   border: solid 1px rgb(210, 210, 210);
+
 }
 .pro_des{
    margin-top: 1rem;
-   border: solid 1px rgb(210, 210, 210);
+   border: solid 3px #ff5a86;
    padding: 1rem;
    height: 150px;
-}
-/*---------------------------------PART(4)-----------------------------------------*/
-.pro_r4{
-   margin: 0.5rem;
-   padding: 1rem;
-   border: solid 1px rgb(210, 210, 210);
-}
-
-.A{
-   border: solid 1px rgb(210, 210, 210);
-   height: 200px;
-   width: 200px; 
-   display: flex; 
-   justify-content: center; 
-   align-items: center; 
-   object-fit: cover;
+   background-color: #ffffff  ;
+   border-radius: 15px;
 }

@@ -1,12 +1,19 @@
-const express= require('express');
-const cors= require('cors');
-const mysql= require('mysql2');
-const app=express();
+const express = require('express');
+const cors = require('cors');
+const mysql = require('mysql2');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+const app = express();
 require('dotenv').config({ path: '../.env' });
 
-const port =5000;
+const port = 5000;
 app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
+// อนุญาตให้เข้าถึงไฟล์ในโฟลเดอร์ uploads
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const pool = mysql.createPool({
     host: process.env.HOST,
@@ -15,44 +22,65 @@ const pool = mysql.createPool({
     database: process.env.DATABASE
 });
 
+// ตรวจสอบและสร้างโฟลเดอร์ uploads 
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+}
 
-app.get('/', (req, res) => {  
-    res.json('111111');
+// ตั้งค่าการอัปโหลดรูปภาพ
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, uploadDir); 
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname)); 
+    }
 });
+const upload = multer({ storage: storage });
 
-app.get("/test",(req,res)=>{
-    res.json('test1 test2 test3');
-});
-
-app.get("/getPost", (req,res) =>{
-    const a = `SELECT * FROM post`;
-    pool.query(a, (err, data) => {
-        if (err) {
-            return res.json(err);
+// ดึงข้อมูลโปรไฟล์ผู้ใช้
+app.get('/getUserProfile/:id', (req, res) => {
+    const { id } = req.params;
+    const query = `SELECT userID, accName, accDescription, Instagram, X, Line, Phone, Other, profilePic FROM user WHERE userID = ?`;
+    pool.query(query, [id], (err, data) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (data.length === 0) {
+            return res.status(404).json({ message: 'User not found' });
         }
-        return res.json(data);
-    })
-})
-
-app.get("/getPost/Count", (req, res) => {
-    const query = `SELECT COUNT(*) FROM comment`;
-    pool.query(query, (err, data) => {
-        if (err) {
-            return res.json(err);
-        }
-        return res.json(data[0]);
+        res.status(200).json(data[0]);
     });
 });
 
-app.get("/getComment", (req,res) =>{
-    const a = `SELECT * FROM comment`;
-    pool.query(a, (err, data) => {
-        if (err) {
-            return res.json(err);
-        }
-        return res.json(data);
-    })
-})
+// อัปเดตข้อมูลโปรไฟล์ผู้ใช้
+app.post('/updateProfile', upload.single('image'), (req, res) => {
+    const { accName, accDescription, Instagram, X, Line, Phone, Other } = req.body;
+    const profilePic = req.file ? req.file.filename : null; 
+    const userId = req.body.userId ; 
 
+    let query;
+    let values;
 
-app.listen(port,()=>{console.log('\x1b[36m%s\x1b[0m is started/updated', `http://localhost:${port}`);})
+    if (profilePic) {
+        query = `
+            UPDATE user 
+            SET accName = ?, accDescription = ?, Instagram = ?, X = ?, Line = ?, Phone = ?, Other = ?, profilePic = ?
+            WHERE userID = ?`;
+        values = [accName, accDescription, Instagram, X, Line, Phone, Other, profilePic, userId];
+    } else {
+        query = `
+            UPDATE user 
+            SET accName = ?, accDescription = ?, Instagram = ?, X = ?, Line = ?, Phone = ?, Other = ?
+            WHERE userID = ?`;
+        values = [accName, accDescription, Instagram, X, Line, Phone, Other, userId];
+    }
+
+    pool.query(query, values, (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.status(200).json({ message: 'Profile updated successfully' });
+    });
+});
+
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+});
