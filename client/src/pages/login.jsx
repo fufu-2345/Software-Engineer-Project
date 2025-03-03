@@ -48,6 +48,21 @@ const Login = () => {
 
     }
 
+    const HandleGoMain = () => {
+        const data = { userId: 20 };
+
+        const handleClick = () => {
+            navigate('/Main', { state: data });
+        };
+
+        return (
+            <>
+                <br /><br />
+                <button onClick={handleClick}> Main </button>
+                <br /><br />
+            </>
+        );
+    };
 
     return (
         <>
@@ -107,31 +122,8 @@ const Login = () => {
                     </div>
                 </Popup>
             </div>
-
-            {/*
-const Login = () => {
-    const navigate = useNavigate();
-
-
-    
-
-
-    const handleGoMain = () => {
-        const data = { test: 'AAA', userId: 20 };
-        navigate('/Main', { state: data });
-    };
-
-    return (
-        <>
-            <h1 className='font-bold text-4xl'>Login</h1><br />
-            <button onClick={handleGoMain}> Main </button>
-
-            <br /><br />
-
-        </>
-    );
-};*/}
-
+            <br></br>
+            <HandleGoMain />
 
         </>
     );
