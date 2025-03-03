@@ -12,8 +12,11 @@ var bcrypt = require('bcryptjs')
 
 const port = 5000;
 app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const pool = mysql.createPool({
     host: process.env.HOST,
@@ -28,6 +31,65 @@ app.get('/', (req, res) => {
 
 app.get("/test", (req, res) => {
     res.json('test1 test2 test3');
+});
+
+// ตรวจสอบและสร้างโฟลเดอร์ uploads 
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+}
+
+// ตั้งค่าการอัปโหลดรูปภาพ
+const storage2 = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname));
+    }
+});
+const upload2 = multer({ storage: storage2 });
+
+// ดึงข้อมูลโปรไฟล์ผู้ใช้
+app.get('/getUserProfile/:id', (req, res) => {
+    const { id } = req.params;
+    const query = `SELECT userID, accName, accDescription, Instagram, X, Line, Phone, Other, profilePic FROM user WHERE userID = ?`;
+    pool.query(query, [id], (err, data) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (data.length === 0) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.status(200).json(data[0]);
+    });
+});
+
+// อัปเดตข้อมูลโปรไฟล์ผู้ใช้
+app.post('/updateProfile', upload2.single('image'), (req, res) => {
+    const { accName, accDescription, Instagram, X, Line, Phone, Other } = req.body;
+    const profilePic = req.file ? req.file.filename : null;
+    const userId = req.body.userId;
+
+    let query;
+    let values;
+
+    if (profilePic) {
+        query = `
+            UPDATE user 
+            SET accName = ?, accDescription = ?, Instagram = ?, X = ?, Line = ?, Phone = ?, Other = ?, profilePic = ?
+            WHERE userID = ?`;
+        values = [accName, accDescription, Instagram, X, Line, Phone, Other, profilePic, userId];
+    } else {
+        query = `
+            UPDATE user 
+            SET accName = ?, accDescription = ?, Instagram = ?, X = ?, Line = ?, Phone = ?, Other = ?
+            WHERE userID = ?`;
+        values = [accName, accDescription, Instagram, X, Line, Phone, Other, userId];
+    }
+
+    pool.query(query, values, (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.status(200).json({ message: 'Profile updated successfully' });
+    });
 });
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -470,8 +532,6 @@ function createSalt(p) {
     return ret
 }
 
-
-
 //API for create new account in user database
 //Insert Profile Pic Path Later to be default
 app.post('/registerNonClubMember', (req, res) => {
@@ -504,3 +564,8 @@ app.post('/registerClubMember', (req, res) => {
 })
 
 app.listen(port, () => { console.log('\x1b[36m%s\x1b[0m is started/updated', `http://localhost:${port}`); })
+
+/*
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+});*/
