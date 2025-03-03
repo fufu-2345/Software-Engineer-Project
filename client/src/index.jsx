@@ -22,7 +22,7 @@ const router = createBrowserRouter([
   { path: "/", element: <App />, },
   { path: "/Login", element: <Login />, },
   { path: "/Main", element: <Main />, },
-  { path: "/PostDetail", element: <PostDetail />, },
+  { path: "/post/:id", element: <PostDetail />, },
   { path: "/Profile", element: <Profile />, },
   { path: "/RegisterClub", element: <RegisterClub />, },
   { path: "/RegisterNonClub", element: <RegisterNonClub />, },

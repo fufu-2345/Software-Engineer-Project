@@ -504,3 +504,202 @@ app.post('/registerClubMember', (req, res) => {
 })
 
 app.listen(port, () => { console.log('\x1b[36m%s\x1b[0m is started/updated', `http://localhost:${port}`); })
+
+// ดึงโพสต์ทั้งหมดจาก MySQL
+app.get('/getPost', (req, res) => {
+    pool.query(`SELECT * FROM post`, (err, data) => {
+        if (err) return res.status(500).json({ error: err });
+        return res.json(data);
+    });
+});
+
+// ดึงคอมเมนต์ทั้งหมดจาก MySQL
+app.get('/getComment', (req, res) => {
+    pool.query(`SELECT * FROM comment`, (err, data) => {
+        if (err) return res.status(500).json({ error: err });
+        return res.json(data);
+    });
+});
+
+// ตรวจสอบ Username
+app.post('/checkUsername', (req, res) => {
+    const { username } = req.body;
+    const query = `SELECT COUNT(*) AS count FROM customer WHERE userName = ?`;
+    pool.query(query, [username], (err, data) => {
+        if (err) return res.status(500).json({ error: err });
+        return res.json({ "Status": data[0].count > 0 });
+    });
+});
+
+app.get('/getComment/:id', (req, res) => {
+    const postID = req.params.id;
+
+    const query = `
+        SELECT u.userName, c.commentDescription, r.ratingValue, c.userID, c.commentTime, u.profilePic
+        FROM comment c
+        JOIN user u ON c.userID = u.userID
+        LEFT JOIN rating r ON c.userID = r.userID AND c.postID = r.postID
+        WHERE c.postID = ?
+        ORDER BY c.commentTime ASC;`;
+
+    pool.query(query, [postID], (err, result) => {
+        res.json(result);
+    });
+});
+
+
+// เพิ่มคอมเมนต์ใหม่ลง Database
+app.post('/addComment', (req, res) => {
+    const { postID, commentDescription, ratingValue, userID } = req.body;
+
+    // ถ้ามีคอมเมนต์ ให้เพิ่มลงตาราง comment
+    if (commentDescription.trim()) {
+        const commentQuery = `INSERT INTO comment (postID, userID, commentDescription, commentTime) VALUES (?, ?, ?, NOW())`;
+
+        pool.query(commentQuery, [postID, userID, commentDescription], (err, commentResult) => {
+        });
+    }
+
+    // ถ้าผู้ใช้เลือก "Select Rating" -> ให้ลบ Rating เดิม
+    if (ratingValue === null || ratingValue === "") {
+        const deleteRatingQuery = `DELETE FROM rating WHERE postID = ? AND userID = ?`;
+        pool.query(deleteRatingQuery, [postID, userID], (err, deleteResult) => {
+            //อัปเดตค่า avgRatin หลังจากลบ Rating
+            updateAvgRating(postID, res);
+        });
+
+    } else {
+        // ตรวจสอบว่ามี Rating อยู่แล้วหรือไม่
+        const checkRatingQuery = `SELECT ratingValue FROM rating WHERE postID = ? AND userID = ?`;
+        pool.query(checkRatingQuery, [postID, userID], (err, result) => {
+            if (result.length > 0) {
+                const existingRating = result[0].ratingValue;
+                if (existingRating !== ratingValue) {
+                    // ถ้าค่า rating เปลี่ยน → UPDATE ค่าใหม่
+                    const updateRatingQuery = `UPDATE rating SET ratingValue = ?, rateTime = NOW() WHERE postID = ? AND userID = ?`;
+                    pool.query(updateRatingQuery, [ratingValue, postID, userID], (err, updateResult) => {
+                        console.log("Rating updated successfully!");
+                        updateAvgRating(postID, res);
+                    });
+                } else {
+                    // ถ้า rating เหมือนเดิม → ไม่ต้องอัปเดต
+                    res.json({ success: true });
+                }
+            } else {
+                // ➕ ถ้ายังไม่มี Rating → เพิ่มใหม่
+                const insertRatingQuery = `INSERT INTO rating (postID, userID, ratingValue, rateTime) VALUES (?, ?, ?, NOW())`;
+                pool.query(insertRatingQuery, [postID, userID, ratingValue], (err, insertResult) => {
+                    updateAvgRating(postID, res);
+                });
+            }
+        });
+    }
+});
+
+// Start Server
+//app.listen(port, () => console.log(`Server started at http://localhost:${port}`));
+
+app.post('/addCommentRating', (req, res) => {
+    const { postID, commentDescription, ratingValue, userID } = req.body;
+
+    // ถ้ามี Comment ให้เพิ่มลง `comment` Table
+    if (commentDescription) {
+        const commentQuery = `INSERT INTO comment (postID, userID, commentDescription, commentTime) VALUES (?, ?, ?, NOW())`;
+        pool.query(commentQuery, [postID, userID, commentDescription], (err, commentResult) => {
+        });
+    }
+
+    // ถ้ามี Rating ต้องอัปเดตหรือเพิ่มลง `rating` Table
+    if (ratingValue !== null) {
+        const checkRatingQuery = `SELECT ratingID FROM rating WHERE postID = ? AND userID = ?`;
+        pool.query(checkRatingQuery, [postID, userID], (err, result) => {
+
+            if (result.length > 0) {
+                // ถ้ามี Rating อยู่แล้ว → อัปเดต
+                const updateRatingQuery = `UPDATE rating SET ratingValue = ?, rateTime = NOW() WHERE postID = ? AND userID = ?`;
+                pool.query(updateRatingQuery, [ratingValue, postID, userID], (err, updateResult) => {
+                    updateAvgRating(postID, res); // อัปเดต avgRating ของโพสต์
+                });
+            } else {
+                // ถ้ายังไม่มี Rating → เพิ่มใหม่
+                const insertRatingQuery = `INSERT INTO rating (postID, userID, ratingValue, rateTime) VALUES (?, ?, ?, NOW())`;
+                pool.query(insertRatingQuery, [postID, userID, ratingValue], (err, insertResult) => {
+                    updateAvgRating(postID, res); // อัปเดต avgRating ของโพสต์
+                });
+            }
+        });
+    } else {
+        res.json({ success: true });
+    }
+});
+
+app.get('/getLatestRatings/:postID', (req, res) => {
+    const postID = req.params.postID;
+    
+    const query = `
+        SELECT userID, ratingValue 
+        FROM rating 
+        WHERE postID = ? 
+        ORDER BY rateTime DESC`;
+
+    pool.query(query, [postID], (err, result) => {
+        res.json(result);
+    });
+});
+
+
+const updateAvgRating = (postID, res) => {
+    const avgRatingQuery = `
+        UPDATE post 
+        SET avgRating = (SELECT IFNULL(AVG(ratingValue), 0) FROM rating WHERE postID = ?) 
+        WHERE postID = ?`;
+
+    pool.query(avgRatingQuery, [postID, postID], (err, result) => {
+        res.json({ success: true });
+    });
+};
+
+app.get('/getPost/:id/:userID?', (req, res) => {
+    const { id, userID } = req.params;
+
+    let query = `
+        SELECT p.*, 
+            u.userName,
+            u.profilePic,
+            COALESCE((SELECT AVG(ratingValue) FROM rating WHERE postID = p.postID), 0) AS avgRating
+        FROM post p
+        JOIN user u ON p.userID = u.userID
+        WHERE p.postID = ?`;
+
+    let queryParams = [id];
+
+    if (userID) {
+        query = `
+            SELECT p.*, 
+                u.userName,
+                u.profilePic,
+                COALESCE((SELECT AVG(ratingValue) FROM rating WHERE postID = p.postID), 0) AS avgRating,
+                (SELECT ratingValue 
+                 FROM rating 
+                 WHERE postID = p.postID AND userID = ? 
+                 ORDER BY rateTime DESC LIMIT 1) AS userRating
+            FROM post p
+            JOIN user u ON p.userID = u.userID
+            WHERE p.postID = ?`;
+
+        queryParams = [userID, id];
+    }
+
+    pool.query(query, queryParams, (err, result) => {
+        if (result.length === 0) {
+            console.warn(`No post found for postID: ${id}`);
+            return res.status(404).json({ error: "Post not found" });
+        }
+        let post = result[0];
+
+        //แปลงค่า avgRating และ userRating ให้ถูกต้อง
+        post.avgRating = post.avgRating ? parseFloat(post.avgRating).toFixed(2) : "0.00";
+        post.userRating = post.userRating ? parseInt(post.userRating) : null;
+        res.json(post);
+    });
+});
