@@ -340,13 +340,13 @@ const ShowPost = ({ userId, role }) => {
                 <div className='flex flex-col items-center bg-grey-300 bg-clip-padding'>
                     <div class="flex space-x-4 ">
                         <div className='w-full flex justify-center'>
-                            <button onClick={handleCancle} className='px-4 py-2 bg-red-500 text-white rounded block my-2'>
+                            <button onClick={handleCancle} className='bg-red-500 hover:bg-red-700  text-white px-4 py-2 m-2 rounded'>
                                 cancle
                             </button>
                         </div>
 
                         <div className='w-full flex justify-center'>
-                            <button onClick={handleUpload} className='px-4 py-2 bg-blue-500 text-white rounded block my-2'>
+                            <button onClick={handleUpload} className='bg-green-500 hover:bg-green-700 text-white px-4 py-2 m-2 rounded'>
                                 confirm
                             </button>
                         </div>
@@ -355,7 +355,11 @@ const ShowPost = ({ userId, role }) => {
             </div>}
             <div className='top-0 right-0 fixed position: fixed; flex items-center'>
                 {(role.roleID == 1 || role.roleID == 2) &&
-                    <button onClick={handleIsAdding} className="text-black bg-red-400 hover:bg-red-600 rounded-full w-12 h-12 flex items-center justify-center text-[32px]"> + </button>
+                    <button onClick={handleIsAdding} className="text-white bg-red-500 hover:bg-red-600 rounded-full w-12 h-12 flex items-center justify-center">
+                        <p className="text-[32px] text-white leading-none relative top-[3px]">
+                            +
+                        </p>
+                    </button>
                 }
             </div>
             <div className='relative w-[90%] mx-auto mt-8'>
@@ -366,7 +370,7 @@ const ShowPost = ({ userId, role }) => {
                     </button>
                 </div>
                 <div className='absolute top-0 left-[37.5%] flex'>
-                    <input type="text" value={searchVal} onChange={handleSearchVal} placeholder="type for search here..." className="bg-white border-2 w-[275px] border-black rounded-2xl p-2.5" />
+                    <input type="text" value={searchVal} onChange={handleSearchVal} placeholder="type for search here" className="bg-white border-2 w-[275px] border-black rounded-2xl p-2.5" />
                     <button className='bg-gray-400 hover:bg-gray-500 rounded-2xl p-2.5 ml-2 text-white' onClick={handleSearch}>
                         Search
                     </button>
@@ -378,7 +382,7 @@ const ShowPost = ({ userId, role }) => {
                                 proImgs.map((profile, index) => (
                                     <div key={index} className="flex items-center p-2 border-b hover:bg-gray-100 cursor-pointer">
                                         <img src={`http://localhost:5000/profilePicture/${profile}`} alt={profile} className='w-8 h-8 object-cover rounded-full' title={profile} />
-                                        <p className="ml-2">{userName[index]}</p>
+                                        <p className="ml-2 leading-none relative top-[7px]">{userName[index]}</p>
                                     </div>
                                 ))
                             ) : (
@@ -411,12 +415,12 @@ const ShowPost = ({ userId, role }) => {
                     <br />
 
                     <div className="flex items-center justify-center space-x-2 py-2">
-                        <button onClick={() => changePage(1)} className="text-black text-lg rounded-full hover:bg-gray-500 w-7 h-7 flex items-center justify-center leading-none">
-                            <span className="flex items-center justify-center hover:text-white">{'<<'}</span>
+                        <button onClick={() => changePage(1)} className="group text-black text-lg rounded-full hover:bg-gray-500 hover:text-white w-7 h-7 flex items-center justify-center leading-none">
+                            <span className="flex items-center justify-center group-hover:text-white">{'<<'}</span>
                         </button>
 
-                        <button onClick={() => changePage(currentPage - 1)} className="text-black text-lg rounded-full hover:bg-gray-500 w-7 h-7 flex items-center justify-center leading-none">
-                            <span className="flex items-center justify-center hover:text-white">{'<'}</span>
+                        <button onClick={() => changePage(currentPage - 1)} className="group text-black text-lg rounded-full hover:bg-gray-500 hover:text-white w-7 h-7 flex items-center justify-center leading-none">
+                            <span className="flex items-center justify-center group-hover:text-white">{'<'}</span>
                         </button>
 
                         {Array.from({ length: endPage - startPage + 1 }, (_, index) => {
@@ -428,12 +432,12 @@ const ShowPost = ({ userId, role }) => {
                             );
                         })}
 
-                        <button onClick={() => changePage(currentPage + 1)} className="text-black text-lg rounded-full hover:bg-gray-500 w-7 h-7 flex items-center justify-center leading-none">
-                            <span className="flex items-center justify-center hover:text-white">{'>'}</span>
+                        <button onClick={() => changePage(currentPage + 1)} className="group text-black text-lg rounded-full hover:bg-gray-500 hover:text-white w-7 h-7 flex items-center justify-center leading-none">
+                            <span className="flex items-center justify-center group-hover:text-white">{'>'}</span>
                         </button>
 
-                        <button onClick={() => changePage(totalPage)} className="text-black text-lg rounded-full hover:bg-gray-500 w-7 h-7 flex items-center justify-center leading-none">
-                            <span className="flex items-center justify-center hover:text-white">{'>>'}</span>
+                        <button onClick={() => changePage(totalPage)} className="group text-black text-lg rounded-full hover:bg-gray-500 hover:text-white w-7 h-7 flex items-center justify-center leading-none">
+                            <span className="flex items-center justify-center group-hover:text-white">{'>>'}</span>
                         </button>
                     </div>
 

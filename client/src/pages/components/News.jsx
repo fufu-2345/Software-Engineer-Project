@@ -48,11 +48,11 @@ const News = ({ role }) => {
                 onDrop={handleDrop} >
                 {newFile ? (
                     <div className="text-center group">
-                        <img src={URL.createObjectURL(newFile)} className='w-full h-[350px] object-cover transition-transform duration-1000 group-hover:scale-[1.1]' alt="New File" />
+                        <img src={URL.createObjectURL(newFile)} className='w-full h-[350px]' alt="New File" />
                     </div>
                 ) : news ? (
                     <div className='text-center group'>
-                        <img src={`http://localhost:5000/news/${news}`} className='w-full h-[350px] object-cover transition-transform duration-1000 group-hover:scale-[1.1]' alt="News" />
+                        <img src={`http://localhost:5000/news/${news}`} className='w-full h-[350px]' alt="News" />
                     </div>
                 ) : (
                     <p className="text-white">no news rn</p>
@@ -60,8 +60,8 @@ const News = ({ role }) => {
             </div>
             {newFile && role.roleID === 1 && ( // แสดงปุ่มเฉพาะเมื่อ role เป็น 1
                 <div className="mt-2 mx-auto flex items-center justify-center">
-                    <button className="bg-red-500 text-white px-4 py-2 m-2" onClick={() => setNewFile(null)}>Cancel</button>
-                    <button className="bg-green-500 text-white px-4 py-2 m-2" onClick={handleConfirm}>Confirm</button>
+                    <button className="bg-red-500 hover:bg-red-700 text-white px-4 py-2 m-2 rounded" onClick={() => setNewFile(null)}>Cancel</button>
+                    <button className="bg-green-500 hover:bg-green-700 text-white px-4 py-2 m-2 rounded" onClick={handleConfirm}>Confirm</button>
                 </div>
             )}
         </>

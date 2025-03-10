@@ -526,7 +526,7 @@ app.post('/registerNonClubMember', (req, res) => {
     var ep = createSalt(req.body.password)
     console.log(ep)
     var queryCommand = `insert into user(userName,passWord,salt,accName,createTime,roleID,profilePic) values(?,"${ep.hp}","${ep.s}",?,NOW(),3,"${defaultProfilePicPath}")`
-    pool.query(queryCommand, [body.username, body.password, body.accountName], (err, results) => {
+    pool.query(queryCommand, [body.username, body.accountName], (err, results) => {
         if (err) {
             console.log(err)
             return res.json({ success: false })
@@ -540,7 +540,7 @@ app.post('/registerClubMember', (req, res) => {
     const body = req.body
     var ep = createSalt(req.body.password)
     var queryCommand = `insert into user(userName,passWord,salt,accName,createTime,roleID,profilePic) values(?,${ep.hp},${ep.s},?,NOW(),2,"${defaultProfilePicPath}")`
-    pool.query(queryCommand, [body.username, body.password, body.accountName], (err, results) => {
+    pool.query(queryCommand, [body.username, body.accountName], (err, results) => {
         if (err) {
             console.log(err)
             return res.json({ success: false })

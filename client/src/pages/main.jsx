@@ -49,9 +49,14 @@ const Main = () => {
 
     return (
         <div className="min-h-screen bg-bgColor">
+            {role === 0 && (
+                <div className="fixed left-1/2 transform -translate-x-1/2 w-[10%] h-[10%] z-100 bg-green-600 flex items-center justify-center cursor-pointer rounded" onClick={() => navigate('/login')}>
+                    <p className='text-white fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2'>login</p>
+                </div>
+            )}
+
             {/*<Nav role={role} />*/}
             {/*<h1>{role ? role.roleID : "Loading..."}</h1>*/}
-            <h3 onClick={() => navigate('/')}>back</h3>
             <br /><br />
 
             <News role={role} />
