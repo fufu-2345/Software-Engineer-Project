@@ -117,7 +117,48 @@ const ShowPost = ({ userId, role }) => {
 
     const handleSetMode = () => {
         setIsOpen(false);
-        setMode(!mode);
+        setSortMode(true);
+        setMode(true);
+        console.log(mode, sortMode);
+
+        const params = {
+            sortMode: sortMode ? 'DESC' : 'ASC',
+            mode: mode ? 'postID' : 'avgRating',
+            search: ""
+        };
+
+        axios.get("http://localhost:5000/getPost/imgs", { params })
+            .then(response => {
+                setPostCount(response.data.length);
+                setPostImgs(response.data);
+                setPicOrProfile(true);
+            })
+            .catch(error => {
+                console.error("Error getPost/imgs(handleSearch): ", error);
+            });
+    };
+
+    const handleSetMode2 = () => {
+        setIsOpen(false);
+        setSortMode(true);
+        setMode(false);
+        console.log(mode, sortMode);
+
+        const params = {
+            sortMode: sortMode ? 'DESC' : 'ASC',
+            mode: mode ? 'postID' : 'avgRating',
+            search: ""
+        };
+
+        axios.get("http://localhost:5000/getPost/imgs", { params })
+            .then(response => {
+                setPostCount(response.data.length);
+                setPostImgs(response.data);
+                setPicOrProfile(true);
+            })
+            .catch(error => {
+                console.error("Error getPost/imgs(handleSearch): ", error);
+            });
     };
 
     const handleSearch = () => {
@@ -163,6 +204,21 @@ const ShowPost = ({ userId, role }) => {
 
     const handleSortMode = () => {
         setSortMode(!sortMode);
+        const params = {
+            sortMode: sortMode ? 'ASC' : 'DESC',
+            mode: mode ? 'postID' : 'avgRating',
+            search: ""
+        };
+
+        axios.get("http://localhost:5000/getPost/imgs", { params })
+            .then(response => {
+                setPostCount(response.data.length);
+                setPostImgs(response.data);
+                setPicOrProfile(true);
+            })
+            .catch(error => {
+                console.error("Error getPost/imgs(handleSearch): ", error);
+            });
     };
 
     const handleIsAdding = () => {
@@ -190,13 +246,13 @@ const ShowPost = ({ userId, role }) => {
     const Dropdown = () => {
         return (
             <div className="relative inline-block text-left">
-                <button onClick={toggleDropdown} className="px-4 py-2 bg-blue-500 text-white rounded-md">
+                <button onClick={toggleDropdown} className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md">
                     {mode ? 'newest' : 'score'}
                 </button>
                 {isOpen && (
                     <div className="absolute left-0 mt-2 w-40 bg-white border rounded-lg shadow-lg z-10">
-                        <button onClick={handleSetMode} className="block w-full px-4 py-2 text-left hover:bg-gray-200">newest</button>
-                        <button onClick={handleSetMode} className="block w-full px-4 py-2 text-left hover:bg-gray-200">score</button>
+                        <button onClick={handleSetMode} className="block w-full px-4 py-2 text-left hover:bg-red-400 hover:text-white">newest</button>
+                        <button onClick={handleSetMode2} className="block w-full px-4 py-2 text-left hover:bg-red-400 hover:text-white">score</button>
                     </div>
                 )}
             </div>
@@ -223,7 +279,7 @@ const ShowPost = ({ userId, role }) => {
 
     return (
         <>
-            {isAdding && <div className='fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center bg-blue-300 p-4 border-4 w-[80%] h-[90vh] overflow-y-auto mx-auto rounded-lg z-50'>
+            {isAdding && <div className='fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center bg-blue-300 p-4 border-4 w-[80%] h-[90vh] overflow-y-auto mx-auto rounded-lg z-50 overflow-hidden'>
 
                 <div {...getRootProps()} className='flex flex-col justify-center items-center bg bg-red-300 w-[60%] min-h-[500px] border-2 border-dashed border-gray-500 p-4 cursor-pointer'>
                     <input {...getInputProps()} />
@@ -285,26 +341,23 @@ const ShowPost = ({ userId, role }) => {
                     </div>
                 </div>
             </div>}
+            <div className='top-0 right-0 fixed position: fixed;'>
+                {(role.roleID == 1 || role.roleID == 2) &&
+                    <button onClick={handleIsAdding} className='border-2'> add img </button>
+                }
+            </div>
             <div className='relative w-[90%] mx-auto mt-8'>
-                <div className='absolute top-0 left-0'>
-                    {(role.roleID == 1 || role.roleID == 2) &&
-                        <button onClick={handleIsAdding} className='border-2'> add img </button>
-                    }
-                </div>
-                <div className='absolute top-0 right-0'>
-
+                <div className="absolute top-0 left-0">
                     <Dropdown />
-
-                    <button className='bg-blue-400 rounded-2xl p-2.5 ml-2' onClick={handleSortMode}>
+                    <button className='rounded-2xl p-2.5 ml-2 bg-red-400 hover:bg-red-600 text-white' onClick={handleSortMode}>
                         Sort
                     </button>
-
-                    <input type="text" value={searchVal} onChange={handleSearchVal} placeholder="type for search here..." className="bg-white border-2 border-black focus:ring-2 focus:ring-gray-950 focus:outline-none rounded-2xl p-2.5 ml-2" />
-
-                    <button className='bg-blue-400 rounded-2xl p-2.5 ml-2 ' onClick={handleSearch}>
+                </div>
+                <div className='absolute top-0 left-[37.5%] flex'>
+                    <input type="text" value={searchVal} onChange={handleSearchVal} placeholder="type for search here..." className="bg-white border-2 w-[275px] border-black rounded-2xl p-2.5" />
+                    <button className='bg-gray-400 hover:bg-gray-500 rounded-2xl p-2.5 ml-2 text-white' onClick={handleSearch}>
                         Search
                     </button>
-
                 </div>
 
                 <br /><br /><br />
@@ -315,7 +368,7 @@ const ShowPost = ({ userId, role }) => {
                                 postImgs.slice(start, stop + 1).map((img, index) => (
                                     img ? (
                                         <div key={index} className='relative group flex justify-center items-center h-[300px] cursor-pointer'>
-                                            <img src={`http://localhost:5000/imgs/${img}`} alt="postImg" className='w-full h-full object-contain transition-transform duration-400 group-hover:scale-[1.25] group-hover:z-10' title={img} />
+                                            <img src={`http://localhost:5000/imgs/${img}`} alt="postImg" className='w-full h-full object-contain' title={img} />
                                         </div>
                                     ) : null
                                 ))
@@ -367,16 +420,8 @@ const ShowPost = ({ userId, role }) => {
                     </div>
 
                 </div>
-
-
-
-
             </div>
         </>
-
-
-
-
     );
 };
 

@@ -43,16 +43,16 @@ const News = ({ role }) => {
 
     return (
         <>
-            <div className='flex items-center justify-center w-[80%] h-[400px] mx-auto'
+            <div className='flex items-center justify-center w-[80%] h-[350px] mx-auto'
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={handleDrop} >
                 {newFile ? (
                     <div className="text-center group">
-                        <img src={URL.createObjectURL(newFile)} className='w-full h-[400px] object-cover transition-transform duration-1000 group-hover:scale-[1.1]' alt="New File" />
+                        <img src={URL.createObjectURL(newFile)} className='w-full h-[350px] object-cover transition-transform duration-1000 group-hover:scale-[1.1]' alt="New File" />
                     </div>
                 ) : news ? (
                     <div className='text-center group'>
-                        <img src={`http://localhost:5000/news/${news}`} className='w-full h-[400px] object-cover transition-transform duration-1000 group-hover:scale-[1.1]' alt="News" />
+                        <img src={`http://localhost:5000/news/${news}`} className='w-full h-[350px] object-cover transition-transform duration-1000 group-hover:scale-[1.1]' alt="News" />
                     </div>
                 ) : (
                     <p className="text-white">no news rn</p>

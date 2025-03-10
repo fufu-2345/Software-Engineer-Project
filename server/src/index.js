@@ -103,48 +103,6 @@ app.use('/profilePicture', express.static(path.join(__dirname, '../profilePictur
 //                    API TEST                           //
 ///////////////////////////////////////////////////////////
 
-/*
-app.get("/getComment", (req, res) => {
-    const a = `SELECT * FROM comment`;
-    pool.query(a, (err, data) => {
-        if (err) {
-            return res.json(err);
-        }
-        return res.json(data);
-    })
-})
-
-app.get("/getPost", (req, res) => {
-    const a = `SELECT * FROM post`;
-    pool.query(a, (err, data) => {
-        if (err) {
-            return res.json(err);
-        }
-        return res.json(data);
-    })
-})
-
-app.get("/getPost/imgs/", (req, res) => {
-    const { sortMode, mode } = req.query;
-
-    console.log(sortMode, mode);
-
-    const order = sortMode === 'DESC' ? 'DESC' : 'ASC';
-    const column = mode === 'postID' ? 'postID' : 'avgRating';
-
-
-    const a = `select photoPath from post ORDER BY ${column} ${order};`;
-    console.log(a);
-
-    pool.query(a, (err, data) => {
-        if (err) {
-            return res.json(err);
-        }
-        const photoPaths = data.map(item => item.photoPath);
-        return res.json(photoPaths);
-    })
-})*/
-
 app.get("/getPost/imgs/", (req, res) => {
     const { sortMode, mode } = req.query;
 
