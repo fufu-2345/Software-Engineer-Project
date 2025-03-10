@@ -15,7 +15,11 @@ const ShowPost = ({ userId, role }) => {
     const [file, setFile] = useState(null);
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
-    const [picOrProfile, setPicOrProfile] = useState(true);
+    //const [picOrProfile, setPicOrProfile] = useState(true);
+    const [proCount, setProCount] = useState(0);
+    const [proImgs, setProImgs] = useState([]);
+    const [profileDropdown, setprofileDropdown] = useState(false);
+    const [userName, setUserName] = useState([]);
 
     const maxVisitPage = 5;
     const column = 4; // จำนวนคอลัมน์ต่อแถว
@@ -131,7 +135,7 @@ const ShowPost = ({ userId, role }) => {
             .then(response => {
                 setPostCount(response.data.length);
                 setPostImgs(response.data);
-                setPicOrProfile(true);
+                //setPicOrProfile(true);
             })
             .catch(error => {
                 console.error("Error getPost/imgs(handleSearch): ", error);
@@ -154,7 +158,7 @@ const ShowPost = ({ userId, role }) => {
             .then(response => {
                 setPostCount(response.data.length);
                 setPostImgs(response.data);
-                setPicOrProfile(true);
+                //setPicOrProfile(true);
             })
             .catch(error => {
                 console.error("Error getPost/imgs(handleSearch): ", error);
@@ -162,39 +166,38 @@ const ShowPost = ({ userId, role }) => {
     };
 
     const handleSearch = () => {
-        if (searchVal == "") {
-            const params = {
-                sortMode: sortMode ? 'DESC' : 'ASC',
-                mode: mode ? 'postID' : 'avgRating',
-                search: searchVal
-            };
-
-            axios.get("http://localhost:5000/getPost/imgs", { params })
-                .then(response => {
-                    setPostCount(response.data.length);
-                    setPostImgs(response.data);
-                    setPicOrProfile(true);
-                })
-                .catch(error => {
-                    console.error("Error getPost/imgs(handleSearch): ", error);
-                });
-        }
-        else {
+        if (searchVal !== "") {
             const params = {
                 search: searchVal
             };
-            //                               getProfile
+            //                               get Profile pic
             axios.get("http://localhost:5000/getProfile/imgs", { params })
                 .then(response => {
-                    setPostCount(response.data.length);
-                    setPostImgs(response.data);
-                    console.log(postCount);
-                    console.log(postImgs);
-                    setPicOrProfile(false);
+                    //setPostCount(response.data.length);
+                    //setPostImgs(response.data);
+                    setProCount(response.data.length);
+                    setProImgs(response.data);
+                    console.log(proImgs);
+                    console.log(proCount);
+                    //setPicOrProfile(false);
                 })
                 .catch(error => {
                     console.error("Error getPost/imgs(handleSearch): ", error);
                 });
+            //                               get user name 
+            axios.get("http://localhost:5000/getProfile/name", { params })
+                .then(response => {
+                    //setPostCount(response.data.length);
+                    setUserName(response.data);
+                    console.log(userName);
+                })
+                .catch(error => {
+                    console.error("Error getPost/imgs(handleSearch): ", error);
+                });
+            setprofileDropdown(true);
+        }
+        else {
+            setprofileDropdown(false);
         }
     };
 
@@ -214,7 +217,7 @@ const ShowPost = ({ userId, role }) => {
             .then(response => {
                 setPostCount(response.data.length);
                 setPostImgs(response.data);
-                setPicOrProfile(true);
+                //setPicOrProfile(true);
             })
             .catch(error => {
                 console.error("Error getPost/imgs(handleSearch): ", error);
@@ -270,7 +273,7 @@ const ShowPost = ({ userId, role }) => {
             .then(response => {
                 setPostCount(response.data.length);
                 setPostImgs(response.data);
-                setPicOrProfile(true);
+                //setPicOrProfile(true);
             })
             .catch(error => {
                 console.error("Error getPost/imgs(handleSearch): ", error);
@@ -279,9 +282,18 @@ const ShowPost = ({ userId, role }) => {
 
     return (
         <>
-            {isAdding && <div className='fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center bg-blue-300 p-4 border-4 w-[80%] h-[90vh] overflow-y-auto mx-auto rounded-lg z-50 overflow-hidden'>
-
-                <div {...getRootProps()} className='flex flex-col justify-center items-center bg bg-red-300 w-[60%] min-h-[500px] border-2 border-dashed border-gray-500 p-4 cursor-pointer'>
+            {isAdding && <div className=' content-area fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center bg-red-300 p-4 border-4 w-[80%] h-[90vh] overflow-y-auto mx-auto rounded-lg z-50'>
+                <style>
+                    {`
+                        .content-area::-webkit-scrollbar {
+                            display: none;
+                        }
+                        .content-area {
+                            overflow-y: scroll;
+                        }
+                    `}
+                </style>
+                <div {...getRootProps()} className='flex flex-col justify-center items-center bg bg-[#ffd1dd] w-[60%] min-h-[500px] border-2 border-dashed border-gray-500 p-4 cursor-pointer'>
                     <input {...getInputProps()} />
                     {isDragActive ?
                         <p className="mb-4 font-bold">Drop the files here ...</p> : <p className="mb-4 font-bold">Drag & drop your picture here</p>
@@ -305,7 +317,7 @@ const ShowPost = ({ userId, role }) => {
                 <div className='flex flex-col items-center bg-grey-300 bg-clip-padding p-3 w-full'>
                     {/* input post ชื่อ */}
                     <div className="relative w-full max-w-lg">
-                        <textarea value={title} onChange={handleTitle} placeholder='Enter your post name' className='w-full p-2 border rounded-md resize-none h-[80px] overflow-y-auto mt-3' />
+                        <textarea value={title} onChange={handleTitle} placeholder='Enter your post name' className='w-full p-2 border rounded-md resize-none h-[80px] overflow-y-auto mt-1' />
                         {title && (
                             <button onClick={() => setTitle("")} className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white text-lg font-bold rounded-full flex items-center justify-center shadow-md hover:bg-red-700">
                                 X
@@ -341,9 +353,9 @@ const ShowPost = ({ userId, role }) => {
                     </div>
                 </div>
             </div>}
-            <div className='top-0 right-0 fixed position: fixed;'>
+            <div className='top-0 right-0 fixed position: fixed; flex items-center'>
                 {(role.roleID == 1 || role.roleID == 2) &&
-                    <button onClick={handleIsAdding} className='border-2'> add img </button>
+                    <button onClick={handleIsAdding} className="text-black bg-red-400 hover:bg-red-600 rounded-full w-12 h-12 flex items-center justify-center text-[32px]"> + </button>
                 }
             </div>
             <div className='relative w-[90%] mx-auto mt-8'>
@@ -358,13 +370,31 @@ const ShowPost = ({ userId, role }) => {
                     <button className='bg-gray-400 hover:bg-gray-500 rounded-2xl p-2.5 ml-2 text-white' onClick={handleSearch}>
                         Search
                     </button>
+
+
+                    {profileDropdown && (
+                        <div className="absolute left-0 mt-12 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+                            {proCount > 0 ? (
+                                proImgs.map((profile, index) => (
+                                    <div key={index} className="flex items-center p-2 border-b hover:bg-gray-100 cursor-pointer">
+                                        <img src={`http://localhost:5000/profilePicture/${profile}`} alt={profile} className='w-8 h-8 object-cover rounded-full' title={profile} />
+                                        <p className="ml-2">{userName[index]}</p>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="p-2 text-gray-500">No results found</p>
+                            )}
+                        </div>
+                    )}
+
+
                 </div>
 
                 <br /><br /><br />
                 <div className=' w-[100%] p-3 border'>
-                    <div className={`grid grid-cols-4 gap-3 pb-3`}>
-                        {picOrProfile ? (
-                            Array.isArray(postImgs) && postImgs.length > 0 ? (
+                    <div className='w-[100%] p-3 border'>
+                        <div className='grid grid-cols-4 gap-3 pb-3'>
+                            {Array.isArray(postImgs) && postImgs.length > 0 ? (
                                 postImgs.slice(start, stop + 1).map((img, index) => (
                                     img ? (
                                         <div key={index} className='relative group flex justify-center items-center h-[300px] cursor-pointer'>
@@ -374,22 +404,10 @@ const ShowPost = ({ userId, role }) => {
                                 ))
                             ) : (
                                 <p className="text-gray-500">no imgs rn</p>
-                            )
-                        ) : (
-                            Array.isArray(postImgs) && postImgs.length > 0 ? (
-                                postImgs.slice(start, stop + 1).map((img, index) => (
-                                    img ? (
-                                        <div key={index} className='relative group flex justify-center items-center h-[300px] cursor-pointer'>
-                                            <img src={`http://localhost:5000/profilePicture/${img}`} alt="postImg" className='w-full h-full object-contain transition-transform duration-400 group-hover:scale-[1.25] group-hover:z-10' title={img} />
-                                        </div>
-                                    ) : null
-                                ))
-                            ) : (
-                                <p className="text-gray-500">no imgs rn</p>
-                            )
-                        )}
-
+                            )}
+                        </div>
                     </div>
+
                     <br />
 
                     <div className="flex items-center justify-center space-x-2 py-2">

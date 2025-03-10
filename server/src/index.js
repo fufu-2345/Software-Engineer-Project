@@ -158,6 +158,20 @@ app.get("/getProfile/imgs", (req, res) => {
     })
 })
 
+app.get("/getProfile/name", (req, res) => {
+    const search = req.query.search;
+
+    a = `select userName from user WHERE userName LIKE '%${search}%'`;
+    pool.query(a, (err, data) => {
+        if (err) {
+            return res.json(err);
+        }
+        const userName = data.map(item => item.userName).filter(userName => userName !== '');;
+        console.log(userName);
+        return res.json(userName);
+    })
+})
+
 app.get("/getPost/imgs2/", (req, res) => {
     const { sortMode, mode } = req.query;
 
@@ -261,7 +275,7 @@ app.get("/getNews", (req, res) => {
             return res.json({ news: null });
         }
 
-        res.json({ news: imageFiles[0] });
+        res.json({ news: imageFiles[1] });
     });
 });
 
