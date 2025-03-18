@@ -5,7 +5,6 @@ const ProfileShowPost = ({ userId }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [postCount, setPostCount] = useState(0);
     const [postImgs, setPostImgs] = useState([]);
-    const [searchVal, setSearchVal] = useState("");
     const [mode, setMode] = useState(true);
     const [sortMode, setSortMode] = useState(true);
     const [isOpen, setIsOpen] = useState(false);
@@ -20,6 +19,8 @@ const ProfileShowPost = ({ userId }) => {
     const startPage = Math.max(1, currentPage - Math.floor(maxVisitPage));
     const endPage = Math.min(totalPage, currentPage + Math.floor(maxVisitPage));
 
+    console.log(userId);
+
     const changePage = (page) => {
         if (page >= 1 && page <= totalPage) {
             setCurrentPage(page);
@@ -32,29 +33,48 @@ const ProfileShowPost = ({ userId }) => {
 
     const handleSetMode = () => {
         setIsOpen(false);
-        setMode(!mode);
-    };
+        setSortMode(true);
+        setMode(true);
+        console.log(mode, sortMode);
 
-    const handleSearch = () => {
         const params = {
             sortMode: sortMode ? 'DESC' : 'ASC',
             mode: mode ? 'postID' : 'avgRating',
-            search: searchVal,
-            userId: userId
+            search: ""
         };
 
-        axios.get("http://localhost:5000/getPost/imgs2", { params })
+        axios.get("http://localhost:5000/getPost/imgs", { params })
             .then(response => {
                 setPostCount(response.data.length);
                 setPostImgs(response.data);
+                //setPicOrProfile(true);
             })
             .catch(error => {
                 console.error("Error getPost/imgs(handleSearch): ", error);
             });
     };
 
-    const handleSearchVal = (event) => {
-        setSearchVal(event.target.value);
+    const handleSetMode2 = () => {
+        setIsOpen(false);
+        setSortMode(true);
+        setMode(false);
+        console.log(mode, sortMode);
+
+        const params = {
+            sortMode: sortMode ? 'DESC' : 'ASC',
+            mode: mode ? 'postID' : 'avgRating',
+            search: ""
+        };
+
+        axios.get("http://localhost:5000/getPost/imgs", { params })
+            .then(response => {
+                setPostCount(response.data.length);
+                setPostImgs(response.data);
+                //setPicOrProfile(true);
+            })
+            .catch(error => {
+                console.error("Error getPost/imgs(handleSearch): ", error);
+            });
     };
 
     const handleSortMode = () => {
@@ -64,13 +84,13 @@ const ProfileShowPost = ({ userId }) => {
     const Dropdown = () => {
         return (
             <div className="relative inline-block text-left">
-                <button onClick={toggleDropdown} className="px-4 py-2 bg-blue-500 text-white rounded-md">
+                <button onClick={toggleDropdown} className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md">
                     {mode ? 'newest' : 'score'}
                 </button>
                 {isOpen && (
                     <div className="absolute left-0 mt-2 w-40 bg-white border rounded-lg shadow-lg z-10">
-                        <button onClick={handleSetMode} className="block w-full px-4 py-2 text-left hover:bg-gray-200">newest</button>
-                        <button onClick={handleSetMode} className="block w-full px-4 py-2 text-left hover:bg-gray-200">score</button>
+                        <button onClick={handleSetMode} className="block w-full px-4 py-2 text-left hover:bg-red-400 hover:text-white">newest</button>
+                        <button onClick={handleSetMode2} className="block w-full px-4 py-2 text-left hover:bg-red-400 hover:text-white">score</button>
                     </div>
                 )}
             </div>
@@ -81,8 +101,7 @@ const ProfileShowPost = ({ userId }) => {
         const params = {
             sortMode: sortMode ? 'DESC' : 'ASC',
             mode: mode ? 'postID' : 'avgRating',
-            search: searchVal,
-            userId: userId
+            userId: userId,
         };
 
         axios.get("http://localhost:5000/getPost/imgs2", { params })
@@ -93,24 +112,18 @@ const ProfileShowPost = ({ userId }) => {
             .catch(error => {
                 console.error("Error getPost/imgs(handleSearch): ", error);
             });
-    }, []);
+    }, [userId, sortMode, mode]);
 
     return (
         <div className='relative w-[90%] mx-auto mt-8'>
-            <div className='absolute top-0 right-0'>
 
-                <Dropdown />
-
-                <button className='bg-blue-400 rounded-2xl p-2.5 ml-2' onClick={handleSortMode}>
-                    Sort
-                </button>
-
-                <input type="text" value={searchVal} onChange={handleSearchVal} placeholder="type for search here..." className="bg-white border-2 border-black focus:ring-2 focus:ring-gray-950 focus:outline-none rounded-2xl p-2.5 ml-2" />
-
-                <button className='bg-blue-400 rounded-2xl p-2.5 ml-2 ' onClick={handleSearch}>
-                    Search
-                </button>
-
+            <div className='relative w-[90%] mx-auto mt-8'>
+                <div className="absolute top-0 left-0">
+                    <Dropdown />
+                    <button className='rounded-2xl p-2.5 ml-2 bg-red-400 hover:bg-red-600 text-white' onClick={handleSortMode}>
+                        Sort
+                    </button>
+                </div>
             </div>
 
             <br /><br /><br />
@@ -120,7 +133,7 @@ const ProfileShowPost = ({ userId }) => {
                         postImgs.slice(start, stop + 1).map((img, index) => (
                             img ? (
                                 <div key={index} className='relative group flex justify-center items-center h-[300px] cursor-pointer'>
-                                    <img src={`http://localhost:5000/imgs/${img}`} alt="postImg" className='w-full h-full object-contain transition-transform duration-400 group-hover:scale-[1.25] group-hover:z-10' title={img} />
+                                    <img src={`http://localhost:5000/imgs/${img}`} alt="postImg" className='w-full h-full object-contain' title={img} />
                                 </div>
                             ) : null < img
 

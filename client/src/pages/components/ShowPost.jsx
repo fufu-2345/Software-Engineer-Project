@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useDropzone } from 'react-dropzone'
+import { useNavigate } from 'react-router-dom';
 
 const ShowPost = ({ userId, role }) => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -20,6 +21,7 @@ const ShowPost = ({ userId, role }) => {
     const [proImgs, setProImgs] = useState([]);
     const [profileDropdown, setprofileDropdown] = useState(false);
     const [userName, setUserName] = useState([]);
+    const [searchUserId, setsearchUserId] = useState([]);
 
     const maxVisitPage = 5;
     const column = 4; // จำนวนคอลัมน์ต่อแถว
@@ -30,6 +32,8 @@ const ShowPost = ({ userId, role }) => {
     const totalPage = Math.ceil(postCount / 20);
     const startPage = Math.max(1, currentPage - Math.floor(maxVisitPage));
     const endPage = Math.min(totalPage, currentPage + Math.floor(maxVisitPage));
+
+    const navigate = useNavigate();
 
     const changePage = (page) => {
         if (page >= 1 && page <= totalPage) {
@@ -91,6 +95,10 @@ const ShowPost = ({ userId, role }) => {
             //alert('Error uploading file.');
             console.log('Upload failed 2');
         }
+    };
+
+    const handleNav = (index) => {
+        navigate('/profile', { state: { userId: searchUserId[index] } });
     };
 
     const handleTitle = (event) => {
@@ -177,8 +185,8 @@ const ShowPost = ({ userId, role }) => {
                     //setPostImgs(response.data);
                     setProCount(response.data.length);
                     setProImgs(response.data);
-                    console.log(proImgs);
-                    console.log(proCount);
+                    //console.log(proImgs);
+                    //console.log(proCount);
                     //setPicOrProfile(false);
                 })
                 .catch(error => {
@@ -189,7 +197,19 @@ const ShowPost = ({ userId, role }) => {
                 .then(response => {
                     //setPostCount(response.data.length);
                     setUserName(response.data);
-                    console.log(userName);
+                    //console.log(userName);
+                })
+                .catch(error => {
+                    console.error("Error getPost/imgs(handleSearch): ", error);
+                });
+            setprofileDropdown(true);
+
+            //                               get user ID
+            axios.get("http://localhost:5000/getProfile/userID", { params })
+                .then(response => {
+                    //setPostCount(response.data.length);
+                    setsearchUserId(response.data);
+                    //console.log(userName);
                 })
                 .catch(error => {
                     console.error("Error getPost/imgs(handleSearch): ", error);
@@ -266,7 +286,7 @@ const ShowPost = ({ userId, role }) => {
         const params = {
             sortMode: sortMode ? 'DESC' : 'ASC',
             mode: mode ? 'postID' : 'avgRating',
-            search: searchVal
+            search: ""
         };
 
         axios.get("http://localhost:5000/getPost/imgs", { params })
@@ -303,7 +323,7 @@ const ShowPost = ({ userId, role }) => {
                             <button onClick={handleClearFile} className="absolute top-2 right-2 w-8 h-8 bg-red-500 text-white text-lg font-bold rounded-full flex items-center justify-center shadow-md hover:bg-red-700">
                                 X
                             </button>
-                            <img src={file.preview} alt="Uploaded Preview" className='bg-blue-200 max-w-[300px] max-h-[300px] block p-3 border-3 border-black border-dashed' />
+                            <img src={file.preview} alt="Uploaded Preview" className='bg-[#ffd1dd] max-w-[300px] max-h-[300px] block p-3 border-3 border-black border-dashed' />
                         </div>
                     )}
                 </div>
@@ -380,7 +400,7 @@ const ShowPost = ({ userId, role }) => {
                         <div className="absolute left-0 mt-12 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">
                             {proCount > 0 ? (
                                 proImgs.map((profile, index) => (
-                                    <div key={index} className="flex items-center p-2 border-b hover:bg-gray-100 cursor-pointer">
+                                    <div key={index} className="flex items-center p-2 border-b hover:bg-gray-100 cursor-pointer" onClick={() => handleNav(index)}>
                                         <img src={`http://localhost:5000/profilePicture/${profile}`} alt={profile} className='w-8 h-8 object-cover rounded-full' title={profile} />
                                         <p className="ml-2 leading-none relative top-[7px]">{userName[index]}</p>
                                     </div>

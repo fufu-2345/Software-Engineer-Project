@@ -112,13 +112,13 @@ app.get("/getPost/imgs/", (req, res) => {
 
     let a;
     if (column === 'avgRating') {
-        a = `select post.photoPath from post JOIN user ON post.userID = user.userID WHERE post.avgRating > 0 AND user.userName LIKE '%${search}%' ORDER BY ${column} ${order};`;
+        a = `select photoPath from post WHERE avgRating > 0 ORDER BY ${column} ${order};`;
 
         pool.query(a, (err, data) => {
             if (err) {
                 return res.json(err);
             }
-            a = `select post.photoPath from post JOIN user ON post.userID = user.userID WHERE post.avgRating = 0 AND user.userName LIKE '%${search}%' ORDER BY postID DESC`;
+            a = `select photoPath from post WHERE avgRating = 0 ORDER BY postID DESC;`;
             let photoPaths = data.map(item => item.photoPath);
             pool.query(a, (err, data) => {
                 if (err) {
@@ -144,51 +144,24 @@ app.get("/getPost/imgs/", (req, res) => {
     }
 })
 
-app.get("/getProfile/imgs", (req, res) => {
-    const search = req.query.search;
-
-    a = `select profilePic from user WHERE userName LIKE '%${search}%'`;
-    pool.query(a, (err, data) => {
-        if (err) {
-            return res.json(err);
-        }
-        const profilePaths = data.map(item => item.profilePic).filter(photoPath => photoPath !== 'Insert Default Path Here');;
-        console.log(profilePaths);
-        return res.json(profilePaths);
-    })
-})
-
-app.get("/getProfile/name", (req, res) => {
-    const search = req.query.search;
-
-    a = `select userName from user WHERE userName LIKE '%${search}%'`;
-    pool.query(a, (err, data) => {
-        if (err) {
-            return res.json(err);
-        }
-        const userName = data.map(item => item.userName).filter(userName => userName !== '');;
-        console.log(userName);
-        return res.json(userName);
-    })
-})
-
 app.get("/getPost/imgs2/", (req, res) => {
     const { sortMode, mode } = req.query;
 
     const order = sortMode === 'DESC' ? 'DESC' : 'ASC';
     const column = mode === 'postID' ? 'postID' : 'avgRating';
-    const search = req.query.search;
     const userId = req.query.userId;
+
+    //console.log(order, column, userId);
 
     let a;
     if (column === 'avgRating') {
-        a = `select post.photoPath from post JOIN user ON post.userID = user.userID WHERE post.userID = ${userId} AND post.avgRating > 0 AND user.userName LIKE '%${search}%' ORDER BY ${column} ${order};`;
+        a = `select photoPath from post WHERE userID = ${userId} AND avgRating > 0 ORDER BY ${column} ${order};`;
 
         pool.query(a, (err, data) => {
             if (err) {
                 return res.json(err);
             }
-            a = `select post.photoPath from post JOIN user ON post.userID = user.userID WHERE post.avgRating = 0 AND user.userName LIKE '%${search}%' ORDER BY postID DESC`;
+            a = `select photoPath from post WHERE userID = ${userId} AND avgRating = 0 ORDER BY postID DESC;`;
             let photoPaths = data.map(item => item.photoPath);
             pool.query(a, (err, data) => {
                 if (err) {
@@ -202,7 +175,7 @@ app.get("/getPost/imgs2/", (req, res) => {
         })
     }
     else {
-        a = `select post.photoPath from post JOIN user ON post.userID = user.userID WHERE post.userID = ${userId} AND user.userName LIKE '%${search}%' ORDER BY ${column} ${order}`;
+        a = `select photoPath from post WHERE userID = ${userId} ORDER BY ${column} ${order}`;
 
         pool.query(a, (err, data) => {
             if (err) {
@@ -214,6 +187,49 @@ app.get("/getPost/imgs2/", (req, res) => {
         })
     }
 })
+
+app.get("/getProfile/userID", (req, res) => {
+    const search = req.query.search;
+
+    a = `select userID from user WHERE userName LIKE '%${search}%'`;
+    pool.query(a, (err, data) => {
+        if (err) {
+            return res.json(err);
+        }
+        const userID = data.map(item => item.userID).filter(userID => userID !== '');;
+        //console.log(userID);
+        return res.json(userID);
+    })
+})
+
+app.get("/getProfile/imgs", (req, res) => {
+    const search = req.query.search;
+
+    a = `select profilePic from user WHERE userName LIKE '%${search}%'`;
+    pool.query(a, (err, data) => {
+        if (err) {
+            return res.json(err);
+        }
+        const profilePaths = data.map(item => item.profilePic).filter(photoPath => photoPath !== 'Insert Default Path Here');;
+        //console.log(profilePaths);
+        return res.json(profilePaths);
+    })
+})
+
+app.get("/getProfile/name", (req, res) => {
+    const search = req.query.search;
+
+    a = `select userName from user WHERE userName LIKE '%${search}%'`;
+    pool.query(a, (err, data) => {
+        if (err) {
+            return res.json(err);
+        }
+        const userName = data.map(item => item.userName).filter(userName => userName !== '');;
+        //console.log(userName);
+        return res.json(userName);
+    })
+})
+
 
 app.get("/getRole", (req, res) => {
     const { userId } = req.query;

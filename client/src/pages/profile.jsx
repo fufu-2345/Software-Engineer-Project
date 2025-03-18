@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
+import { useLocation } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
+import ProfileShowPost from './components/profileShowPost';
 
 function Profile() {
+    const location = useLocation();
+    const { state } = location;
+
     const [show, setShow] = useState(false);
     const [formData, setFormData] = useState({
         accName: '',
@@ -21,11 +26,19 @@ function Profile() {
     const [userId, setUserId] = useState(null); // เพิ่ม state สำหรับเก็บ userID
 
     // ดึง userID จาก localStorage เมื่อ component โหลด
-    useEffect(() => {
+    useEffect(() => {/*
         const loggedInUser = localStorage.getItem('user');
         if (loggedInUser) {
             const user = JSON.parse(loggedInUser);
             setUserId(user.userID); // ตั้งค่า userID จากข้อมูลการล็อกอิน
+        }*/
+
+        if (state) {
+            setUserId(state.userId);
+            console.log(userId);
+        }
+        else {
+            console.log("cant get state / useEffect err");
         }
     }, []);
 
@@ -54,6 +67,7 @@ function Profile() {
 
     const handleSave = () => {
         const formDataWithImage = new FormData();
+        formDataWithImage.append('userId', userId);
         formDataWithImage.append('accName', formData.accName);
         formDataWithImage.append('accDescription', formData.accDescription);
         formDataWithImage.append('Instagram', formData.Instagram);
@@ -163,6 +177,8 @@ function Profile() {
                     <Button variant="primary" onClick={handleSave}>Save Changes</Button>
                 </Modal.Footer>
             </Modal>
+            <br /><br />
+            <ProfileShowPost userId={userId} />
         </Container>
     );
 }
