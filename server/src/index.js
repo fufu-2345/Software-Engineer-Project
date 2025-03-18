@@ -12,8 +12,11 @@ var bcrypt = require('bcryptjs')
 
 const port = 5000;
 app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const pool = mysql.createPool({
     host: process.env.HOST,
@@ -30,57 +33,75 @@ app.get("/test", (req, res) => {
     res.json('test1 test2 test3');
 });
 
+// ตรวจสอบและสร้างโฟลเดอร์ uploads 
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+}
+
+// ตั้งค่าการอัปโหลดรูปภาพ
+const storage2 = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname));
+    }
+});
+const upload2 = multer({ storage: storage2 });
+
+// ดึงข้อมูลโปรไฟล์ผู้ใช้
+app.get('/getUserProfile/:id', (req, res) => {
+    const { id } = req.params;
+    const query = `SELECT userID, accName, accDescription, Instagram, X, Line, Phone, Other, profilePic FROM user WHERE userID = ?`;
+    pool.query(query, [id], (err, data) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (data.length === 0) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.status(200).json(data[0]);
+    });
+});
+
+// อัปเดตข้อมูลโปรไฟล์ผู้ใช้
+app.post('/updateProfile', upload2.single('image'), (req, res) => {
+    const { accName, accDescription, Instagram, X, Line, Phone, Other } = req.body;
+    const profilePic = req.file ? req.file.filename : null;
+    const userId = req.body.userId;
+
+    let query;
+    let values;
+
+    if (profilePic) {
+        query = `
+            UPDATE user 
+            SET accName = ?, accDescription = ?, Instagram = ?, X = ?, Line = ?, Phone = ?, Other = ?, profilePic = ?
+            WHERE userID = ?`;
+        values = [accName, accDescription, Instagram, X, Line, Phone, Other, profilePic, userId];
+    } else {
+        query = `
+            UPDATE user 
+            SET accName = ?, accDescription = ?, Instagram = ?, X = ?, Line = ?, Phone = ?, Other = ?
+            WHERE userID = ?`;
+        values = [accName, accDescription, Instagram, X, Line, Phone, Other, userId];
+    }
+
+    pool.query(query, values, (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.status(200).json({ message: 'Profile updated successfully' });
+    });
+});
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 app.use('/imgs', express.static(path.join(__dirname, '../imgs')));
 app.use('/news', express.static(path.join(__dirname, '../news')));
+app.use('/profilePicture', express.static(path.join(__dirname, '../profilePicture')));
 
 ///////////////////////////////////////////////////////////
 //                    API TEST                           //
 ///////////////////////////////////////////////////////////
-
-/*
-app.get("/getComment", (req, res) => {
-    const a = `SELECT * FROM comment`;
-    pool.query(a, (err, data) => {
-        if (err) {
-            return res.json(err);
-        }
-        return res.json(data);
-    })
-})
-
-app.get("/getPost", (req, res) => {
-    const a = `SELECT * FROM post`;
-    pool.query(a, (err, data) => {
-        if (err) {
-            return res.json(err);
-        }
-        return res.json(data);
-    })
-})
-
-app.get("/getPost/imgs/", (req, res) => {
-    const { sortMode, mode } = req.query;
-
-    console.log(sortMode, mode);
-
-    const order = sortMode === 'DESC' ? 'DESC' : 'ASC';
-    const column = mode === 'postID' ? 'postID' : 'avgRating';
-
-
-    const a = `select photoPath from post ORDER BY ${column} ${order};`;
-    console.log(a);
-
-    pool.query(a, (err, data) => {
-        if (err) {
-            return res.json(err);
-        }
-        const photoPaths = data.map(item => item.photoPath);
-        return res.json(photoPaths);
-    })
-})*/
 
 app.get("/getPost/imgs/", (req, res) => {
     const { sortMode, mode } = req.query;
@@ -91,13 +112,13 @@ app.get("/getPost/imgs/", (req, res) => {
 
     let a;
     if (column === 'avgRating') {
-        a = `select post.photoPath from post JOIN user ON post.userID = user.userID WHERE post.avgRating > 0 AND user.userName LIKE '%${search}%' ORDER BY ${column} ${order};`;
+        a = `select photoPath from post WHERE avgRating > 0 ORDER BY ${column} ${order};`;
 
         pool.query(a, (err, data) => {
             if (err) {
                 return res.json(err);
             }
-            a = `select post.photoPath from post JOIN user ON post.userID = user.userID WHERE post.avgRating = 0 AND user.userName LIKE '%${search}%' ORDER BY postID DESC`;
+            a = `select photoPath from post WHERE avgRating = 0 ORDER BY postID DESC;`;
             let photoPaths = data.map(item => item.photoPath);
             pool.query(a, (err, data) => {
                 if (err) {
@@ -106,7 +127,6 @@ app.get("/getPost/imgs/", (req, res) => {
                 photoPaths = photoPaths.concat(data.map(item => item.photoPath));
                 //console.log(photoPaths);
                 return res.json(photoPaths);
-
             })
         })
     }
@@ -129,18 +149,19 @@ app.get("/getPost/imgs2/", (req, res) => {
 
     const order = sortMode === 'DESC' ? 'DESC' : 'ASC';
     const column = mode === 'postID' ? 'postID' : 'avgRating';
-    const search = req.query.search;
     const userId = req.query.userId;
+
+    //console.log(order, column, userId);
 
     let a;
     if (column === 'avgRating') {
-        a = `select post.photoPath from post JOIN user ON post.userID = user.userID WHERE post.userID = ${userId} AND post.avgRating > 0 AND user.userName LIKE '%${search}%' ORDER BY ${column} ${order};`;
+        a = `select photoPath from post WHERE userID = ${userId} AND avgRating > 0 ORDER BY ${column} ${order};`;
 
         pool.query(a, (err, data) => {
             if (err) {
                 return res.json(err);
             }
-            a = `select post.photoPath from post JOIN user ON post.userID = user.userID WHERE post.avgRating = 0 AND user.userName LIKE '%${search}%' ORDER BY postID DESC`;
+            a = `select photoPath from post WHERE userID = ${userId} AND avgRating = 0 ORDER BY postID DESC;`;
             let photoPaths = data.map(item => item.photoPath);
             pool.query(a, (err, data) => {
                 if (err) {
@@ -154,7 +175,7 @@ app.get("/getPost/imgs2/", (req, res) => {
         })
     }
     else {
-        a = `select post.photoPath from post JOIN user ON post.userID = user.userID WHERE post.userID = ${userId} AND user.userName LIKE '%${search}%' ORDER BY ${column} ${order}`;
+        a = `select photoPath from post WHERE userID = ${userId} ORDER BY ${column} ${order}`;
 
         pool.query(a, (err, data) => {
             if (err) {
@@ -166,6 +187,49 @@ app.get("/getPost/imgs2/", (req, res) => {
         })
     }
 })
+
+app.get("/getProfile/userID", (req, res) => {
+    const search = req.query.search;
+
+    a = `select userID from user WHERE userName LIKE '%${search}%'`;
+    pool.query(a, (err, data) => {
+        if (err) {
+            return res.json(err);
+        }
+        const userID = data.map(item => item.userID).filter(userID => userID !== '');;
+        //console.log(userID);
+        return res.json(userID);
+    })
+})
+
+app.get("/getProfile/imgs", (req, res) => {
+    const search = req.query.search;
+
+    a = `select profilePic from user WHERE userName LIKE '%${search}%'`;
+    pool.query(a, (err, data) => {
+        if (err) {
+            return res.json(err);
+        }
+        const profilePaths = data.map(item => item.profilePic).filter(photoPath => photoPath !== 'Insert Default Path Here');;
+        //console.log(profilePaths);
+        return res.json(profilePaths);
+    })
+})
+
+app.get("/getProfile/name", (req, res) => {
+    const search = req.query.search;
+
+    a = `select userName from user WHERE userName LIKE '%${search}%'`;
+    pool.query(a, (err, data) => {
+        if (err) {
+            return res.json(err);
+        }
+        const userName = data.map(item => item.userName).filter(userName => userName !== '');;
+        //console.log(userName);
+        return res.json(userName);
+    })
+})
+
 
 app.get("/getRole", (req, res) => {
     const { userId } = req.query;
@@ -227,7 +291,7 @@ app.get("/getNews", (req, res) => {
             return res.json({ news: null });
         }
 
-        res.json({ news: imageFiles[0] });
+        res.json({ news: imageFiles[1] });
     });
 });
 
@@ -398,13 +462,13 @@ app.post('/checkstdID', (req, res) => {
 app.post('/login', (req, res) => {
     const query = `select * from user where userName = '${req.body.username}'`;
     pool.query(query, (err, data) => {
-        if(bcrypt.compareSync(req.body.password, data[0].passWord)){
-            return res.json({"ID" : data[0].userID, "Status": true })
-        }else{
-            return res.json({"ID" : null, "Status": false })
+        if (bcrypt.compareSync(req.body.password, data[0].passWord)) {
+            return res.json({ "ID": data[0].userID, "Status": true })
+        } else {
+            return res.json({ "ID": null, "Status": false })
         }
     })
-    
+
 })
 
 app.post('/getData', (req, res) => {
@@ -488,15 +552,13 @@ app.post('/Sendotp', async (req, res) => {
     }
 })
 
-function createSalt(p){
+function createSalt(p) {
     var salt = bcrypt.genSaltSync(10)
-    var hash = bcrypt.hashSync(p,salt)
+    var hash = bcrypt.hashSync(p, salt)
 
-    var ret = {s :salt , hp : hash}
+    var ret = { s: salt, hp: hash }
     return ret
 }
-
-
 
 //API for create new account in user database
 //Insert Profile Pic Path Later to be default
@@ -530,3 +592,207 @@ app.post('/registerClubMember', (req, res) => {
 })
 
 app.listen(port, () => { console.log('\x1b[36m%s\x1b[0m is started/updated', `http://localhost:${port}`); })
+
+/*
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+});*/
+
+// ดึงโพสต์ทั้งหมดจาก MySQL
+app.get('/getPost', (req, res) => {
+    pool.query(`SELECT * FROM post`, (err, data) => {
+        if (err) return res.status(500).json({ error: err });
+        return res.json(data);
+    });
+});
+
+// ดึงคอมเมนต์ทั้งหมดจาก MySQL
+app.get('/getComment', (req, res) => {
+    pool.query(`SELECT * FROM comment`, (err, data) => {
+        if (err) return res.status(500).json({ error: err });
+        return res.json(data);
+    });
+});
+
+// ตรวจสอบ Username
+app.post('/checkUsername', (req, res) => {
+    const { username } = req.body;
+    const query = `SELECT COUNT(*) AS count FROM customer WHERE userName = ?`;
+    pool.query(query, [username], (err, data) => {
+        if (err) return res.status(500).json({ error: err });
+        return res.json({ "Status": data[0].count > 0 });
+    });
+});
+
+app.get('/getComment/:id', (req, res) => {
+    const postID = req.params.id;
+
+    const query = `
+        SELECT u.userName, c.commentDescription, r.ratingValue, c.userID, c.commentTime, u.profilePic
+        FROM comment c
+        JOIN user u ON c.userID = u.userID
+        LEFT JOIN rating r ON c.userID = r.userID AND c.postID = r.postID
+        WHERE c.postID = ?
+        ORDER BY c.commentTime ASC;`;
+
+    pool.query(query, [postID], (err, result) => {
+        res.json(result);
+    });
+});
+
+
+// เพิ่มคอมเมนต์ใหม่ลง Database
+app.post('/addComment', (req, res) => {
+    const { postID, commentDescription, ratingValue, userID } = req.body;
+
+    // ถ้ามีคอมเมนต์ ให้เพิ่มลงตาราง comment
+    if (commentDescription.trim()) {
+        const commentQuery = `INSERT INTO comment (postID, userID, commentDescription, commentTime) VALUES (?, ?, ?, NOW())`;
+
+        pool.query(commentQuery, [postID, userID, commentDescription], (err, commentResult) => {
+        });
+    }
+
+    // ถ้าผู้ใช้เลือก "Select Rating" -> ให้ลบ Rating เดิม
+    if (ratingValue === null || ratingValue === "") {
+        const deleteRatingQuery = `DELETE FROM rating WHERE postID = ? AND userID = ?`;
+        pool.query(deleteRatingQuery, [postID, userID], (err, deleteResult) => {
+            //อัปเดตค่า avgRatin หลังจากลบ Rating
+            updateAvgRating(postID, res);
+        });
+
+    } else {
+        // ตรวจสอบว่ามี Rating อยู่แล้วหรือไม่
+        const checkRatingQuery = `SELECT ratingValue FROM rating WHERE postID = ? AND userID = ?`;
+        pool.query(checkRatingQuery, [postID, userID], (err, result) => {
+            if (result.length > 0) {
+                const existingRating = result[0].ratingValue;
+                if (existingRating !== ratingValue) {
+                    // ถ้าค่า rating เปลี่ยน → UPDATE ค่าใหม่
+                    const updateRatingQuery = `UPDATE rating SET ratingValue = ?, rateTime = NOW() WHERE postID = ? AND userID = ?`;
+                    pool.query(updateRatingQuery, [ratingValue, postID, userID], (err, updateResult) => {
+                        console.log("Rating updated successfully!");
+                        updateAvgRating(postID, res);
+                    });
+                } else {
+                    // ถ้า rating เหมือนเดิม → ไม่ต้องอัปเดต
+                    res.json({ success: true });
+                }
+            } else {
+                // ➕ ถ้ายังไม่มี Rating → เพิ่มใหม่
+                const insertRatingQuery = `INSERT INTO rating (postID, userID, ratingValue, rateTime) VALUES (?, ?, ?, NOW())`;
+                pool.query(insertRatingQuery, [postID, userID, ratingValue], (err, insertResult) => {
+                    updateAvgRating(postID, res);
+                });
+            }
+        });
+    }
+});
+
+// Start Server
+//app.listen(port, () => console.log(`Server started at http://localhost:${port}`));
+
+app.post('/addCommentRating', (req, res) => {
+    const { postID, commentDescription, ratingValue, userID } = req.body;
+
+    // ถ้ามี Comment ให้เพิ่มลง `comment` Table
+    if (commentDescription) {
+        const commentQuery = `INSERT INTO comment (postID, userID, commentDescription, commentTime) VALUES (?, ?, ?, NOW())`;
+        pool.query(commentQuery, [postID, userID, commentDescription], (err, commentResult) => {
+        });
+    }
+
+    // ถ้ามี Rating ต้องอัปเดตหรือเพิ่มลง `rating` Table
+    if (ratingValue !== null) {
+        const checkRatingQuery = `SELECT ratingID FROM rating WHERE postID = ? AND userID = ?`;
+        pool.query(checkRatingQuery, [postID, userID], (err, result) => {
+
+            if (result.length > 0) {
+                // ถ้ามี Rating อยู่แล้ว → อัปเดต
+                const updateRatingQuery = `UPDATE rating SET ratingValue = ?, rateTime = NOW() WHERE postID = ? AND userID = ?`;
+                pool.query(updateRatingQuery, [ratingValue, postID, userID], (err, updateResult) => {
+                    updateAvgRating(postID, res); // อัปเดต avgRating ของโพสต์
+                });
+            } else {
+                // ถ้ายังไม่มี Rating → เพิ่มใหม่
+                const insertRatingQuery = `INSERT INTO rating (postID, userID, ratingValue, rateTime) VALUES (?, ?, ?, NOW())`;
+                pool.query(insertRatingQuery, [postID, userID, ratingValue], (err, insertResult) => {
+                    updateAvgRating(postID, res); // อัปเดต avgRating ของโพสต์
+                });
+            }
+        });
+    } else {
+        res.json({ success: true });
+    }
+});
+
+app.get('/getLatestRatings/:postID', (req, res) => {
+    const postID = req.params.postID;
+
+    const query = `
+        SELECT userID, ratingValue 
+        FROM rating 
+        WHERE postID = ? 
+        ORDER BY rateTime DESC`;
+
+    pool.query(query, [postID], (err, result) => {
+        res.json(result);
+    });
+});
+
+
+const updateAvgRating = (postID, res) => {
+    const avgRatingQuery = `
+        UPDATE post 
+        SET avgRating = (SELECT IFNULL(AVG(ratingValue), 0) FROM rating WHERE postID = ?) 
+        WHERE postID = ?`;
+
+    pool.query(avgRatingQuery, [postID, postID], (err, result) => {
+        res.json({ success: true });
+    });
+};
+
+app.get('/getPost/:id/:userID?', (req, res) => {
+    const { id, userID } = req.params;
+
+    let query = `
+        SELECT p.*, 
+            u.userName,
+            u.profilePic,
+            COALESCE((SELECT AVG(ratingValue) FROM rating WHERE postID = p.postID), 0) AS avgRating
+        FROM post p
+        JOIN user u ON p.userID = u.userID
+        WHERE p.postID = ?`;
+
+    let queryParams = [id];
+
+    if (userID) {
+        query = `
+            SELECT p.*, 
+                u.userName,
+                u.profilePic,
+                COALESCE((SELECT AVG(ratingValue) FROM rating WHERE postID = p.postID), 0) AS avgRating,
+                (SELECT ratingValue 
+                 FROM rating 
+                 WHERE postID = p.postID AND userID = ? 
+                 ORDER BY rateTime DESC LIMIT 1) AS userRating
+            FROM post p
+            JOIN user u ON p.userID = u.userID
+            WHERE p.postID = ?`;
+
+        queryParams = [userID, id];
+    }
+
+    pool.query(query, queryParams, (err, result) => {
+        if (result.length === 0) {
+            console.warn(`No post found for postID: ${id}`);
+            return res.status(404).json({ error: "Post not found" });
+        }
+        let post = result[0];
+
+        //แปลงค่า avgRating และ userRating ให้ถูกต้อง
+        post.avgRating = post.avgRating ? parseFloat(post.avgRating).toFixed(2) : "0.00";
+        post.userRating = post.userRating ? parseInt(post.userRating) : null;
+        res.json(post);
+    });
+});

@@ -2,160 +2,480 @@
 @tailwind components;
 @tailwind utilities;
 
-/*
-html,
-body {
-   @apply bg-bgColor;
-}*/
 
+body {
+  @apply bg-bgColor;
+}
+
+
+/*               .= class   #=id                  */
+
+body {
+  background-color: #ffd1dd !important;
+
+}
 
 .post-detail-container {
-   display: flex;
-   max-width: 1000px;
-   margin: 20px auto;
-   padding: 20px;
-   background-color: #fff;
-   border: 1px solid #ddd;
-   border-radius: 8px;
-   gap: 20px;
+  display: flex;
+  max-width: 1000px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  gap: 20px;
+  @apply bg-[#ffd1dd];
 }
 
-.post-title {
-   font-size: 1.8rem;
-   font-weight: bold;
-   color: #333;
+.post-container {
+  display: flex;
+  flex-wrap: nowrap;
+  width: 80%;
+  margin: auto;
+  padding: 20px;
+  background-color: white;
+  margin-top: 1%;
+  margin-bottom: 1%;
+  align-items: stretch;
+  /* ✅ ให้ post-left และ post-right ยืดเต็ม */
+  gap: 30px;
+  min-height: 100px;
+  border-radius: 10px;
 }
 
-.post-image {
-   width: 100%;
-   height: auto;
-   border-radius: 8px;
-}
+/* ✅ ปรับให้ post-left กว้างกว่า post-right (อัตราส่วน 2:1) */
+.post-left {
+  flex: 2;
+  /* ✅ ให้ post-left กว้างกว่า */
 
-.post-description {
-   font-size: 1rem;
-   color: #555;
-   line-height: 1.6;
-   height: 20%;
-   border: 1px solid gray;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-radius: 10px;
+  background-color: #ffcbea;
 }
 
 .post-right {
-   background-color: #f9f9f9;
-   border: 1px solid #ddd;
-   border-radius: 8px;
-   padding: 15px;
+  flex: 1;
+  /* ✅ ให้ post-right แคบกว่า */
+  background-color: #f5f5f5;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-radius: 10px;
 }
 
-.post-left {
-   flex: 2;
-   display: flex;
-   flex-direction: column;
-   gap: 15px;
+/* ✅ คงรูปแบบเดิมของ title */
+.post-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #333;
 }
 
+.post-image {
+  max-width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+  border-radius: 10px;
+  background-color: #fbfbfb;
+  padding: 10px;
+}
+
+/* ✅ ปรับ post-description ให้ยืดอัตโนมัติ */
+.post-description {
+  padding: 10px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  min-height: 50px;
+  flex-grow: 1;
+  display: block;
+  background-color: #fefdfd;
+  border-radius: 10px;
+}
+
+/* ✅ ปรับ comments-list ให้ยืดอัตโนมัติ */
 .comments-list {
-   max-height: 300px;
-   overflow-y: auto;
-   padding: 10px;
-   border-radius: 8px;
-   background-color: #f9f9f9;
+  border: 2px solid rgb(223, 11, 173);
+  padding: 10px;
+  flex-grow: 1;
+  max-height: 500px;
+  /* ✅ ให้ comments-list ยืดตาม post-left */
+  overflow-y: auto;
+  /* ✅ Scrollbar เมื่อคอมเมนต์เยอะเกิน */
+  word-wrap: break-word;
+  border-radius: 10px;
+  background-color: #ffffff;
+}
+
+.rating-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #d62388;
+  padding: 10px 0;
+}
+
+.comment-btn {
+  background-color: rgb(223, 11, 173);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  cursor: pointer;
+  border-radius: 10px;
+  font-weight: bold;
+  align-self: flex-end;
+  margin-top: auto;
+  font-size: 1rem;
+  transition: all 0.3s ease-in-out;
+  /* ✅ ทำให้ Smooth */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* ✅ Hover Effect */
+.comment-btn:hover {
+  background-color: #ff2a50;
+  /* ✅ เปลี่ยนสีเมื่อ Hover */
+  transform: translateY(-3px);
+  /* ✅ ขยับปุ่มขึ้นเล็กน้อย */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* ✅ คลิกแล้วให้มีเอฟเฟกต์ */
+.comment-btn:active {
+  transform: scale(0.95);
+  /* ✅ กดแล้วหดตัวเล็กน้อย */
+}
+
+/* ✅ Popup Styles */
+.popup-container {
+  border: 3px solid rgb(223, 11, 173);
+  padding: 15px;
+  border-radius: 8px;
+  background: white;
+  text-align: center;
+}
+
+.popup-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.popup-label {
+  font-size: 1rem;
+  font-weight: bold;
+  display: block;
+  margin-top: 10px;
+}
+
+.popup-select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.popup-textarea {
+  width: 100%;
+  height: 80px;
+  padding: 8px;
+  margin-top: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.popup-btn {
+  background-color: #ff5b77;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  margin-top: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  width: 100%;
+  transition: all 0.3s ease-in-out;
+  /* ✅ ทำให้ Smooth */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* ✅ Hover Effect */
+.popup-btn:hover {
+  background-color: #ff2a50;
+  /* ✅ เปลี่ยนสีเมื่อ Hover */
+  transform: translateY(-2px) scale(1.05);
+  /* ✅ ขยับขึ้น + ขยายเล็กน้อย */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* ✅ เมื่อคลิกปุ่ม */
+.popup-btn:active {
+  transform: scale(0.95);
+  /* ✅ ปุ่มหดตัวเล็กน้อยเมื่อกด */
+}
+
+/* ✅ ปรับแต่ง Scrollbar สำหรับ comments-list */
+.comments-list::-webkit-scrollbar {
+  width: 8px;
+  /* ✅ กำหนดความกว้างของ Scrollbar */
+}
+
+.comments-list::-webkit-scrollbar-track {
+  background: #ffe6f2;
+  /* ✅ สีพื้นหลังของ Scrollbar */
+  border-radius: 10px;
+}
+
+.comments-list::-webkit-scrollbar-thumb {
+  background: #ff69b4;
+  /* ✅ สีของ Scrollbar */
+  border-radius: 10px;
+  border: 2px solid #ffe6f2;
+  /* ✅ ขอบรอบ scrollbar */
+}
+
+.comments-list::-webkit-scrollbar-thumb:hover {
+  background: #d147a3;
+  /* ✅ เปลี่ยนสีเมื่อ Hover */
+}
+
+/* ✅ ปรับแต่ง Scrollbar สำหรับ Browser ที่รองรับ */
+.comments-list {
+  scrollbar-width: thin;
+  /* ✅ ให้ scrollbar บางลง */
+  scrollbar-color: #ff69b4 #ffe6f2;
+  /* ✅ กำหนดสี Thumb และ Track */
+}
+
+.comment-user {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #333;
+  transition: color 0.3s, text-shadow 0.3s, font-size 0.3s;
+}
+
+.comment-user:hover {
+  font-size: 1.05rem;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.comment-time {
+  font-size: 0.8rem;
+  /* ✅ ทำให้เล็กลง */
+  font-weight: normal;
+  /* ✅ ไม่ตัวหนา */
+  color: #888;
+  /* ✅ สีเทาอ่อน */
+  font-style: italic;
+  /* ✅ เอียงนิดๆ ดูสวยขึ้น */
+  float: right;
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  /* ✅ ให้ Profile Pic และ Username อยู่ตรงกลางกัน */
+  gap: 10px;
+  /* ✅ เพิ่มระยะห่างระหว่างรูปกับชื่อ */
+  background-color: white;
+  border-radius: 25px;
+
+}
+
+.post-profile-pic {
+  width: 50px;
+  /* กำหนดขนาด */
+  height: 50px;
+  /* กำหนดขนาด */
+  border-radius: 50%;
+  /* ทำให้เป็นวงกลม */
+  object-fit: cover;
+  /* ปรับขนาดรูปให้พอดี */
+  border: 2px solid #ddd;
+  /* เพิ่มขอบจาง ๆ */
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+/* ✅ ทำให้ลิงก์ของรูปไม่แสดงขีดเส้นใต้ */
+.post-profile-pic-link {
+  display: inline-block;
+  text-decoration: none;
+}
+
+/* ✅ เอฟเฟกต์เมื่อ Hover */
+.post-profile-pic:hover {
+  transform: scale(1.1);
+  /* ขยายเล็กน้อย */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  /* เพิ่มเงา */
+  border-color: #000000;
+  /* เปลี่ยนสีขอบ */
+}
+
+.post-username {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333333;
+  /* ✅ สีข้อความ */
+}
+
+.post-username-Link {
+  transition: color 0.3s, text-shadow 0.3s, font-size 0.3s;
+}
+
+.post-username-Link:hover {
+  text-shadow: 2px 2px 5px #ff1198;
+}
+
+.post-username:hover {
+  color: #5e0638;
 }
 
 .comment-item {
-   margin-bottom: 15px;
-   font-size: 0.9rem;
-   color: #545454;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
 }
 
-.comment-item strong {
-   color: #000;
+/* ✅ ใช้ flex เพื่อให้รูปอยู่หน้ากล่องคอมเมนต์ */
+.comment-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
 }
 
-.Head-comment {
-   color: #000;
+/* ✅ กำหนดขนาด Profile Pic */
+.comment-profile-pic {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ddd;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
+/* ✅ เอฟเฟกต์เมื่อ Hover */
+.comment-profile-pic:hover {
+  transform: scale(1.1);
+  /* ขยายเล็กน้อย */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  /* เพิ่มเงา */
+  border-color: #000000;
+  /* เปลี่ยนสีขอบ */
+}
 
+.post-profile-pic-link {
+  display: inline-block;
+  text-decoration: none;
+}
 
+/* ✅ กล่องข้อความของคอมเมนต์ */
+.comment-text-box {
+  background: #ffecf5;
+  border-radius: 8px;
+  padding: 10px;
+  flex: 1;
+  /* ✅ ให้ขยายเต็มพื้นที่ */
+  border-left: 5px solid #ff69b4;
+  border-bottom: 4px solid #ddd;
+  border-right: 4px solid #ddd;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
 
 /*--------------------------------------PART(1)--------------------------------------------------------------*/
+
+.pagePro {
+  color: #ff5a86;
+  font-weight: bold;
+  font-size: 18px;
+}
+
 .pro_r1 {
-   margin: 0.5rem;
-   padding: 1rem;
-   border: solid 1px rgb(210, 210, 210);
+  margin: 0.5rem;
+  padding: 1rem;
 }
 
 .pro_main {
-   height: 200px;
-   width: 200px;
-   display: flex;
-   justify-content: center;
-   align-items: center;
-   object-fit: cover;
-   margin-left: 10rem;
+  height: 200px;
+  width: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  object-fit: cover;
+  margin-left: 10rem;
 
 }
 
 .pro_contract .contact-row {
-   display: flex;
-   align-items: left;
-   margin-bottom: 8px;
-   /* เพิ่มช่องว่างระหว่างแต่ละแถว */
-   padding-top: 1.5rem;
+  display: flex;
+  align-items: left;
+  margin-bottom: 8px;
+  padding-top: 1.5rem;
 }
 
 .contract_head {
-   width: 100px;
-
+  width: 100px;
 }
 
 .contract_box {
-   border: solid 1px rgb(210, 210, 210);
-   width: 200px;
-   padding-left: 0.5rem;
-
+  border: solid 3px #ff5a86;
+  border-radius: 15px;
+  width: 300px;
+  padding-left: 0.5rem;
+  background-color: #ffffff;
+  height: 35px;
 }
 
 
 
 /*---------------------------------PART(2)----------------------------------------*/
 .pro_r2 {
-   margin: 0.5rem;
-   padding: 1rem;
-   border: solid 1px rgb(210, 210, 210);
+  margin: 0.5rem;
+  padding: 1rem;
+
 }
 
 /*---------------------------------PART(3)-----------------------------------------*/
 
 .pro_r3 {
-   margin: 0.5rem;
-   padding: 1rem;
-   border: solid 1px rgb(210, 210, 210);
+  margin: 0.5rem;
+  padding: 1rem;
+
 }
 
 .pro_des {
-   margin-top: 1rem;
-   border: solid 1px rgb(210, 210, 210);
-   padding: 1rem;
-   height: 150px;
+  margin-top: 1rem;
+  border: solid 3px #ff5a86;
+  padding: 1rem;
+  height: 150px;
+  background-color: #ffffff;
+  border-radius: 15px;
 }
 
 /*---------------------------------PART(4)-----------------------------------------*/
 .pro_r4 {
-   margin: 0.5rem;
-   padding: 1rem;
-   border: solid 1px rgb(210, 210, 210);
+  margin: 0.5rem;
+  padding: 1rem;
+  border: solid 1px rgb(210, 210, 210);
 }
 
 .A {
-   border: solid 1px rgb(210, 210, 210);
-   height: 200px;
-   width: 200px;
-   display: flex;
-   justify-content: center;
-   align-items: center;
-   object-fit: cover;
+  border: solid 1px rgb(210, 210, 210);
+  height: 200px;
+  width: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  object-fit: cover;
 }
 
 
@@ -166,124 +486,133 @@ body {
 /* registerPage */
 /* Centering the register page */
 .registerPage {
-   display: flex;
-   justify-content: center;
-   align-items: center;
-   width: 100vw;
-   height: 100vh;
-   background-color: #ffd1dd;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  background-color: #ffd1dd;
 }
 
 /* Styling the register box */
 .registerBox {
-   background-color: rgb(216, 182, 203);
-   border-radius: 10px;
-   width: 400px;
-   padding: 20px;
-   display: flex;
-   flex-direction: column;
-   align-items: center;
-   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-   font-size: 1.5rem;
-   font-weight: bold;
+  background-color: rgb(216, 182, 203);
+  border-radius: 10px;
+  width: 400px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  font-size: 1.5rem;
+  font-weight: bold;
 }
 
 /* Input container */
 .registerTopicInputBox {
-   display: flex;
-   flex-direction: column;
-   align-items: flex-start;
-   width: 100%;
-   margin: 15px;
-   font-size: 1rem;
-   font-weight: bold;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  margin: 15px;
+  font-size: 1rem;
+  font-weight: bold;
 }
 
 /* Input box styling */
 .registerInputBox {
-   width: 90%;
-   padding: 8px;
-   border: 1px solid #000;
-   border-radius: 5px;
-   font-size: 16px;
-   text-align: left;
-   outline: none;
+  width: 90%;
+  padding: 8px;
+  border: 1px solid #000;
+  border-radius: 5px;
+  font-size: 16px;
+  text-align: left;
+  outline: none;
 }
 
 /* Button styling */
 .registerButton {
-   margin-top: 10px;
-   padding: 10px 15px;
-   border: none;
-   background-color: #8b5e83;
-   color: white;
-   font-size: 16px;
-   font-weight: bold;
-   border-radius: 5px;
-   cursor: pointer;
-   transition: background 0.3s;
+  margin-top: 10px;
+  padding: 10px 15px;
+  border: none;
+  background-color: #8b5e83;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
 }
 
 .registerButton:hover {
-   background-color: #6a4564;
+  background-color: #6a4564;
 }
 
 /* Popup Background */
 .popup-overlay {
-   background: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
-   backdrop-filter: blur(5px); /* Blurred background */
+  background: rgba(0, 0, 0, 0.5);
+  /* Semi-transparent black */
+  backdrop-filter: blur(5px);
+  /* Blurred background */
 }
 
 /* Popup Box */
 .popup-content {
-   background: white;
-   width: 500px;
-   padding: 20px;
-   border-radius: 12px;
-   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-   text-align: center;
-   position: relative;
-   animation: fadeIn 0.3s ease-in-out;
+  background: white;
+  width: 500px;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  position: relative;
+  animation: fadeIn 0.3s ease-in-out;
 }
 
 /* Close Button */
 .popup-close {
-   position: absolute;
-   top: 10px;
-   right: 10px;
-   background: transparent;
-   border: none;
-   font-size: 20px;
-   cursor: pointer;
-   color: #333;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #333;
 }
 
 /* Button Styles */
 .popup-button {
-   background: #ff5e78;
-   color: white;
-   border: none;
-   padding: 10px 15px;
-   margin-top: 10px;
-   border-radius: 6px;
-   cursor: pointer;
-   font-size: 16px;
-   transition: 0.3s;
+  background: #ff5e78;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  margin-top: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.3s;
 }
 
 .popup-button:hover {
-   background: #e04b65;
+  background: #e04b65;
 }
 
 .otpInputBox {
-   width: 50%;
-   margin: 1rem;
-   padding: 8px;
-   border: 1px solid #000;
-   border-radius: 5px;
-   font-size: 16px;
-   text-align: center;
-   outline: none;
+  width: 50%;
+  margin: 1rem;
+  padding: 8px;
+  border: 1px solid #000;
+  border-radius: 5px;
+  font-size: 16px;
+  text-align: center;
+  outline: none;
+}
+
+.post-username-Link,
+.post-profile-pic-Link,
+.comment-pic-Link,
+.comment-user-Link {
+  text-decoration: none;
 }
 .selectRegisterBox{
    background-color: rgb(216, 182, 203);
@@ -307,13 +636,13 @@ body {
 
 /* Fade-in animation */
 @keyframes fadeIn {
-   from {
-       opacity: 0;
-       transform: translateY(-10px);
-   }
-   to {
-       opacity: 1;
-       transform: translateY(0);
-   }
-}
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
 
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

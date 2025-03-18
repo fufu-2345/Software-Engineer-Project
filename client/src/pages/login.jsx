@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link,useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import Popup from "reactjs-popup";
 
@@ -9,46 +9,61 @@ import "../index.css";
 import Navbar from "../components/navbar";
 
 const Login = () => {
-  var [username, setusername] = useState("");
-  var [password, setpassword] = useState("");
+    var [username, setusername] = useState("");
+    var [password, setpassword] = useState("");
 
-  var [isLoading , setIsLoading] = useState(false)
+    var [isLoading, setIsLoading] = useState(false)
 
-  var [signInError, setSignInError] = useState(false)
+    var [signInError, setSignInError] = useState(false)
 
-  var [signInSuccess , setSignInSuccess] = useState(false)
+    var [signInSuccess, setSignInSuccess] = useState(false)
 
     const navigate = useNavigate();
 
-  async function submitData(){
+    async function submitData() {
 
-    setIsLoading(true)
-    var api = `http://localhost:5000/login`
+        setIsLoading(true)
+        var api = `http://localhost:5000/login`
 
-    var body = {
-      username: username,
-      password : password
-    };
+        var body = {
+            username: username,
+            password: password
+        };
 
-    var response = await axios.post(api, body);
+        var response = await axios.post(api, body);
 
-    setIsLoading(false)
+        setIsLoading(false)
 
-    if (response.data.Status == false) {
-      setSignInError(true)
-      return
+        if (response.data.Status == false) {
+            setSignInError(true)
+            return
+        }
+      
+        setSignInSuccess(true)
+      
+        setTimeout(() => {
+            const data = { userId: response.data.ID };
+            navigate("/Main", { state: data });
+        }, 1000);
+        return
+        
     }
+  
+  const HandleGoMain = () => {
+        const data = { userId: 20 };
 
-    setSignInSuccess(true)
 
-    setTimeout(() => {
-        const data = {userId : response.data.ID}
-        navigate("/Main", {state : data});
-    }, 1000);
-    return
-
-  }
-
+        const handleClick = () => {
+            navigate('/Main', { state: data });
+        };
+        return (
+            <>
+                <br /><br />
+                <button onClick={handleClick}> Main </button>
+                <br /><br />
+            </>
+        );
+    };
 
   return (
     <>
@@ -82,9 +97,7 @@ const Login = () => {
             Submit
             </button>
                 {isLoading && <Loader/>}
-
-        </div>
-
+  
         <Popup
                   open={signInError}
                   onClose={() => setSignInError(false)}
@@ -110,9 +123,9 @@ const Login = () => {
         </Popup>
       </div>
 
-
     </>
   );
+
 };
 
 export default Login;
