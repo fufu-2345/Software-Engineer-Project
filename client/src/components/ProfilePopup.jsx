@@ -34,20 +34,22 @@ const ProfilePopup = (props) => {
   }, [open]);
 
   return (
+
     <div className="profile-container">
-      <img 
+
+      <img
         ref={profileRef}
-        src={"client\src\default.png"} 
-        className="profile-icon" 
-        onClick={handleClick} 
+        src={"client\src\default.png"}
+        className="profile-icon"
+        onClick={handleClick}
       />
 
       {open && (
-        <div 
+        <div
           ref={popupRef}
           className="popup-box"
         >
-          <AccountDetails userID = {userID}/>
+          <AccountDetails userID={userID} />
         </div>
       )}
     </div>

@@ -1,48 +1,49 @@
 .account-container {
-    width: 300px;
-    padding: 20px;
-    background-color: #f5f5f5;
-    border-radius: 10px;
-    text-align: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
-  
-  .profile-pic {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 10px;
-  }
-  
-  
-  p {
-    font-size: 16px;
-    color: #555;
-  }
-  
-  .logout-btn {
-    padding: 10px 15px;
-    background-color: #ff5757;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 10px;
-  }
-  
-  .logout-btn:hover {
-    background-color: #cc4747;
-  }
+  width: 300px;
+  padding: 20px;
+  background-color: #f5f5f5;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
 
-  .Accname{
-    font-size: 1.5rem;
-    color: #555;
-  }
-  .profileContainer {
-    display: flex;
-    justify-content: center; /* Centers horizontally */
-    align-items: center; /* Centers vertically */
-  }
+.profile-pic {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
 
-  
+
+p {
+  font-size: 16px;
+  color: #555;
+}
+
+.logout-btn {
+  padding: 10px 15px;
+  background-color: #ff5757;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.logout-btn:hover {
+  background-color: #cc4747;
+}
+
+.Accname {
+  font-size: 1.5rem;
+  color: #555;
+}
+
+.profileContainer {
+  display: flex;
+  justify-content: center;
+  /* Centers horizontally */
+  align-items: center;
+  /* Centers vertically */
+}

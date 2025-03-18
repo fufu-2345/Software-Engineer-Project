@@ -28,13 +28,14 @@ const Main = () => {
 
 
     useEffect(() => {
+        console.log("logined")
         //////// ดัก login มั่ว
         if (!state) {
             setRole(0);
             //navigate('/');
         }
         else {
-            console.log(state)
+            //console.log(state)
             axios.get("http://localhost:5000/getRole", { params: { userId: state.userId } })
                 .then(response => {
                     if (response.data) {
@@ -49,12 +50,15 @@ const Main = () => {
 
     return (
         <div className="min-h-screen bg-bgColor">
+            {role !== 0 ? <Nav userID={userID} /> : <Nav userID={null} />}
+            {/*
             {role === 0 && (
-                /*{!!!!!!}*/
+
+                
                 <div className="fixed left-1/2 transform -translate-x-1/2 w-[10%] h-[10%] z-100 bg-green-600 flex items-center justify-center cursor-pointer rounded" onClick={() => navigate('/login')}>
                     <p className='text-white fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2'>login</p>
                 </div>
-            )}
+            )}*/}
 
             {/*<Nav role={role} />*/}
             {/*<h1>{role ? role.roleID : "Loading..."}</h1>*/}
