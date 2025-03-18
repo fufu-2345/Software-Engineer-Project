@@ -6,6 +6,7 @@ import Popup from "reactjs-popup";
 import Loader from "../components/loader";
 
 import "../index.css";
+import Navbar from "../components/navbar";
 
 const Login = () => {
     var [username, setusername] = useState("");
@@ -37,24 +38,24 @@ const Login = () => {
             setSignInError(true)
             return
         }
-
+      
         setSignInSuccess(true)
-
+      
         setTimeout(() => {
             const data = { userId: response.data.ID };
             navigate("/Main", { state: data });
         }, 1000);
         return
-
+        
     }
-
-    const HandleGoMain = () => {
+  
+  const HandleGoMain = () => {
         const data = { userId: 20 };
+
 
         const handleClick = () => {
             navigate('/Main', { state: data });
         };
-
         return (
             <>
                 <br /><br />
@@ -64,69 +65,67 @@ const Login = () => {
         );
     };
 
-    return (
-        <>
-            <div className="registerPage">
-                <div className="registerBox">
-                    Sign In
-                    <div className="registerTopicInputBox">
-                        Username
-                        <br></br>
-                        <input
-                            className="registerInputBox"
-                            value={username}
-                            onChange={(e) => { setusername(e.target.value) }}
-                        />
-                        <br></br>
-                    </div>
-                    <div className="registerTopicInputBox">
-                        Password
-                        <br></br>
-                        <input
-                            type="password"
-                            className="registerInputBox"
-                            value={password}
-                            onChange={(e) => { setpassword(e.target.value) }}
-                        />
-                        <br></br>
-                    </div>
-
-                    <button className="registerButton" onClick={submitData}>
-                        Submit
-                    </button>
-                    {isLoading && <Loader />}
-
-                </div>
-
-                <Popup
-                    open={signInError}
-                    onClose={() => setSignInError(false)}
-                    modal
-                    className="popup-content"
-                >
-                    <div>
-                        <p>Wrong Username or Password</p>
-                        <button onClick={() => setSignInError(false)}>Close</button>
-                    </div>
-                </Popup>
-
-                <Popup
-                    open={signInSuccess}
-                    onClose={() => setSignInSuccess(false)}
-                    modal
-                    className="popup-content"
-                >
-                    <div>
-                        <p>Login Success. Redirecting...</p>
-                        <button onClick={() => setSignInSuccess(false)}>Close</button>
-                    </div>
-                </Popup>
-            </div>
+  return (
+    <>
+    <Navbar />
+      <div className="registerPage">
+        <div className="registerBox">
+          Sign In
+          <div className="registerTopicInputBox">
+            Username
             <br></br>
-            <HandleGoMain />
+            <input
+              className="registerInputBox"
+              value={username}
+              onChange={(e) => {setusername(e.target.value)}}
+            />
+            <br></br>
+          </div>
+          <div className="registerTopicInputBox">
+            Password
+            <br></br>
+            <input
+            type="password"
+              className="registerInputBox"
+              value={password}
+              onChange={(e) => {setpassword(e.target.value)}}
+            />
+            <br></br>
+          </div>
 
-        </>
-    );
+            <button className="registerButton" onClick={submitData}>
+            Submit
+            </button>
+                {isLoading && <Loader/>}
+  
+        <Popup
+                  open={signInError}
+                  onClose={() => setSignInError(false)}
+                  modal
+                  className="popup-content"
+                >
+                  <div>
+                    <p>Wrong Username or Password</p>
+                    <button onClick={() => setSignInError(false)}>Close</button>
+                  </div>
+        </Popup>
+
+        <Popup
+                  open={signInSuccess}
+                  onClose={() => setSignInSuccess(false)}
+                  modal
+                  className="popup-content"
+                >
+                  <div>
+                    <p>Login Success. Redirecting...</p>
+                    <button onClick={() => setSignInSuccess(false)}>Close</button>
+                  </div>
+        </Popup>
+      </div>
+
+    </>
+  );
+
 };
 
 export default Login;

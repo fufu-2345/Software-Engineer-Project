@@ -35,4 +35,8 @@
   .nav-links a:hover {
     color: #ffcc00;
   }
+
+  .navButton{
+    margin-right: 1rem;
+  }
   

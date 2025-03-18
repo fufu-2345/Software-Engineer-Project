@@ -2,7 +2,9 @@ import React, { useState, useRef, useEffect } from "react";
 import AccountDetails from "./AccountDetails";
 import "./ProfilePopup.css";
 
-const ProfilePopup = ({userID}) => {
+const ProfilePopup = (props) => {
+
+  const { userID } = props
 
   const [open, setOpen] = useState(false);
   const popupRef = useRef(null);
@@ -35,7 +37,7 @@ const ProfilePopup = ({userID}) => {
     <div className="profile-container">
       <img 
         ref={profileRef}
-        src={profilePic} 
+        src={"client\src\default.png"} 
         className="profile-icon" 
         onClick={handleClick} 
       />
@@ -45,8 +47,7 @@ const ProfilePopup = ({userID}) => {
           ref={popupRef}
           className="popup-box"
         >
-          <AccountDetails name={name} email={email} profilePic={profilePic} />
-          <button className="close-btn" onClick={() => setOpen(false)}>Close</button>
+          <AccountDetails userID = {userID}/>
         </div>
       )}
     </div>

@@ -471,6 +471,32 @@ app.post('/login', (req, res) => {
 
 })
 
+app.post('/getData', (req, res) => {
+    const query = `select roleName from role where roleID = (select roleID from user where userID = ${req.body.userID})`;
+    pool.query(query, (err, data) => {
+        if(data[0]){
+            return res.json({"Role" : data[0].roleName, "Status" : true})
+        }else{
+            return res.json({"Role" : null, "Status" : false})
+        }
+        
+    })
+    
+})
+
+app.post('/getData2', (req, res) => {
+    const query = `select accName,profilePic from user where userID = ${req.body.userID}`;
+    pool.query(query, (err, data) => {
+        if(data[0]){
+            return res.json({"accName" : data[0].accName,"profilePath" : data[0].profilePic, "Status" : true})
+        }else{
+            return res.json({"accName" : null,"profilePath" : null, "Status" : false})
+        }
+        
+    })
+    
+})
+
 //For verifying email address(Spam Prevention)
 const nodemailer = require('nodemailer');
 const { data } = require('react-router-dom');

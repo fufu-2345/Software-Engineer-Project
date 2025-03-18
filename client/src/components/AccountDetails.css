@@ -15,10 +15,6 @@
     margin-bottom: 10px;
   }
   
-  h2 {
-    font-size: 22px;
-    margin: 10px 0;
-  }
   
   p {
     font-size: 16px;
@@ -38,4 +34,15 @@
   .logout-btn:hover {
     background-color: #cc4747;
   }
+
+  .Accname{
+    font-size: 1.5rem;
+    color: #555;
+  }
+  .profileContainer {
+    display: flex;
+    justify-content: center; /* Centers horizontally */
+    align-items: center; /* Centers vertically */
+  }
+
   
