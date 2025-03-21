@@ -9,10 +9,29 @@ const ProfilePopup = (props) => {
   const [open, setOpen] = useState(false);
   const popupRef = useRef(null);
   const profileRef = useRef(null);
+  const [pic, setPic] = useState("");
 
   const handleClick = () => {
     setOpen((prev) => !prev); // Toggle popup
   };
+
+  useEffect(() => {
+    if (!userID) return;
+
+    fetch(`http://localhost:5000/getProfile/imgs2?search=${userID}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data !== null) {
+          setPic(data[0]);
+          console.log("20", pic);
+        }
+      })
+      .catch(err => console.error("Error fetching profile image:", err));
+  }, [userID]);
+
+  useEffect(() => {
+    console.log("Updated pic:", pic);
+  }, [pic]);
 
   // Close popup when clicking outside
   useEffect(() => {
@@ -39,7 +58,7 @@ const ProfilePopup = (props) => {
 
       <img
         ref={profileRef}
-        src={"client\src\default.png"}
+        src={`http://localhost:5000/profilePicture/${pic}`}
         className="profile-icon"
         onClick={handleClick}
       />

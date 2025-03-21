@@ -216,6 +216,20 @@ app.get("/getProfile/imgs", (req, res) => {
     })
 })
 
+app.get("/getProfile/imgs2", (req, res) => {
+    const search = req.query.search;
+
+    a = `select profilePic from user WHERE userName = ${search}`;
+    pool.query(a, (err, data) => {
+        if (err) {
+            return res.json(err);
+        }
+        const profilePaths = data.map(item => item.profilePic).filter(photoPath => photoPath !== 'Insert Default Path Here');;
+        console.log(profilePaths);
+        return res.json(profilePaths);
+    })
+})
+
 app.get("/getProfile/name", (req, res) => {
     const search = req.query.search;
 
@@ -474,27 +488,27 @@ app.post('/login', (req, res) => {
 app.post('/getData', (req, res) => {
     const query = `select roleName from role where roleID = (select roleID from user where userID = ${req.body.userID})`;
     pool.query(query, (err, data) => {
-        if(data[0]){
-            return res.json({"Role" : data[0].roleName, "Status" : true})
-        }else{
-            return res.json({"Role" : null, "Status" : false})
+        if (data[0]) {
+            return res.json({ "Role": data[0].roleName, "Status": true })
+        } else {
+            return res.json({ "Role": null, "Status": false })
         }
-        
+
     })
-    
+
 })
 
 app.post('/getData2', (req, res) => {
     const query = `select accName,profilePic from user where userID = ${req.body.userID}`;
     pool.query(query, (err, data) => {
-        if(data[0]){
-            return res.json({"accName" : data[0].accName,"profilePath" : data[0].profilePic, "Status" : true})
-        }else{
-            return res.json({"accName" : null,"profilePath" : null, "Status" : false})
+        if (data[0]) {
+            return res.json({ "accName": data[0].accName, "profilePath": data[0].profilePic, "Status": true })
+        } else {
+            return res.json({ "accName": null, "profilePath": null, "Status": false })
         }
-        
+
     })
-    
+
 })
 
 //For verifying email address(Spam Prevention)
