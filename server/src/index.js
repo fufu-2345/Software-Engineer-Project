@@ -1,4 +1,5 @@
 const express = require('express');
+const helmet = require('helmet');
 const cors = require('cors');
 const multer = require('multer');
 const mysql = require('mysql2');
@@ -13,9 +14,9 @@ var bcrypt = require('bcryptjs')
 const port = 5000;
 app.use(cors());
 app.use(express.json());
+app.use(helmet.frameguard({ action: 'deny' }));
 app.use(express.urlencoded({ extended: true }));
 
-app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const pool = mysql.createPool({
@@ -225,7 +226,7 @@ app.get("/getProfile/imgs2", (req, res) => {
             return res.json(err);
         }
         const profilePaths = data.map(item => item.profilePic).filter(photoPath => photoPath !== 'Insert Default Path Here');;
-        console.log(profilePaths);
+        //console.log(profilePaths);
         return res.json(profilePaths);
     })
 })

@@ -155,11 +155,14 @@ const ProfileShowPost = ({ userId }) => {
 
                     {Array.from({ length: endPage - startPage + 1 }, (_, index) => {
                         const page = startPage + index;
+                        console.log(page, startPage, endPage);
+
                         return (
                             <button key={page} onClick={() => changePage(page)} className={`text-black px-3 py-1 rounded-full ${page === currentPage ? "bg-gray-600 text-white" : "hover:bg-gray-500"}`}>
                                 {page}
                             </button>
                         );
+
                     })}
 
                     <button onClick={() => changePage(currentPage + 1)} className="text-black text-lg rounded-full hover:bg-gray-500 w-7 h-7 flex items-center justify-center leading-none">
