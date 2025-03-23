@@ -15,7 +15,7 @@ const ProfileShowPost = ({ userId }) => {
     const start = (currentPage - 1) * postPerPage;
     const stop = start + postPerPage - 1;
 
-    const totalPage = Math.ceil(postCount / 20);
+    const totalPage = Math.max(1, Math.ceil(postCount / 20));
     const startPage = Math.max(1, currentPage - Math.floor(maxVisitPage));
     const endPage = Math.min(totalPage, currentPage + Math.floor(maxVisitPage));
 
