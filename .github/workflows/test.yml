@@ -1,0 +1,45 @@
+name: Run Tests
+
+on:
+  push:
+    branches:
+      - drag
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    container:
+      image: node:16
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: |
+          npm install && cd client && npm install && cd ../server && npm install
+
+      - name: Create .env file
+        run: |
+          echo "HOST=localhost" >> server/.env
+          echo "USER=root" >> server/.env
+          echo "PASSWORD=${{ secrets.DOCKER_PASSWORD }}" >> server/.env
+          echo "DATABASE=${{ secrets.DOCKER_DATABASE }}" >> server/.env
+          echo "SERVEREMAIL=${{ secrets.DOCKER_SERVEREMAIL }}" >> server/.env
+          echo "APP_PASSWORD=${{ secrets.DOCKER_APP_PASSWORD }}" >> server/.env
+
+      - name: rootTests
+        run: npm test
+
+      - name: clientTests
+        run: |
+          cd client
+          npm test
+
+      - name: serverTests
+        run: |
+          cd server
+          npm test
