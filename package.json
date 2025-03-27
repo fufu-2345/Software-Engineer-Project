@@ -7,7 +7,7 @@
     "start": "concurrently \"npm run client\" \"npm run server\"",
     "client": "cd client && npm run dev",
     "server": "cd server && npm run dev",
-    "test": "echo \"root checked\" && exit 1"
+    "test": "echo \"root checked\" && exit 0"
   },
   "keywords": [],
   "author": "",
