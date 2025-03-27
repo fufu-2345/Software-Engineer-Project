@@ -26,4 +26,4 @@ jobs:
           context: ./client
           file: ./client/Dockerfile
           push: true
-          tags: fufu2345/software-engineer-project-client:latest
+          tags: software-engineer-project-client
