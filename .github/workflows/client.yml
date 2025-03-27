@@ -24,6 +24,6 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: ./client
-          file: ./Dockerfile
+          file: ./client/Dockerfile
           push: true
           tags: fufu2345/software-engineer-project-client:latest
