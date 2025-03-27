@@ -6,7 +6,8 @@
   "scripts": {
     "start": "concurrently \"npm run client\" \"npm run server\"",
     "client": "cd client && npm run dev",
-    "server": "cd server && npm run dev"
+    "server": "cd server && npm run dev",
+    "test": "echo \"root checked\" && exit 1"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +18,10 @@
     "express": "^4.21.2",
     "multer": "^1.4.5-lts.1",
     "react-dom": "^19.0.0",
-    "react-router-dom": "^7.1.1"
+    "react-router-dom": "^7.1.1",
+    "react-scripts": "^5.0.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
   }
 }
