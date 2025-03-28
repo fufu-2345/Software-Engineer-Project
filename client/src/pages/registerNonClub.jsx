@@ -143,6 +143,7 @@ const RegisterNonClub = () => {
 
   return (
     <>
+     <Navbar />
       <div className="registerPage">
         <div className="registerBox">
           Register Form
