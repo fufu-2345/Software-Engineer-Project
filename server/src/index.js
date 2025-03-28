@@ -483,7 +483,6 @@ app.post('/login', (req, res) => {
             return res.json({ "ID": null, "Status": false })
         }
     })
-
 })
 
 app.post('/getData', (req, res) => {
@@ -596,7 +595,7 @@ app.post('/registerClubMember', (req, res) => {
     const defaultProfilePicPath = "Insert Default Path Here"
     const body = req.body
     var ep = createSalt(req.body.password)
-    var queryCommand = `insert into user(userName,passWord,salt,accName,createTime,roleID,profilePic) values(?,${ep.hp},${ep.s},?,NOW(),2,"${defaultProfilePicPath}")`
+    var queryCommand = `insert into user(userName,passWord,salt,accName,createTime,roleID,profilePic) values(?,"${ep.hp}","${ep.s}",?,NOW(),2,"${defaultProfilePicPath}")`
     pool.query(queryCommand, [body.username, body.accountName], (err, results) => {
         if (err) {
             console.log(err)

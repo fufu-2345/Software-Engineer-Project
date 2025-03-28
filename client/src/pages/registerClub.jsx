@@ -136,10 +136,19 @@ const RegisterNonClub = () => {
       return;
     }
 
+    api = `http://localhost:5000/login/`
+    response = await axios.post(api, body);
+    var data = {}
+    if (response.data.Status == false) {
+      data = {userId : null}
+    }else{
+      data = {userId : response.data.ID}
+    }
+
     setCreateAccSuccess(true);
 
     setTimeout(() => {
-      navigate("/");
+      navigate("/Main", { state: data });
   }, 1000);
   return
   }
