@@ -523,7 +523,7 @@ const transporter = nodemailer.createTransport({
     port: 587,
     secure: false,
     auth: {
-        user: process.env.serverEmail,
+        user: process.env.SERVEREMAIL,
         pass: process.env.APP_PASSWORD
     },
 })
@@ -542,7 +542,7 @@ async function sendOTP(transporter, email) {
     const mailOption = {
         from: {
             name: 'PAPHON',
-            address: process.env.serverEmail
+            address: process.env.SERVEREMAIL
         },
         to: email,
         subject: 'Verify Your Registration',
