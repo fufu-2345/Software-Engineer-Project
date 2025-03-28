@@ -49,7 +49,12 @@ const Navbar = (props) => {
 
   return (
     <nav className="navbar">
-      <div className="logo" onclick={goMain}><Link to="/Main">MyLogo</Link></div>
+      <div className="logo" onclick={goMain}>
+        <Link to="/Main">
+          <img src="../imgs/1.jpg" className="w-20 h-20 rounded-full m-2" alt="Logo" />
+        </Link>
+      </div>
+
       <ul className="nav-links">
         {isGuest && <li className="navButton"><Link to="/login">Login</Link></li>}
         {isGuest && <li className="navButton"><Link to="/SelectRegister">Sign up</Link></li>}
