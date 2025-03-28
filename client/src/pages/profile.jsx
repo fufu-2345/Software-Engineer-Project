@@ -17,52 +17,59 @@ function Profile() {
         Other: '',
         profilePic: '',
     });
+    const [tempFormData, setTempFormData] = useState({ ...formData }); // state สำรอง
     const [profileImage, setProfileImage] = useState(null);
-    const [userId, setUserId] = useState(null); // เพิ่ม state สำหรับเก็บ userID
+    const [userId, setUserId] = useState('1');
 
-    // ดึง userID จาก localStorage เมื่อ component โหลด
     useEffect(() => {
         const loggedInUser = localStorage.getItem('user');
         if (loggedInUser) {
             const user = JSON.parse(loggedInUser);
-            setUserId(user.userID); // ตั้งค่า userID จากข้อมูลการล็อกอิน
+            setUserId(user.userID);
         }
     }, []);
 
-    // ดึงข้อมูลโปรไฟล์ผู้ใช้เมื่อ userID เปลี่ยน
     useEffect(() => {
         if (userId) {
             fetch(`http://localhost:5000/getUserProfile/${userId}`)
                 .then(response => response.json())
-                .then(data => setFormData(data))
+                .then(data => {
+                    setFormData(data);
+                    setTempFormData(data); // ตั้งค่า state สำรองให้ตรงกับข้อมูลปัจจุบัน
+                })
                 .catch(error => console.error('Error fetching profile:', error));
         }
     }, [userId]);
 
-    const handleShow = () => setShow(true);
+    const handleShow = () => {
+        setTempFormData({ ...formData }); // รีเซ็ต tempFormData ทุกครั้งที่เปิด Modal
+        setShow(true);
+    };
+
     const handleClose = () => setShow(false);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        setTempFormData({ ...tempFormData, [name]: value });
     };
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
-        setProfileImage(file); // เก็บไฟล์รูปภาพที่เลือก
+        setProfileImage(file);
     };
 
     const handleSave = () => {
         const formDataWithImage = new FormData();
-        formDataWithImage.append('accName', formData.accName);
-        formDataWithImage.append('accDescription', formData.accDescription);
-        formDataWithImage.append('Instagram', formData.Instagram);
-        formDataWithImage.append('Line', formData.Line);
-        formDataWithImage.append('X', formData.X);
-        formDataWithImage.append('Phone', formData.Phone);
-        formDataWithImage.append('Other', formData.Other);
+        formDataWithImage.append('userId', userId);
+        formDataWithImage.append('accName', tempFormData.accName || '');
+        formDataWithImage.append('accDescription', tempFormData.accDescription || '');
+        formDataWithImage.append('Instagram', tempFormData.Instagram || '');
+        formDataWithImage.append('Line', tempFormData.Line || '');
+        formDataWithImage.append('X', tempFormData.X || '');
+        formDataWithImage.append('Phone', tempFormData.Phone || '');
+        formDataWithImage.append('Other', tempFormData.Other || '');
         if (profileImage) {
-            formDataWithImage.append('image', profileImage); // ส่งรูปภาพ
+            formDataWithImage.append('image', profileImage);
         }
 
         fetch('http://localhost:5000/updateProfile', {
@@ -74,11 +81,7 @@ function Profile() {
             alert(data.message || 'Failed to update profile');
             if (data.message) {
                 setShow(false);
-                // โหลดข้อมูลใหม่หลังจากอัปเดต
-                fetch(`http://localhost:5000/getUserProfile/${userId}`)
-                    .then(response => response.json())
-                    .then(data => setFormData(data))
-                    .catch(error => console.error('Error fetching profile:', error));
+                window.location.reload(); // รีเฟรชหน้า Profile
             }
         })
         .catch(error => alert('Error updating profile: ' + error));
@@ -90,7 +93,7 @@ function Profile() {
                 <Col sm={7}>
                     <Image
                         className="pro_main"
-                        src={formData.profilePic ? `http://localhost:5000/uploads/${formData.profilePic}` : `https://localhost:5000/uploads/standard.png`}
+                        src={formData.profilePic ? `http://localhost:5000/uploads/${formData.profilePic}` : `http://localhost:5000/uploads/standard.png`}
                         roundedCircle
                         onClick={handleShow}
                         style={{ cursor: 'pointer' }}
@@ -125,12 +128,12 @@ function Profile() {
                     </div>
                 </Col>
             </Row>
-
             <Row className="pro_r3">
                 <div>Other</div>
                 <div className="pro_des">{formData.Other}</div>
             </Row>
 
+            {/* Modal แก้ไขข้อมูล */}
             <Modal show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
                     <Modal.Title>Edit Profile</Modal.Title>
@@ -143,7 +146,7 @@ function Profile() {
                                 <Form.Control
                                     type="text"
                                     name={field}
-                                    value={formData[field]}
+                                    value={tempFormData[field]}
                                     onChange={handleChange}
                                 />
                             </Form.Group>
