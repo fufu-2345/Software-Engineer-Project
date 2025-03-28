@@ -30,7 +30,9 @@ const ProfilePopup = (props) => {
   }, [userID]);
 
   useEffect(() => {
-    console.log("Updated pic:", pic);
+    if (pic === "" || pic === undefined) {
+      setPic("default.png");
+    }
   }, [pic]);
 
   // Close popup when clicking outside

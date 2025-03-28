@@ -1,63 +1,66 @@
 /* โครงสร้างหลัก */
 .post-detail-container {
-    display: flex; /* ใช้ flexbox สำหรับจัด layout ซ้าย-ขวา */
-    max-width: 1000px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    gap: 20px;
-  }
-  
-  /* ซ้าย: เนื้อหาโพสต์ */
-  .post-left {
-    flex: 2; /* ฝั่งซ้ายกว้างกว่า */
-    display: flex;
-    flex-direction: column; /* เรียงจากบนลงล่าง */
-    gap: 15px;
-  }
-  
-  .post-title {
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: #333;
-  }
-  
-  .post-image {
-    width: 100%;
-    height: auto;
-    border-radius: 8px;
-  }
-  
-  .post-description {
-    font-size: 1rem;
-    color: #555;
-    line-height: 1.6;
-  }
-  
-  /* ขวา: คอมเมนต์ */
-  .post-right {
-    flex: 1; /* ฝั่งขวาแคบกว่า */
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 15px;
-  }
-  
-  .comments-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .comment-item {
-    margin-bottom: 15px;
-    font-size: 0.9rem;
-    color: #444;
-  }
-  
-  .comment-item strong {
-    color: #000;
-  }
-  
+  display: flex;
+  /* ใช้ flexbox สำหรับจัด layout ซ้าย-ขวา */
+  max-width: 1000px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  gap: 20px;
+}
+
+/* ซ้าย: เนื้อหาโพสต์ */
+.post-left {
+  flex: 2;
+  /* ฝั่งซ้ายกว้างกว่า */
+  display: flex;
+  flex-direction: column;
+  /* เรียงจากบนลงล่าง */
+  gap: 15px;
+}
+
+.post-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.post-image {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.post-description {
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.6;
+}
+
+/* ขวา: คอมเมนต์ */
+.post-right {
+  flex: 1;
+  /* ฝั่งขวาแคบกว่า */
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.comments-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.comment-item {
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.comment-item strong {
+  color: #000;
+}

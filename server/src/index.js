@@ -577,11 +577,11 @@ function createSalt(p) {
 //API for create new account in user database
 //Insert Profile Pic Path Later to be default
 app.post('/registerNonClubMember', (req, res) => {
-    const defaultProfilePicPath = "Insert Default Path Here"
+    //const defaultProfilePicPath = "Insert Default Path Here"
     const body = req.body
     var ep = createSalt(req.body.password)
     console.log(ep)
-    var queryCommand = `insert into user(userName,passWord,salt,accName,createTime,roleID,profilePic) values(?,"${ep.hp}","${ep.s}",?,NOW(),3,"${defaultProfilePicPath}")`
+    var queryCommand = `insert into user(userName,passWord,salt,accName,createTime,roleID,profilePic) values(?,"${ep.hp}","${ep.s}",?,NOW(),3,"")`
     pool.query(queryCommand, [body.username, body.accountName], (err, results) => {
         if (err) {
             console.log(err)
@@ -592,10 +592,10 @@ app.post('/registerNonClubMember', (req, res) => {
 })
 
 app.post('/registerClubMember', (req, res) => {
-    const defaultProfilePicPath = "Insert Default Path Here"
+    //const defaultProfilePicPath = "Insert Default Path Here"
     const body = req.body
     var ep = createSalt(req.body.password)
-    var queryCommand = `insert into user(userName,passWord,salt,accName,createTime,roleID,profilePic) values(?,"${ep.hp}","${ep.s}",?,NOW(),2,"${defaultProfilePicPath}")`
+    var queryCommand = `insert into user(userName,passWord,salt,accName,createTime,roleID,profilePic) values(?,"${ep.hp}","${ep.s}",?,NOW(),2,"")`
     pool.query(queryCommand, [body.username, body.accountName], (err, results) => {
         if (err) {
             console.log(err)
