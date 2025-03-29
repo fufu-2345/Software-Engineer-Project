@@ -19,7 +19,7 @@ function Profile() {
     });
     const [tempFormData, setTempFormData] = useState({ ...formData }); // state สำรอง
     const [profileImage, setProfileImage] = useState(null);
-    const [userId, setUserId] = useState('1');
+    const [userId, setUserId] = useState(null);
 
     useEffect(() => {
         const loggedInUser = localStorage.getItem('user');
@@ -76,15 +76,15 @@ function Profile() {
             method: 'POST',
             body: formDataWithImage,
         })
-        .then(response => response.json())
-        .then(data => {
-            alert(data.message || 'Failed to update profile');
-            if (data.message) {
-                setShow(false);
-                window.location.reload(); // รีเฟรชหน้า Profile
-            }
-        })
-        .catch(error => alert('Error updating profile: ' + error));
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message || 'Failed to update profile');
+                if (data.message) {
+                    setShow(false);
+                    window.location.reload(); // รีเฟรชหน้า Profile
+                }
+            })
+            .catch(error => alert('Error updating profile: ' + error));
     };
 
     return (
