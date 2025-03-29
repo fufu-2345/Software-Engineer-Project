@@ -673,10 +673,15 @@ app.post('/addComment', (req, res) => {
     const { postID, commentDescription, ratingValue, userID } = req.body;
 
     // ถ้ามีคอมเมนต์ ให้เพิ่มลงตาราง comment
-    if (commentDescription.trim()) {
+    // ปลอดภัย + จำกัดความยาว comment ไม่เกิน 800 ตัว
+    const cleanComment = commentDescription?.trim();
+    if (cleanComment && cleanComment.length > 800) {
+        return res.status(400).json({ error: "Comment too long. Max 700 characters." });
+    }
+    if (cleanComment) {
         const commentQuery = `INSERT INTO comment (postID, userID, commentDescription, commentTime) VALUES (?, ?, ?, NOW())`;
-
-        pool.query(commentQuery, [postID, userID, commentDescription], (err, commentResult) => {
+        pool.query(commentQuery, [postID, userID, cleanComment], (err, commentResult) => {
+            if (err) return res.status(500).json({ error: "Insert comment failed", details: err });
         });
     }
 
@@ -723,11 +728,18 @@ app.post('/addCommentRating', (req, res) => {
     const { postID, commentDescription, ratingValue, userID } = req.body;
 
     // ถ้ามี Comment ให้เพิ่มลง `comment` Table
-    if (commentDescription) {
+    // ปลอดภัย + จำกัดความยาว comment ไม่เกิน 800 ตัว
+    const cleanComment = commentDescription?.trim();
+    if (cleanComment && cleanComment.length > 800) {
+        return res.status(400).json({ error: "Comment too long. Max 700 characters." });
+    }
+    if (cleanComment) {
         const commentQuery = `INSERT INTO comment (postID, userID, commentDescription, commentTime) VALUES (?, ?, ?, NOW())`;
-        pool.query(commentQuery, [postID, userID, commentDescription], (err, commentResult) => {
+        pool.query(commentQuery, [postID, userID, cleanComment], (err, commentResult) => {
+            if (err) return res.status(500).json({ error: "Insert comment failed", details: err });
         });
     }
+
 
     // ถ้ามี Rating ต้องอัปเดตหรือเพิ่มลง `rating` Table
     if (ratingValue !== null) {
@@ -783,32 +795,34 @@ app.get('/getPost/:id/:userID?', (req, res) => {
     const { id, userID } = req.params;
 
     let query = `
+    SELECT p.*, 
+        u.userName,
+        u.profilePic,
+        COALESCE((SELECT AVG(ratingValue) FROM rating WHERE postID = p.postID), 0) AS avgRating,
+        COALESCE((SELECT COUNT(*) FROM rating WHERE postID = p.postID), 0) AS ratingCount
+    FROM post p
+    JOIN user u ON p.userID = u.userID
+    WHERE p.postID = ?`;
+
+let queryParams = [id];
+
+if (userID) {
+    query = `
         SELECT p.*, 
             u.userName,
             u.profilePic,
-            COALESCE((SELECT AVG(ratingValue) FROM rating WHERE postID = p.postID), 0) AS avgRating
+            COALESCE((SELECT AVG(ratingValue) FROM rating WHERE postID = p.postID), 0) AS avgRating,
+            COALESCE((SELECT COUNT(*) FROM rating WHERE postID = p.postID), 0) AS ratingCount,
+            (SELECT ratingValue 
+             FROM rating 
+             WHERE postID = p.postID AND userID = ? 
+             ORDER BY rateTime DESC LIMIT 1) AS userRating
         FROM post p
         JOIN user u ON p.userID = u.userID
         WHERE p.postID = ?`;
 
-    let queryParams = [id];
-
-    if (userID) {
-        query = `
-            SELECT p.*, 
-                u.userName,
-                u.profilePic,
-                COALESCE((SELECT AVG(ratingValue) FROM rating WHERE postID = p.postID), 0) AS avgRating,
-                (SELECT ratingValue 
-                 FROM rating 
-                 WHERE postID = p.postID AND userID = ? 
-                 ORDER BY rateTime DESC LIMIT 1) AS userRating
-            FROM post p
-            JOIN user u ON p.userID = u.userID
-            WHERE p.postID = ?`;
-
-        queryParams = [userID, id];
-    }
+    queryParams = [userID, id];
+}
 
     pool.query(query, queryParams, (err, result) => {
         if (result.length === 0) {
