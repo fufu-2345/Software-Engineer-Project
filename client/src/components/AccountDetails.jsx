@@ -17,8 +17,7 @@ const AccountDetails = (props) => {
   var [profilePath, setProfilePath] = useState("")
 
   const goProfile = () => {
-    console.log("AAA")
-    navigate('/profile', { state: { userId: userID } });
+    navigate('/profile', { state: { userId: userID, loggedInUser: userID } });
   };
 
   async function getData() {
