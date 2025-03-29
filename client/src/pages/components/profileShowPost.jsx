@@ -139,7 +139,7 @@ const ProfileShowPost = ({ userId }) => {
 
                         ))
                     ) : (
-                        <p className="text-gray-500">no imgs rn</p>
+                        <></>
                     )}
                 </div>
                 <br />
