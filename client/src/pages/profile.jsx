@@ -26,13 +26,13 @@ function Profile() {
     const [profileImage, setProfileImage] = useState(null);
     const [userId, setUserId] = useState(1);
 
-    useEffect(() => {
+    /*useEffect(() => {
         const loggedInUser = localStorage.getItem('user');
         if (loggedInUser) {
             const user = JSON.parse(loggedInUser);
             setUserId(user.userID);
         }
-    }, []);
+    }, []);*/
 
     useEffect(() => {
         if (state) {
@@ -56,9 +56,22 @@ function Profile() {
         }
     }, [userId]);
 
+    const [isOwner, setIsOwner] = useState(false);
+
+    useEffect(() => {
+        const loggedInUser = localStorage.getItem('user');
+        if (loggedInUser) {
+            const user = JSON.parse(loggedInUser);
+            setUserId(user.userID);
+            setIsOwner(user.userID === state?.userId); // ตรวจสอบว่าเป็นเจ้าของโปรไฟล์หรือไม่
+        }
+    }, [state?.userId]);
+
     const handleShow = () => {
-        setTempFormData({ ...formData }); // รีเซ็ต tempFormData ทุกครั้งที่เปิด Modal
-        setShow(true);
+        if (isOwner) {
+            setTempFormData({ ...formData });
+            setShow(true);
+        }
     };
 
     const handleClose = () => setShow(false);
@@ -106,17 +119,13 @@ function Profile() {
         <Container className='pagePro'>
             <Row className="pro_r1">
                 <Col sm={7}>
-
-                {userId === state?.userId && ( 
                     <Image
                         className="pro_main"
                         src={formData.profilePic ? `http://localhost:5000/uploads/${formData.profilePic}` : `http://localhost:5000/uploads/standard.png`}
                         roundedCircle
-                        onClick={handleShow}
-                        style={{ cursor: 'pointer' }}
+                        onClick={isOwner ? handleShow : undefined} 
+                        style={{ cursor: isOwner ? 'pointer' : 'default' }}
                     />
-                )}
-
                 </Col>
                 <Col sm={5} className="pro_contract">
                     <div className="contact-row">
@@ -180,10 +189,12 @@ function Profile() {
                         </Form.Group>
                     </Form>
                 </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>Close</Button>
-                    <Button variant="primary" onClick={handleSave}>Save Changes</Button>
-                </Modal.Footer>
+                {isOwner && (
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={handleClose}>Close</Button>
+                        <Button variant="primary" onClick={handleSave}>Save Changes</Button>
+                    </Modal.Footer>
+                )}
             </Modal>
             <ProfileShowPost userId={userId} />
         </Container>

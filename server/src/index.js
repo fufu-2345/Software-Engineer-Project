@@ -66,24 +66,21 @@ app.get('/getUserProfile/:id', (req, res) => {
 
 // อัปเดตข้อมูลโปรไฟล์ผู้ใช้
 app.post('/updateProfile', upload2.single('image'), (req, res) => {
-    const { accName, accDescription, Instagram, X, Line, Phone, Other } = req.body;
+    const { accName, accDescription, Instagram, X, Line, Phone, Other, userId } = req.body;
     const newProfilePic = req.file ? req.file.filename : null;
-    
-    // ตรวจสอบว่ามี session หรือ token ของผู้ใช้หรือไม่ (ตัวอย่างใช้ session)
-    const userId = req.session?.userID;  // หรือ req.user.userID ถ้าใช้ JWT
 
     if (!userId) {
-        return res.status(403).json({ error: 'Unauthorized' });
+        return res.status(400).json({ error: 'User ID is required' });
     }
 
-    // ตรวจสอบว่า userId ที่ล็อกอินตรงกับโปรไฟล์ที่กำลังอัปเดตหรือไม่
-    pool.query('SELECT userID, profilePic FROM user WHERE userID = ?', [userId], (err, results) => {
+    // ดึงชื่อไฟล์รูปภาพเดิม
+    const getUserQuery = 'SELECT profilePic FROM user WHERE userID = ?';
+    pool.query(getUserQuery, [userId], (err, results) => {
         if (err) return res.status(500).json({ error: err.message });
-        if (results.length === 0) return res.status(404).json({ error: 'User not found' });
 
         const oldProfilePic = results[0]?.profilePic;
-        let query, values;
 
+        let query, values;
         if (newProfilePic) {
             query = `UPDATE user SET accName = ?, accDescription = ?, Instagram = ?, X = ?, Line = ?, Phone = ?, Other = ?, profilePic = ? WHERE userID = ?`;
             values = [accName, accDescription, Instagram, X, Line, Phone, Other, newProfilePic, userId];
