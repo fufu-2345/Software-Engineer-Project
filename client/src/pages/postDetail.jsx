@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import { Link } from "react-router-dom";
 import axios from "axios";
 import Popup from "reactjs-popup";
@@ -14,7 +14,7 @@ const PostDetail = () => {
     const [rating, setRating] = useState(null);
     const [open, setOpen] = useState(false);
     const [userID, setUserID] = useState(null);
-    
+    const [role, setRole] = useState(null);
     
     useEffect(() => {
         const storedUserID = localStorage.getItem("userID");
@@ -22,6 +22,13 @@ const PostDetail = () => {
     
         const fetchData = async () => {
             try {
+                if (storedUserID) {
+                    const roleRes = await axios.get("http://localhost:5000/getRole", {
+                        params: { userId: storedUserID }
+                    });
+                    setRole(roleRes.data.roleID);
+                }
+    
                 const postURL = storedUserID 
                     ? `http://localhost:5000/getPost/${id}/${storedUserID}`
                     : `http://localhost:5000/getPost/${id}`;
@@ -32,23 +39,21 @@ const PostDetail = () => {
                 const commentRes = await axios.get(`http://localhost:5000/getComment/${id}`);
                 setComments(commentRes.data);
             } catch (error) {
-                console.error(" Error fetching post/comments:", error);
+                console.error("Error fetching post/comments:", error);
             }
         };
     
         fetchData();
-    }, [id, userID]); // เพิ่ม userID เป็น dependency
-    
-    
+    }, [id]);    
 
     const handleOpenPopup = () => {
         if (!userID) {
-            navigate("/login"); // ถ้ายังไม่ได้ login ให้ไปหน้า login
+            navigate("/login");
         } else {
-            setOpen(true); // ถ้า login แล้วให้เปิด popup
+            setOpen(true);
         }
     };
-
+    
     const handleCommentSubmit = () => {
         if (!newComment.trim() && rating === null) {
             alert(" Please provide either a rating or a comment!");
@@ -82,7 +87,7 @@ const PostDetail = () => {
 
     return (
         <div className="post-container">
-            {/* 🔹 ส่วนของโพสต์ */}
+            {/*ส่วนของโพสต์ */}
             <div className="post-left">
                 <div className="post-header">
                     <Link to={`/profile/${post.userID}`} className="post-profile-pic-Link">
@@ -96,15 +101,19 @@ const PostDetail = () => {
                 <div className="post-description">{post.postDescription}</div>
             </div>
 
-            {/* 🔹 ส่วนของคอมเมนต์ */}
+            {/*ส่วนของคอมเมนต์ */}
             <div className="post-right">
                 <div className="comment-header">
                     <div className="comment-header">
                         <h2 className="head-comment">Comments</h2>
                             <div className="rating-container">
-                                <span className="avg-rating">
-                                ⭐ {post.avgRating && !isNaN(post.avgRating) ? parseFloat(post.avgRating).toFixed(2) : "N/A"}
+                            <span className="avg-rating">
+                            ⭐ {post.avgRating && !isNaN(post.avgRating) ? parseFloat(post.avgRating).toFixed(2) : "N/A"} 
+                                <span style={{ fontSize: "0.85rem", color: "#333", marginLeft: "5px" }}>
+                                ({post.ratingCount || 0} reviews)
                                 </span>
+                            </span>
+
                                 {userID && post.userRating !== null && (
                                     <span className="user-rating">Your Rating: {post.userRating} ⭐</span>
                                 )}
@@ -134,11 +143,13 @@ const PostDetail = () => {
                         ))}
                     </ul>
                     {/* แสดงปุ่มหรือข้อความขึ้นอยู่กับสถานะ login */}
-                    {userID ? (<button className="comment-btn" onClick={handleOpenPopup}>Give Feedback</button>) : (
-                        <p className="login-message">
-                            Please <Link to="/login" className="login-link">Login</Link> first
-                        </p>
-                    )}
+                    {userID && [1, 2, 3].includes(role) ? (
+                            <button className="comment-btn" onClick={handleOpenPopup}>Give Feedback</button>
+                            ) : (
+                            <p className="login-message">
+                                Please <Link to="/login" className="login-link">Login</Link> first
+                            </p>
+                        )}
                     {/* Popup แบบ Rating หรือ Comment */}
                     <Popup open={open} closeOnDocumentClick onClose={() => setOpen(false)} modal nested>
                         <div className="popup-container">
@@ -157,7 +168,17 @@ const PostDetail = () => {
 
                             {/* Input สำหรับ Comment (ไม่บังคับ) */}
                             <label className="popup-label">Feedback (Optional):</label>
-                            <textarea className="popup-textarea" placeholder="Write your comment..." value={newComment} onChange={(e) => setNewComment(e.target.value)}/>
+                            <textarea
+                            className="popup-textarea"
+                            placeholder="Write your comment..."
+                            value={newComment}
+                            onChange={(e) => setNewComment(e.target.value)}
+                            maxLength={800}
+                            />
+                            <p style={{ textAlign: "right", fontSize: "0.9rem", color: "#666" }}>
+                            {newComment.length}/800 characters
+                            </p>
+
                             <button className="popup-btn" onClick={handleCommentSubmit}>Submit</button>
                         </div>
                     </Popup>
