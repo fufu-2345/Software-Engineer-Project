@@ -69,18 +69,17 @@ app.post('/updateProfile', upload2.single('image'), (req, res) => {
     const { accName, accDescription, Instagram, X, Line, Phone, Other, userId } = req.body;
     const newProfilePic = req.file ? req.file.filename : null;
 
-    if (!userId) {
-        return res.status(400).json({ error: 'User ID is required' });
+    if (!req.user || req.user.id !== parseInt(userId, 10)) {
+        return res.status(403).json({ error: 'You are not authorized to update this profile' });
     }
 
-    // ดึงชื่อไฟล์รูปภาพเดิม
     const getUserQuery = 'SELECT profilePic FROM user WHERE userID = ?';
     pool.query(getUserQuery, [userId], (err, results) => {
         if (err) return res.status(500).json({ error: err.message });
 
         const oldProfilePic = results[0]?.profilePic;
-
         let query, values;
+
         if (newProfilePic) {
             query = `UPDATE user SET accName = ?, accDescription = ?, Instagram = ?, X = ?, Line = ?, Phone = ?, Other = ?, profilePic = ? WHERE userID = ?`;
             values = [accName, accDescription, Instagram, X, Line, Phone, Other, newProfilePic, userId];
@@ -92,10 +91,8 @@ app.post('/updateProfile', upload2.single('image'), (req, res) => {
         pool.query(query, values, (err, result) => {
             if (err) return res.status(500).json({ error: err.message });
 
-            // ลบรูปเก่าถ้ามีและไม่ใช่ค่าเริ่มต้น
             if (newProfilePic && oldProfilePic && oldProfilePic !== 'standard.png') {
-                const oldImagePath = path.join(uploadDir, oldProfilePic);
-                fs.unlink(oldImagePath, (err) => {
+                fs.unlink(path.join(uploadDir, oldProfilePic), (err) => {
                     if (err) console.error('Error deleting old profile picture:', err);
                 });
             }
