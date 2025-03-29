@@ -55,7 +55,7 @@ const News = ({ role }) => {
                         <img src={`http://localhost:5000/news/${news}`} className='w-full h-[350px]' alt="News" />
                     </div>
                 ) : (
-                    <p className="text-white">no news rn</p>
+                    <></>
                 )}
             </div>
             {newFile && role.roleID === 1 && ( // แสดงปุ่มเฉพาะเมื่อ role เป็น 1
