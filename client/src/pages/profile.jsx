@@ -35,22 +35,23 @@ function Profile() {
     }, []);*/
 
     useEffect(() => {
-        if (state) {
+        if (state?.userId) {
             setUserId(state.userId);
-            console.log(userId);
+            console.log("User ID from state:", state.userId);
+        } else {
+            console.log("Can't get state / useEffect error");
         }
-        else {
-            console.log("cant get state / useEffect err");
-        }
-    }, []);
+    }, [state]);
 
     useEffect(() => {
         if (userId) {
             fetch(`http://localhost:5000/getUserProfile/${userId}`)
                 .then(response => response.json())
                 .then(data => {
-                    setFormData(data);
-                    setTempFormData(data); // ตั้งค่า state สำรองให้ตรงกับข้อมูลปัจจุบัน
+                    if (JSON.stringify(data) !== JSON.stringify(formData)) { // ป้องกัน fetch ซ้ำ
+                        setFormData(data);
+                        setTempFormData(data);
+                    }
                 })
                 .catch(error => console.error('Error fetching profile:', error));
         }
@@ -59,13 +60,12 @@ function Profile() {
     const [isOwner, setIsOwner] = useState(false);
 
     useEffect(() => {
-        const loggedInUser = localStorage.getItem('user');
-        if (loggedInUser) {
-            const user = JSON.parse(loggedInUser);
-            setUserId(user.userID);
-            setIsOwner(user.userID === state?.userId); // ตรวจสอบว่าเป็นเจ้าของโปรไฟล์หรือไม่
+        const loggedInUser = JSON.parse(localStorage.getItem('user'));
+        if (loggedInUser?.userID) {
+            setUserId(loggedInUser.userID);
+            setIsOwner(loggedInUser.userID === state?.userId);
         }
-    }, [state?.userId]);
+    }, [state]);
 
     const handleShow = () => {
         if (isOwner) {

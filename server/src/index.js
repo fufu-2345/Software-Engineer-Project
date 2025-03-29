@@ -54,13 +54,18 @@ const upload2 = multer({ storage: storage2 });
 // ดึงข้อมูลโปรไฟล์ผู้ใช้
 app.get('/getUserProfile/:id', (req, res) => {
     const { id } = req.params;
-    const query = `SELECT userID, accName, accDescription, Instagram, X, Line, Phone, Other, profilePic FROM user WHERE userID = ?`;
-    pool.query(query, [id], (err, data) => {
-        if (err) return res.status(500).json({ error: err.message });
-        if (data.length === 0) {
-            return res.status(404).json({ message: 'User not found' });
+    pool.getConnection((err, connection) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database connection error' });
         }
-        res.status(200).json(data[0]);
+
+        const query = `SELECT userID, accName, accDescription, Instagram, X, Line, Phone, Other, profilePic FROM user WHERE userID = ?`;
+        connection.query(query, [id], (err, data) => {
+            connection.release(); // ปิดการเชื่อมต่อหลังใช้เสร็จ
+            if (err) return res.status(500).json({ error: err.message });
+            if (data.length === 0) return res.status(404).json({ message: 'User not found' });
+            res.status(200).json(data[0]);
+        });
     });
 });
 
@@ -95,12 +100,16 @@ app.post('/updateProfile', upload2.single('image'), (req, res) => {
             // ลบรูปเก่าถ้ามีและไม่ใช่ค่าเริ่มต้น
             if (newProfilePic && oldProfilePic && oldProfilePic !== 'standard.png') {
                 const oldImagePath = path.join(uploadDir, oldProfilePic);
-                fs.unlink(oldImagePath, (err) => {
-                    if (err) console.error('Error deleting old profile picture:', err);
-                });
+                if (fs.existsSync(oldImagePath)) {
+                    fs.unlink(oldImagePath, (err) => {
+                        if (err) console.error('Error deleting old profile picture:', err);
+                    });
+                }
             }
 
-            res.status(200).json({ message: 'Profile updated successfully' });
+            if (!userId) {
+                return res.status(400).json({ error: 'User ID is required' });
+            }
         });
     });
 });
