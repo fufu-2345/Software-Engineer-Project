@@ -86,7 +86,7 @@ const ShowPost = ({ userId, role }) => {
                 setErrorMessage("");
                 setTitle("");
                 setDescription("");
-                console.log('Upload successful!');
+                //console.log('Upload successful!');
             } else {
                 //alert('Upload failed.');
                 console.log('Upload failed 1');
@@ -131,7 +131,7 @@ const ShowPost = ({ userId, role }) => {
         setIsOpen(false);
         setSortMode(true);
         setMode(true);
-        console.log(mode, sortMode);
+        //console.log(mode, sortMode);
 
         const params = {
             sortMode: sortMode ? 'DESC' : 'ASC',
@@ -154,7 +154,7 @@ const ShowPost = ({ userId, role }) => {
         setIsOpen(false);
         setSortMode(true);
         setMode(false);
-        console.log(mode, sortMode);
+        //console.log(mode, sortMode);
 
         const params = {
             sortMode: sortMode ? 'DESC' : 'ASC',
@@ -300,6 +300,17 @@ const ShowPost = ({ userId, role }) => {
             });
     }, []);
 
+    const goPostDetail = (img) => {
+        if (img) {
+            const postId = parseInt(img.split('.')[0]);
+            console.log(userId, postId);
+            navigate(`/post`, { state: { userId: userId, postId: postId } });
+        }
+        else {
+            console.log("img null")
+        }
+    }
+
     return (
         <>
             {isAdding && <div className=' content-area fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center bg-red-300 p-4 border-4 w-[80%] h-[90vh] overflow-y-auto mx-auto rounded-lg z-50'>
@@ -422,7 +433,7 @@ const ShowPost = ({ userId, role }) => {
                                 postImgs.slice(start, stop + 1).map((img, index) => (
                                     img ? (
                                         <div key={index} className='relative group flex justify-center items-center h-[300px] cursor-pointer'>
-                                            <img src={`http://localhost:5000/imgs/${img}`} alt="postImg" className='w-full h-full object-contain' title={img} />
+                                            <img src={`http://localhost:5000/imgs/${img}`} alt="postImg" className='w-full h-full object-contain' title={img} onClick={() => goPostDetail(img)} />
                                         </div>
                                     ) : null
                                 ))

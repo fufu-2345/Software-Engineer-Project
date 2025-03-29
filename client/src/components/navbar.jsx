@@ -5,7 +5,6 @@ import ProfilePopup from "./ProfilePopup";
 import axios from "axios";
 
 const Navbar = (props) => {
-  console.log(props);
   const { userID } = props
 
   var [isGuest, setGuest] = useState(false)

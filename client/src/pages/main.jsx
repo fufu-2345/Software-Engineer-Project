@@ -28,7 +28,6 @@ const Main = () => {
 
 
     useEffect(() => {
-        console.log("logined")
         //////// ดัก login มั่ว
         if (!state) {
             setRole(0);

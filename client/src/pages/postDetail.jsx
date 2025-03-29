@@ -2,12 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 import { Link } from "react-router-dom";
+import { useLocation } from 'react-router-dom';
 import axios from "axios";
 import Popup from "reactjs-popup";
 
 const PostDetail = () => {
     // id=postID
-    const { id } = useParams();
+    //const { id } = useParams();
+    const [id, setId] = useState(null);
     const navigate = useNavigate();
     const [post, setPost] = useState(null);
     const [comments, setComments] = useState([]);
@@ -16,11 +18,29 @@ const PostDetail = () => {
     const [open, setOpen] = useState(false);
     const [userID, setUserID] = useState(null);
     const [role, setRole] = useState(null);
+    const [storedUserID, setStoredUserID] = useState(null);
+
+    const location = useLocation();
+    const { state } = location;
 
     useEffect(() => {
         // storedUserID = userID คนดู
-        const storedUserID = localStorage.getItem("userID");
+        setStoredUserID(state.userId);
+        ////////////////////////////
+        /////////////////////////////
+        if (state.postId === undefined && state.postId === null) {
+            setId(0);
+        }
+        else {
+            setId(state.postId);
+        }
         setUserID(storedUserID);
+        /////////////////
+        /////////////////
+        console.log("USERID= ", userID);
+        console.log("ID= ", id);
+        //const storedUserID = localStorage.getItem("userID");
+
 
         const fetchData = async () => {
             try {
@@ -57,11 +77,6 @@ const PostDetail = () => {
     };
 
     const handleCommentSubmit = () => {
-        if (!newComment.trim() && rating === null) {
-            alert(" Please provide either a rating or a comment!");
-            return;
-        }
-
         const data = {
             postID: id,
             commentDescription: newComment,
@@ -107,17 +122,17 @@ const PostDetail = () => {
             <div className="post-right">
                 <div className="comment-header">
                     <div className="comment-header">
-                        <h2 className="head-comment">Comments</h2>
+                        <h2 className="cursor-default">Comments</h2>
                         <div className="rating-container">
-                            <span className="avg-rating">
+                            <span className="acursor-default cursor-default">
                                 ⭐ {post.avgRating && !isNaN(post.avgRating) ? parseFloat(post.avgRating).toFixed(2) : "N/A"}
-                                <span style={{ fontSize: "0.85rem", color: "#333", marginLeft: "5px" }}>
+                                <span style={{ fontSize: "0.85rem", color: "#333", marginLeft: "5px", cursor: "default" }}>
                                     ({post.ratingCount || 0} reviews)
                                 </span>
                             </span>
 
                             {userID && post.userRating !== null && (
-                                <span className="user-rating">Your Rating: {post.userRating} ⭐</span>
+                                <span className="cursor-default">Your Rating: {post.userRating} ⭐</span>
                             )}
                         </div>
                     </div>
@@ -132,7 +147,7 @@ const PostDetail = () => {
                                 </Link>
                                 {/* กล่องคอมเมนต์ */}
                                 <div className="comment-text-box">
-                                    <div className="comment-user-time">
+                                    <div className="cursor-default">
                                         <Link to={`/profile/${comment.userID}`} className="comment-user-Link">
                                             <strong className="comment-user">{comment.userName}</strong>
                                         </Link>
@@ -177,7 +192,7 @@ const PostDetail = () => {
                             onChange={(e) => setNewComment(e.target.value)}
                             maxLength={800}
                         />
-                        <p style={{ textAlign: "right", fontSize: "0.9rem", color: "#666" }}>
+                        <p style={{ textAlign: "right", fontSize: "0.9rem", color: "#666", cursor: "default" }}>
                             {newComment.length}/800 characters
                         </p>
 
