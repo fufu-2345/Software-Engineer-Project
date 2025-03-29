@@ -54,13 +54,23 @@ const upload2 = multer({ storage: storage2 });
 // ดึงข้อมูลโปรไฟล์ผู้ใช้
 app.get('/getUserProfile/:id', (req, res) => {
     const { id } = req.params;
-    const query = `SELECT userID, accName, accDescription, Instagram, X, Line, Phone, Other, profilePic FROM user WHERE userID = ?`;
-    pool.query(query, [id], (err, data) => {
-        if (err) return res.status(500).json({ error: err.message });
-        if (data.length === 0) {
-            return res.status(404).json({ message: 'User not found' });
+    pool.getConnection((err, connection) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database connection error' });
         }
-        res.status(200).json(data[0]);
+
+        const query = `SELECT userID, accName, accDescription, Instagram, X, Line, Phone, Other, profilePic FROM user WHERE userID = ?`;
+        pool.query(query, [id], (err, data) => {
+            if (err) {
+                console.error('Database query error: ', err);
+                return res.status(500).json({ error: err.message });
+            }
+            if (data.length === 0) {
+                console.log('No data found for userID:', id);
+                return res.status(404).json({ message: 'User not found' });
+            }
+            res.status(200).json(data[0]);
+        });
     });
 });
 
@@ -91,16 +101,18 @@ app.post('/updateProfile', upload2.single('image'), (req, res) => {
 
         pool.query(query, values, (err, result) => {
             if (err) return res.status(500).json({ error: err.message });
-
-            // ลบรูปเก่าถ้ามีและไม่ใช่ค่าเริ่มต้น
+        
+            // ส่งค่า profilePic ใหม่กลับไปให้ client
+            res.json({ message: 'Profile updated successfully', profilePic: newProfilePic || oldProfilePic });
+        
             if (newProfilePic && oldProfilePic && oldProfilePic !== 'standard.png') {
                 const oldImagePath = path.join(uploadDir, oldProfilePic);
-                fs.unlink(oldImagePath, (err) => {
-                    if (err) console.error('Error deleting old profile picture:', err);
-                });
+                if (fs.existsSync(oldImagePath)) {
+                    fs.unlink(oldImagePath, (err) => {
+                        if (err) console.error('Error deleting old profile picture:', err);
+                    });
+                }
             }
-
-            res.status(200).json({ message: 'Profile updated successfully' });
         });
     });
 });
