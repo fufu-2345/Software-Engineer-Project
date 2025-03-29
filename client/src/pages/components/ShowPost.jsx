@@ -86,19 +86,19 @@ const ShowPost = ({ userId, role }) => {
                 setErrorMessage("");
                 setTitle("");
                 setDescription("");
-                console.log('Upload successful!');
+                //console.log('Upload successful!');
             } else {
                 //alert('Upload failed.');
-                console.log('Upload failed 1');
+                //console.log('Upload failed 1');
             }
         } catch (error) {
             //alert('Error uploading file.');
-            console.log('Upload failed 2');
+            //console.log('Upload failed 2');
         }
     };
 
     const handleNav = (index) => {
-        navigate('/profile', { state: { userId: searchUserId[index] } });
+        navigate('/profile', { state: { userId: userId, loggedInUser: searchUserId[index] } });
     };
 
     const handleTitle = (event) => {

@@ -28,13 +28,13 @@ function Profile() {
     const [isOwner, setIsOwner] = useState(false);
 
     useEffect(() => {
-        const loggedInUser = JSON.parse(localStorage.getItem('user'));
-        if (loggedInUser?.userID) {
-            setUserId(loggedInUser.userID);
-        }
-        if (state?.userId && loggedInUser?.userID) {
-            setIsOwner(loggedInUser.userID === state.userId);
-            fetch(`http://localhost:5000/getUserProfile/${state.userId}`)
+        const loggedInUser = state.loggedInUser;
+        setUserId(loggedInUser);
+        if (state.userIdrId !== null && state.userId !== undefined && loggedInUser !== null && loggedInUser !== undefined) {
+            if (loggedInUser === state.userId) {
+                setIsOwner(true);
+            }
+            fetch(`http://localhost:5000/getUserProfile/${loggedInUser}`)
                 .then(response => response.json())
                 .then(data => {
                     setFormData(data);
@@ -97,7 +97,7 @@ function Profile() {
                         className="pro_main"
                         src={formData.profilePic ? `http://localhost:5000/uploads/${formData.profilePic}` : `http://localhost:5000/uploads/standard.png`}
                         roundedCircle
-                        onClick={isOwner ? handleShow : undefined} 
+                        onClick={isOwner ? handleShow : undefined}
                         style={{ cursor: isOwner ? 'pointer' : 'default' }}
                     />
                 </Col>
