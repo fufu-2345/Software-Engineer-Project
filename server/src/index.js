@@ -60,10 +60,15 @@ app.get('/getUserProfile/:id', (req, res) => {
         }
 
         const query = `SELECT userID, accName, accDescription, Instagram, X, Line, Phone, Other, profilePic FROM user WHERE userID = ?`;
-        connection.query(query, [id], (err, data) => {
-            connection.release(); // ปิดการเชื่อมต่อหลังใช้เสร็จ
-            if (err) return res.status(500).json({ error: err.message });
-            if (data.length === 0) return res.status(404).json({ message: 'User not found' });
+        pool.query(query, [id], (err, data) => {
+            if (err) {
+                console.error('Database query error: ', err);
+                return res.status(500).json({ error: err.message });
+            }
+            if (data.length === 0) {
+                console.log('No data found for userID:', id);
+                return res.status(404).json({ message: 'User not found' });
+            }
             res.status(200).json(data[0]);
         });
     });

@@ -43,7 +43,7 @@ function Profile() {
                 .catch(error => console.error('Error fetching profile:', error));
         }
     }, [state]);
-    
+
     const handleShow = () => {
         if (isOwner) {
             setTempFormData({ ...formData });
@@ -80,6 +80,7 @@ function Profile() {
             .then(response => response.json())
             .then(data => {
                 if (data.message) {
+                    console.log('Profile updated:', data.message); // Debug log
                     setShow(false);
                     setFormData(tempFormData);
                     setProfileImage(null);
