@@ -97,15 +97,15 @@ body {
   cursor: default;
 }
 
-/* ✅ ปรับ comments-list ให้ยืดอัตโนมัติ */
+/*ปรับ comments-list ให้ยืดอัตโนมัติ */
 .comments-list {
   border: 2px solid rgb(223, 11, 173);
   padding: 10px;
   flex-grow: 1;
   max-height: 500px;
-  /* ✅ ให้ comments-list ยืดตาม post-left */
+  /*ให้ comments-list ยืดตาม post-left */
   overflow-y: auto;
-  /* ✅ Scrollbar เมื่อคอมเมนต์เยอะเกิน */
+  /*Scrollbar เมื่อคอมเมนต์เยอะเกิน */
   word-wrap: break-word;
   border-radius: 10px;
   background-color: #ffffff;
@@ -345,6 +345,7 @@ body {
   display: flex;
   flex-direction: column;
   margin-bottom: 10px;
+  margin-left: 1%;
 }
 
 /* ✅ ใช้ flex เพื่อให้รูปอยู่หน้ากล่องคอมเมนต์ */
@@ -598,6 +599,27 @@ body {
 
 .popup-button:hover {
   background: #e04b65;
+}
+
+.back-arrow {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background: transparent;
+  border: none;
+  font-size: 64px;      /* ตัวใหญ่ */
+  font-weight: 900;     /* ตัวหนา */
+  color: #ff69b4;       /* ชมพูเด่น */
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  z-index: 999;
+  padding: 0;
+  line-height: 1;
+}
+
+.back-arrow:hover {
+  transform: scale(1.15);    /* ขยายเบาๆตอน hover */
+  color: #ff1493;            /* ชมพูเข้มขึ้นตอน hover */
 }
 
 .otpInputBox {

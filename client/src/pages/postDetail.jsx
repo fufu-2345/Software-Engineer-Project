@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 import { Link } from "react-router-dom";
@@ -83,39 +83,52 @@ const PostDetail = () => {
             ratingValue: rating,
             userID: userID,
         };
-
+    
         axios.post(`http://localhost:5000/addComment`, data)
             .then(() => {
                 setNewComment("");
                 setOpen(false);
-
-                // โหลดข้อมูลใหม่หลังจากให้คอมเมนต์หรือให้คะแนน
                 axios.get(`http://localhost:5000/getPost/${id}/${userID}`)
                     .then(response => {
                         setPost(response.data);
                         setRating(response.data.userRating || null);
-                    })
+                    });
                 axios.get(`http://localhost:5000/getComment/${id}`)
-                    .then(response => setComments(response.data))
-            })
+                    .then(response => setComments(response.data));
+            });
     };
+    
+    {/*ส่วนของscroll comment ไปล่างสุด */}
+    const commentsRef = useRef(null);
+    const scrollToBottom = () => {
+        if (commentsRef.current) {
+            commentsRef.current.scrollTop = commentsRef.current.scrollHeight;
+        }
+    };
+    useEffect(() => {
+        scrollToBottom();
+    }, [comments]);
 
     if (!post) return <h2>Loading...</h2>;
 
     return (
+        <div className="page">
+            <button className="back-arrow" onClick={() => navigate(-1)}>←</button>
+
         <div className="post-container">
             {/*ส่วนของโพสต์ */}
             <div className="post-left">
                 <div className="post-header">
                     <Link to={`/profile/${post.userID}`} className="post-profile-pic-Link">
-                        <img className="post-profile-pic" src={post.profilePic ? `http://localhost:5000/imgs/${post.profilePic}` : "http://localhost:5000/imgs/def-pic.jpg"} alt="Profile" />
+                    <img className="post-profile-pic" src={post.profilePic ? `http://localhost:5000/profilePicture/${post.profilePic}` : `http://localhost:5000/imgs/def-pic.jpg` } />
                     </Link>
                     <Link to={`/profile/${post.userID}`} className="post-username-Link">
                         <span className="post-username">{post.userName}</span>
                     </Link>
                 </div>
                 <img className="post-image" src={`http://localhost:5000/imgs/${post.photoPath}`} alt={post.postName} />
-                <div className="post-description">{post.postDescription}</div>
+                <div className="cursor-default"><strong>PictureName:</strong> {post.postName ? post.postName : "-"}</div>
+                <div className="post-description"><strong>Description:</strong> {post.postDescription ? post.postDescription : "-"}</div>
             </div>
 
             {/*ส่วนของคอมเมนต์ */}
@@ -137,13 +150,13 @@ const PostDetail = () => {
                         </div>
                     </div>
                 </div>
-                <ul className="comments-list">
+                <ul className="comments-list" ref={commentsRef}>
                     {comments.map((comment, index) => (
                         <li key={index} className="comment-item">
                             <div className="comment-content">
                                 {/* Profile Picture ของผู้ใช้คอมเมนต์ */}
                                 <Link to={`/profile/${comment.userID}`} className="comment-pic-Link">
-                                    <img className="comment-profile-pic" src={`http://localhost:5000/imgs/${comment.profilePic || "def-pic.jpg"}`} alt="Profile" />
+                                    <img className="comment-profile-pic" src={`http://localhost:5000/profilePicture/${comment.profilePic || "def-pic.jpg"}`} alt="Profile" />
                                 </Link>
                                 {/* กล่องคอมเมนต์ */}
                                 <div className="comment-text-box">
@@ -153,7 +166,9 @@ const PostDetail = () => {
                                         </Link>
                                         <span className="comment-time">{new Date(comment.commentTime).toLocaleString()}</span>
                                     </div>
-                                    {comment.commentDescription}
+                                    <div style={{ whiteSpace: 'pre-wrap' }}>
+                                        {comment.commentDescription}
+                                    </div>
                                 </div>
                             </div>
                         </li>
@@ -201,6 +216,7 @@ const PostDetail = () => {
                 </Popup>
             </div>
         </div>
+    </div>
     );
 };
 
