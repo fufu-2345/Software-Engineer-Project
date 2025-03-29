@@ -96,8 +96,10 @@ app.post('/updateProfile', upload2.single('image'), (req, res) => {
 
         pool.query(query, values, (err, result) => {
             if (err) return res.status(500).json({ error: err.message });
-
-            // ลบรูปเก่าถ้ามีและไม่ใช่ค่าเริ่มต้น
+        
+            // ส่งค่า profilePic ใหม่กลับไปให้ client
+            res.json({ message: 'Profile updated successfully', profilePic: newProfilePic || oldProfilePic });
+        
             if (newProfilePic && oldProfilePic && oldProfilePic !== 'standard.png') {
                 const oldImagePath = path.join(uploadDir, oldProfilePic);
                 if (fs.existsSync(oldImagePath)) {
@@ -105,10 +107,6 @@ app.post('/updateProfile', upload2.single('image'), (req, res) => {
                         if (err) console.error('Error deleting old profile picture:', err);
                     });
                 }
-            }
-
-            if (!userId) {
-                return res.status(400).json({ error: 'User ID is required' });
             }
         });
     });
