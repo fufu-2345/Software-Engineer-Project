@@ -66,30 +66,42 @@ app.get('/getUserProfile/:id', (req, res) => {
 
 // อัปเดตข้อมูลโปรไฟล์ผู้ใช้
 app.post('/updateProfile', upload2.single('image'), (req, res) => {
-    const { accName, accDescription, Instagram, X, Line, Phone, Other } = req.body;
-    const profilePic = req.file ? req.file.filename : null;
-    const userId = req.body.userId;
+    const { accName, accDescription, Instagram, X, Line, Phone, Other, userId } = req.body;
+    const newProfilePic = req.file ? req.file.filename : null;
 
-    let query;
-    let values;
-
-    if (profilePic) {
-        query = `
-            UPDATE user 
-            SET accName = ?, accDescription = ?, Instagram = ?, X = ?, Line = ?, Phone = ?, Other = ?, profilePic = ?
-            WHERE userID = ?`;
-        values = [accName, accDescription, Instagram, X, Line, Phone, Other, profilePic, userId];
-    } else {
-        query = `
-            UPDATE user 
-            SET accName = ?, accDescription = ?, Instagram = ?, X = ?, Line = ?, Phone = ?, Other = ?
-            WHERE userID = ?`;
-        values = [accName, accDescription, Instagram, X, Line, Phone, Other, userId];
+    if (!userId) {
+        return res.status(400).json({ error: 'User ID is required' });
     }
 
-    pool.query(query, values, (err, result) => {
+    // ดึงชื่อไฟล์รูปภาพเดิม
+    const getUserQuery = 'SELECT profilePic FROM user WHERE userID = ?';
+    pool.query(getUserQuery, [userId], (err, results) => {
         if (err) return res.status(500).json({ error: err.message });
-        res.status(200).json({ message: 'Profile updated successfully' });
+
+        const oldProfilePic = results[0]?.profilePic;
+
+        let query, values;
+        if (newProfilePic) {
+            query = `UPDATE user SET accName = ?, accDescription = ?, Instagram = ?, X = ?, Line = ?, Phone = ?, Other = ?, profilePic = ? WHERE userID = ?`;
+            values = [accName, accDescription, Instagram, X, Line, Phone, Other, newProfilePic, userId];
+        } else {
+            query = `UPDATE user SET accName = ?, accDescription = ?, Instagram = ?, X = ?, Line = ?, Phone = ?, Other = ? WHERE userID = ?`;
+            values = [accName, accDescription, Instagram, X, Line, Phone, Other, userId];
+        }
+
+        pool.query(query, values, (err, result) => {
+            if (err) return res.status(500).json({ error: err.message });
+
+            // ลบรูปเก่าถ้ามีและไม่ใช่ค่าเริ่มต้น
+            if (newProfilePic && oldProfilePic && oldProfilePic !== 'standard.png') {
+                const oldImagePath = path.join(uploadDir, oldProfilePic);
+                fs.unlink(oldImagePath, (err) => {
+                    if (err) console.error('Error deleting old profile picture:', err);
+                });
+            }
+
+            res.status(200).json({ message: 'Profile updated successfully' });
+        });
     });
 });
 
@@ -608,6 +620,7 @@ app.post('/registerClubMember', (req, res) => {
 app.listen(port, () => { console.log('\x1b[36m%s\x1b[0m is started/updated', `http://localhost:${port}`); })
 
 /*
+
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });*/
