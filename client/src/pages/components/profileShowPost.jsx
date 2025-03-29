@@ -35,19 +35,17 @@ const ProfileShowPost = ({ userId }) => {
         setIsOpen(false);
         setSortMode(true);
         setMode(true);
-        console.log(mode, sortMode);
 
         const params = {
             sortMode: sortMode ? 'DESC' : 'ASC',
             mode: mode ? 'postID' : 'avgRating',
-            search: ""
+            userId: userId,
         };
 
-        axios.get("http://localhost:5000/getPost/imgs", { params })
+        axios.get("http://localhost:5000/getPost/imgs2", { params })
             .then(response => {
                 setPostCount(response.data.length);
                 setPostImgs(response.data);
-                //setPicOrProfile(true);
             })
             .catch(error => {
                 console.error("Error getPost/imgs(handleSearch): ", error);
@@ -58,19 +56,17 @@ const ProfileShowPost = ({ userId }) => {
         setIsOpen(false);
         setSortMode(true);
         setMode(false);
-        console.log(mode, sortMode);
 
         const params = {
             sortMode: sortMode ? 'DESC' : 'ASC',
             mode: mode ? 'postID' : 'avgRating',
-            search: ""
+            userId: userId,
         };
 
-        axios.get("http://localhost:5000/getPost/imgs", { params })
+        axios.get("http://localhost:5000/getPost/imgs2", { params })
             .then(response => {
                 setPostCount(response.data.length);
                 setPostImgs(response.data);
-                //setPicOrProfile(true);
             })
             .catch(error => {
                 console.error("Error getPost/imgs(handleSearch): ", error);

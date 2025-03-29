@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(helmet.frameguard({ action: 'deny' }));
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, '../profilePicture')));
 
 const pool = mysql.createPool({
     host: process.env.HOST,
@@ -35,7 +35,7 @@ app.get("/test", (req, res) => {
 });
 
 // ตรวจสอบและสร้างโฟลเดอร์ uploads 
-const uploadDir = path.join(__dirname, 'uploads');
+const uploadDir = path.join(__dirname, '../profilePicture');
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir);
 }
@@ -101,10 +101,10 @@ app.post('/updateProfile', upload2.single('image'), (req, res) => {
 
         pool.query(query, values, (err, result) => {
             if (err) return res.status(500).json({ error: err.message });
-        
+
             // ส่งค่า profilePic ใหม่กลับไปให้ client
             res.json({ message: 'Profile updated successfully', profilePic: newProfilePic || oldProfilePic });
-        
+
             if (newProfilePic && oldProfilePic && oldProfilePic !== 'standard.png') {
                 const oldImagePath = path.join(uploadDir, oldProfilePic);
                 if (fs.existsSync(oldImagePath)) {
@@ -171,14 +171,11 @@ app.get("/getPost/imgs/", (req, res) => {
 
 app.get("/getPost/imgs2/", (req, res) => {
     const { sortMode, mode } = req.query;
-
     const order = sortMode === 'DESC' ? 'DESC' : 'ASC';
     const column = mode === 'postID' ? 'postID' : 'avgRating';
     const userId = req.query.userId;
-
-    //console.log(order, column, userId);
-
     let a;
+
     if (column === 'avgRating') {
         a = `select photoPath from post WHERE userID = ${userId} AND avgRating > 0 ORDER BY ${column} ${order};`;
 
@@ -816,10 +813,10 @@ app.get('/getPost/:id/:userID?', (req, res) => {
     JOIN user u ON p.userID = u.userID
     WHERE p.postID = ?`;
 
-let queryParams = [id];
+    let queryParams = [id];
 
-if (userID) {
-    query = `
+    if (userID) {
+        query = `
         SELECT p.*, 
             u.userName,
             u.profilePic,
@@ -833,8 +830,8 @@ if (userID) {
         JOIN user u ON p.userID = u.userID
         WHERE p.postID = ?`;
 
-    queryParams = [userID, id];
-}
+        queryParams = [userID, id];
+    }
 
     pool.query(query, queryParams, (err, result) => {
         if (result.length === 0) {

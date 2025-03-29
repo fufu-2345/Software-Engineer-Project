@@ -84,6 +84,7 @@ function Profile() {
                     setShow(false);
                     setFormData(tempFormData);
                     setProfileImage(null);
+                    window.location.reload();
                 }
             })
             .catch(error => alert('Error updating profile: ' + error));
