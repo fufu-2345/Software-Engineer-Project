@@ -26,15 +26,16 @@ function Profile() {
     const [profileImage, setProfileImage] = useState(null);
     const [userId, setUserId] = useState(null);
     const [isOwner, setIsOwner] = useState(false);
-
+    //loggedInUser= iduser ของ profile 
+    //userid=id คนดู
     useEffect(() => {
         const loggedInUser = state.loggedInUser;
         setUserId(loggedInUser);
         if (state.userIdrId !== null && state.userId !== undefined && loggedInUser !== null && loggedInUser !== undefined) {
-            if (loggedInUser === state.userId) {
+            if (state.loggedInUser === state.userId) {
                 setIsOwner(true);
             }
-            fetch(`http://localhost:5000/getUserProfile/${loggedInUser}`)
+            fetch(`http://localhost:5000/getUserProfile/${state.loggedInUser}`)
                 .then(response => response.json())
                 .then(data => {
                     setFormData(data);

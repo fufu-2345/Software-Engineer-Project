@@ -105,6 +105,7 @@ const ShowPost = ({ userId, role }) => {
                 setErrorMessage("");
                 setTitle("");
                 setDescription("");
+                window.location.reload();
             }
         } catch (error) {
             //console.log('Upload failed 2');

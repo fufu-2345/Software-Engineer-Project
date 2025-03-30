@@ -28,7 +28,7 @@ const PostDetail = () => {
         else {
             setId(state.postId);
         }
-        setUserID(storedUserID);
+        setUserID(state.userId);
         const fetchData = async () => {
             try {
                 if (storedUserID) {
@@ -37,10 +37,9 @@ const PostDetail = () => {
                     });
                     setRole(roleRes.data.roleID);
                 }
-
-                const postURL = storedUserID
-                    ? `http://localhost:5000/getPost/${id}/${storedUserID}`
-                    : `http://localhost:5000/getPost/${id}`;
+                const postURL = state.userId
+                    ? `http://localhost:5000/getPost/${state.postId}/${state.userId}`
+                    : `http://localhost:5000/getPost/${state.postId}`;
                 const postRes = await axios.get(postURL);
                 setPost(postRes.data);
                 setRating(postRes.data.userRating || 0);
@@ -63,6 +62,21 @@ const PostDetail = () => {
         }
     };
 
+    const goProfile = () => {
+        let loggedInUser;
+        const params = {
+            id: id
+        };
+        axios.get(`http://localhost:5000/getUserid`, { params })
+            .then(response => {
+                loggedInUser = response.data.userID;
+                navigate('/profile', { state: { userId: userID, loggedInUser: loggedInUser } });
+            })
+            .catch(error => {
+                console.error("Error getPost/imgs(handleSearch): ", error);
+            });
+    };
+
     const handleCommentSubmit = () => {
         const data = {
             postID: id,
@@ -75,6 +89,7 @@ const PostDetail = () => {
             .then(() => {
                 setNewComment("");
                 setOpen(false);
+
                 axios.get(`http://localhost:5000/getPost/${id}/${userID}`)
                     .then(response => {
                         setPost(response.data);
@@ -105,6 +120,7 @@ const PostDetail = () => {
             <div className="post-container">
                 {/*ส่วนของโพสต์ */}
                 <div className="post-left">
+                    {/*
                     <div className="post-header">
                         <Link to={`/profile/${post.userID}`} className="post-profile-pic-Link">
                             <img className="post-profile-pic" src={post.profilePic ? `http://localhost:5000/profilePicture/${post.profilePic}` : `http://localhost:5000/imgs/def-pic.jpg`} />
@@ -112,7 +128,16 @@ const PostDetail = () => {
                         <Link to={`/profile/${post.userID}`} className="post-username-Link">
                             <span className="post-username">{post.userName}</span>
                         </Link>
+                    </div>*/}
+                    <div className="post-header">
+                        <div className="post-profile-pic-Link" onClick={goProfile}>
+                            <img className="post-profile-pic" src={post.profilePic ? `http://localhost:5000/profilePicture/${post.profilePic}` : `http://localhost:5000/imgs/def-pic.jpg`} />
+                        </div>
+                        <div className="post-username-Link" onClick={goProfile}>
+                            <span className="post-username">{post.userName}</span>
+                        </div>
                     </div>
+
                     <img className="post-image" src={`http://localhost:5000/imgs/${post.photoPath}`} alt={post.postName} />
                     <div className="cursor-default"><strong>PictureName:</strong> {post.postName ? post.postName : "-"}</div>
                     <div className="post-description"><strong>Description:</strong> {post.postDescription ? post.postDescription : "-"}</div>

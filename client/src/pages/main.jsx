@@ -14,8 +14,8 @@ const Main = () => {
     // 0=guest  1=externalUser  2=clubMember  3=admin
 
     useEffect(() => {
-        //////// for guest
         if (!state) {
+            //////// for guest
             setRole(0);
         }
         else {

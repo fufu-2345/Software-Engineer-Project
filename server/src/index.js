@@ -54,11 +54,11 @@ const upload2 = multer({ storage: storage2 });
 // ดึงข้อมูลโปรไฟล์ผู้ใช้
 app.get('/getUserProfile/:id', (req, res) => {
     const { id } = req.params;
+    console.log(req.params);
     pool.getConnection((err, connection) => {
         if (err) {
             return res.status(500).json({ error: 'Database connection error' });
         }
-
         const query = `SELECT userID, accName, accDescription, Instagram, X, Line, Phone, Other, profilePic FROM user WHERE userID = ?`;
         pool.query(query, [id], (err, data) => {
             if (err) {
@@ -298,6 +298,17 @@ app.get("/getPost/max", (req, res) => {
 
     });
 });
+
+app.get("/getUserid", (req, res) => {
+    const id = req.query.id;
+    const a = 'SELECT userID FROM post WHERE postID = ?';
+    pool.query(a, [id], (err, data) => {
+        if (err) {
+            return res.json(err);
+        }
+        return res.json({ userID: data[0].userID });
+    })
+})
 
 ///////////////////////////////////////////////////////////
 //                         NEWS                          //
