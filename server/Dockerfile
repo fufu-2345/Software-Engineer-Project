@@ -4,9 +4,7 @@ WORKDIR /app
 
 COPY . . 
 
-COPY .env /.env
-
 RUN npm install
 EXPOSE 5000
 
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "start"]
