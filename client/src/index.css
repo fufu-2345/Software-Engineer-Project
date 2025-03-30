@@ -101,7 +101,7 @@ body {
   border: 2px solid rgb(223, 11, 173);
   padding: 10px;
   flex-grow: 1;
-  max-height: 500px;
+  max-height: 600px;
   /*ให้ comments-list ยืดตาม post-left */
   overflow-y: auto;
   /*Scrollbar เมื่อคอมเมนต์เยอะเกิน */
@@ -109,6 +109,43 @@ body {
   border-radius: 10px;
   background-color: #ffffff;
 }
+
+.post-description.collapsed {
+  display: -webkit-box;
+  display: box;
+  -webkit-box-orient: vertical;
+  box-orient: vertical;
+  -webkit-line-clamp: 6;
+  line-clamp: 6; /* มาตรฐาน */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.read-more-btn {
+  margin-top: 0.5rem;
+  background-color: #ff66b2;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.read-more-btn:hover {
+  background-color: #ff3399;
+}
+
+
+.comments-list {
+  transition: max-height 0.3s ease;
+}
+
+.comments-list.expand-comments {
+  max-height: none;
+}
+
 
 .rating-container {
   display: flex;

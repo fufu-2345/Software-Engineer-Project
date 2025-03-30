@@ -17,6 +17,10 @@ const PostDetail = () => {
     const [userID, setUserID] = useState(null);
     const [role, setRole] = useState(0);
     const [storedUserID, setStoredUserID] = useState(null);
+    const [showFullDesc, setShowFullDesc] = useState(false);
+    const [descTooLong, setDescTooLong] = useState(false);
+    const descriptionRef = React.useRef();
+
 
     const location = useLocation();
     const { state } = location;
@@ -112,6 +116,17 @@ const PostDetail = () => {
         scrollToBottom();
     }, [comments]);
 
+    useEffect(() => {
+        if (descriptionRef.current) {
+          const lineHeight = parseFloat(getComputedStyle(descriptionRef.current).lineHeight);
+          const maxLines = 6;
+          const maxHeight = lineHeight * maxLines;
+          if (descriptionRef.current.scrollHeight > maxHeight) {
+            setDescTooLong(true);
+          }
+        }
+      }, [post]);
+
     if (!post) return <h2>Loading...</h2>;
 
     return (
@@ -133,7 +148,16 @@ const PostDetail = () => {
 
                     <img className="post-image" src={`http://localhost:5000/imgs/${post.photoPath}`} alt={post.postName} />
                     <div className="cursor-default"><strong>PictureName:</strong> {post.postName ? post.postName : "-"}</div>
-                    <div className="post-description"><strong>Description:</strong> {post.postDescription ? post.postDescription : "-"}</div>
+                    <div ref={descriptionRef} className={`post-description ${showFullDesc ? "" : "collapsed"}`}>
+                        {post.postDescription || "-"}
+                    </div>
+
+                    {descTooLong && ( 
+                        <button onClick={() => setShowFullDesc(!showFullDesc)} className="read-more-btn">
+                        {showFullDesc ? "-Read less-" : "-Read More-"}
+                        </button>
+                    )}
+
                 </div>
 
                 {/*ส่วนของคอมเมนต์ */}
@@ -155,7 +179,7 @@ const PostDetail = () => {
                             </div>
                         </div>
                     </div>
-                    <ul className="comments-list" ref={commentsRef}>
+                    <ul className={`comments-list ${showFullDesc ? 'expand-comments' : ''}`} ref={commentsRef}>
                         {comments.map((comment, index) => (
                             <li key={index} className="comment-item">
                                 <div className="comment-content">
