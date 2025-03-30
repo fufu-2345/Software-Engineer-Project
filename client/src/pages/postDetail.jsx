@@ -20,6 +20,9 @@ const PostDetail = () => {
     const [showFullDesc, setShowFullDesc] = useState(false);
     const [descTooLong, setDescTooLong] = useState(false);
     const descriptionRef = React.useRef();
+    const postLeftRef = useRef(null);
+    const [commentMaxHeight, setCommentMaxHeight] = useState(null);
+
 
 
     const location = useLocation();
@@ -105,6 +108,22 @@ const PostDetail = () => {
             });
     };
 
+    const handleToggleDescription = () => {
+        const newState = !showFullDesc;
+        setShowFullDesc(newState);
+      
+        setTimeout(() => {
+          if (newState && postLeftRef.current) {
+            const height = postLeftRef.current.offsetHeight;
+            setCommentMaxHeight(height);
+          } else {
+            // ย่อกลับมา default
+            setCommentMaxHeight(null);
+          }
+        }, 200);
+      };
+      
+
     {/*ส่วนของscroll comment ไปล่างสุด */ }
     const commentsRef = useRef(null);
     const scrollToBottom = () => {
@@ -136,7 +155,7 @@ const PostDetail = () => {
 
             <div className="post-container">
                 {/*ส่วนของโพสต์ */}
-                <div className="post-left">
+                <div className="post-left" ref={postLeftRef}>
                     <div className="post-header">
                         <div className="post-profile-pic-Link" onClick={goProfile}>
                             <img className="post-profile-pic" src={post.profilePic ? `http://localhost:5000/profilePicture/${post.profilePic}` : `http://localhost:5000/imgs/def-pic.jpg`} />
@@ -152,11 +171,12 @@ const PostDetail = () => {
                         {post.postDescription || "-"}
                     </div>
 
-                    {descTooLong && ( 
-                        <button onClick={() => setShowFullDesc(!showFullDesc)} className="read-more-btn">
-                        {showFullDesc ? "-Read less-" : "-Read More-"}
+                    {descTooLong && (
+                        <button onClick={handleToggleDescription} className="read-more-btn">
+                        {showFullDesc ? "-Read less-" : "-Read more-"}
                         </button>
                     )}
+
 
                 </div>
 
@@ -179,7 +199,7 @@ const PostDetail = () => {
                             </div>
                         </div>
                     </div>
-                    <ul className={`comments-list ${showFullDesc ? 'expand-comments' : ''}`} ref={commentsRef}>
+                    <ul className="comments-list" ref={commentsRef} style={commentMaxHeight ? { maxHeight: `${commentMaxHeight}px` } : {}}>
                         {comments.map((comment, index) => (
                             <li key={index} className="comment-item">
                                 <div className="comment-content">
