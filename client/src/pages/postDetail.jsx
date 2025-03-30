@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useLocation } from 'react-router-dom';
 import axios from "axios";
 import Popup from "reactjs-popup";
+import Nav from '../components/navbar';
 
 const PostDetail = () => {
     const [id, setId] = useState(null);
@@ -14,7 +15,7 @@ const PostDetail = () => {
     const [rating, setRating] = useState(null);
     const [open, setOpen] = useState(false);
     const [userID, setUserID] = useState(null);
-    const [role, setRole] = useState(null);
+    const [role, setRole] = useState(0);
     const [storedUserID, setStoredUserID] = useState(null);
 
     const location = useLocation();
@@ -115,20 +116,12 @@ const PostDetail = () => {
 
     return (
         <div className="page">
+            {role !== 0 ? <Nav userID={userID} /> : <Nav userID={null} />}
             <button className="back-arrow" onClick={() => navigate(-1)}>←</button>
 
             <div className="post-container">
                 {/*ส่วนของโพสต์ */}
                 <div className="post-left">
-                    {/*
-                    <div className="post-header">
-                        <Link to={`/profile/${post.userID}`} className="post-profile-pic-Link">
-                            <img className="post-profile-pic" src={post.profilePic ? `http://localhost:5000/profilePicture/${post.profilePic}` : `http://localhost:5000/imgs/def-pic.jpg`} />
-                        </Link>
-                        <Link to={`/profile/${post.userID}`} className="post-username-Link">
-                            <span className="post-username">{post.userName}</span>
-                        </Link>
-                    </div>*/}
                     <div className="post-header">
                         <div className="post-profile-pic-Link" onClick={goProfile}>
                             <img className="post-profile-pic" src={post.profilePic ? `http://localhost:5000/profilePicture/${post.profilePic}` : `http://localhost:5000/imgs/def-pic.jpg`} />

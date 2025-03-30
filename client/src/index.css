@@ -603,13 +603,16 @@ body {
 
 .back-arrow {
   position: fixed;
-  top: 20px;
+  top: 17.5%;
   left: 20px;
   background: transparent;
   border: none;
-  font-size: 64px;      /* ตัวใหญ่ */
-  font-weight: 900;     /* ตัวหนา */
-  color: #ff69b4;       /* ชมพูเด่น */
+  font-size: 64px;
+  /* ตัวใหญ่ */
+  font-weight: 900;
+  /* ตัวหนา */
+  color: #ff69b4;
+  /* ชมพูเด่น */
   cursor: pointer;
   transition: transform 0.2s ease;
   z-index: 999;
@@ -618,8 +621,10 @@ body {
 }
 
 .back-arrow:hover {
-  transform: scale(1.15);    /* ขยายเบาๆตอน hover */
-  color: #ff1493;            /* ชมพูเข้มขึ้นตอน hover */
+  transform: scale(1.15);
+  /* ขยายเบาๆตอน hover */
+  color: #ff1493;
+  /* ชมพูเข้มขึ้นตอน hover */
 }
 
 .otpInputBox {

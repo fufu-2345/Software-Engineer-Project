@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import ProfileShowPost from './components/profileShowPost';
+import Nav from '../components/navbar';
+
 
 function Profile() {
+    const navigate = useNavigate();
     const location = useLocation();
     const { state } = location;
-
+    const [role, setRole] = useState(0);
     const [show, setShow] = useState(false);
     const [formData, setFormData] = useState({
         accName: '',
@@ -26,8 +29,6 @@ function Profile() {
     const [profileImage, setProfileImage] = useState(null);
     const [userId, setUserId] = useState(null);
     const [isOwner, setIsOwner] = useState(false);
-    //loggedInUser= iduser ของ profile 
-    //userid=id คนดู
     useEffect(() => {
         const loggedInUser = state.loggedInUser;
         setUserId(loggedInUser);
@@ -92,53 +93,58 @@ function Profile() {
     };
 
     return (
-        <Container className='pagePro'>
-            <Row className="pro_r1">
-                <Col sm={7}>
-                    <Image
-                        className="pro_main"
-                        src={formData.profilePic ? `http://localhost:5000/uploads/${formData.profilePic}` : `http://localhost:5000/uploads/standard.png`}
-                        roundedCircle
-                        onClick={isOwner ? handleShow : undefined}
-                        style={{ cursor: isOwner ? 'pointer' : 'default' }}
-                    />
-                </Col>
-                <Col sm={5} className="pro_contract">
-                    <div className="contact-row"><div className="contract_head">Instagram:</div><div className="contract_box">{formData.Instagram}</div></div>
-                    <div className="contact-row"><div className="contract_head">Line:</div><div className="contract_box">{formData.Line}</div></div>
-                    <div className="contact-row"><div className="contract_head">X:</div><div className="contract_box">{formData.X}</div></div>
-                </Col>
-            </Row>
-            <Row className="pro_r2">
-                <Col className="pro_contract"><div className="contact-row"><div className="contract_head">Name:</div><div className="contract_box">{formData.accName}</div></div></Col>
-                <Col className="pro_contract"><div className="contact-row"><div className="contract_head">About Me:</div><div className="contract_box">{formData.accDescription}</div></div></Col>
-            </Row>
-            <Row className="pro_r3"><div>Other</div><div className="pro_des">{formData.Other}</div></Row>
-            <Modal show={show} onHide={handleClose}>
-                <Modal.Header closeButton><Modal.Title>Edit Profile</Modal.Title></Modal.Header>
-                <Modal.Body>
-                    <Form>
-                        {['accName', 'accDescription', 'Instagram', 'Line', 'X', 'Phone', 'Other'].map((field) => (
-                            <Form.Group controlId={`form${field}`} className="mt-3" key={field}>
-                                <Form.Label>{field.replace(/([A-Z])/g, ' $1').toUpperCase()}</Form.Label>
-                                <Form.Control type="text" name={field} value={tempFormData[field]} onChange={handleChange} />
+        <>
+            {role !== 0 ? <Nav userID={userId} /> : <Nav userID={null} />}
+            <Container className='pagePro'>
+
+                <button className="back-arrow" onClick={() => navigate(-1)}>←</button>
+                <Row className="pro_r1">
+                    <Col sm={7}>
+                        <Image
+                            className="pro_main"
+                            src={formData.profilePic ? `http://localhost:5000/uploads/${formData.profilePic}` : `http://localhost:5000/uploads/standard.png`}
+                            roundedCircle
+                            onClick={isOwner ? handleShow : undefined}
+                            style={{ cursor: isOwner ? 'pointer' : 'default' }}
+                        />
+                    </Col>
+                    <Col sm={5} className="pro_contract">
+                        <div className="contact-row"><div className="contract_head">Instagram:</div><div className="contract_box">{formData.Instagram}</div></div>
+                        <div className="contact-row"><div className="contract_head">Line:</div><div className="contract_box">{formData.Line}</div></div>
+                        <div className="contact-row"><div className="contract_head">X:</div><div className="contract_box">{formData.X}</div></div>
+                    </Col>
+                </Row>
+                <Row className="pro_r2">
+                    <Col className="pro_contract"><div className="contact-row"><div className="contract_head">Name:</div><div className="contract_box">{formData.accName}</div></div></Col>
+                    <Col className="pro_contract"><div className="contact-row"><div className="contract_head">About Me:</div><div className="contract_box">{formData.accDescription}</div></div></Col>
+                </Row>
+                <Row className="pro_r3"><div>Other</div><div className="pro_des">{formData.Other}</div></Row>
+                <Modal show={show} onHide={handleClose}>
+                    <Modal.Header closeButton><Modal.Title>Edit Profile</Modal.Title></Modal.Header>
+                    <Modal.Body>
+                        <Form>
+                            {['accName', 'accDescription', 'Instagram', 'Line', 'X', 'Phone', 'Other'].map((field) => (
+                                <Form.Group controlId={`form${field}`} className="mt-3" key={field}>
+                                    <Form.Label>{field.replace(/([A-Z])/g, ' $1').toUpperCase()}</Form.Label>
+                                    <Form.Control type="text" name={field} value={tempFormData[field]} onChange={handleChange} />
+                                </Form.Group>
+                            ))}
+                            <Form.Group controlId="formImage" className="mt-3">
+                                <Form.Label>Profile Image</Form.Label>
+                                <Form.Control type="file" name="image" onChange={handleImageChange} />
                             </Form.Group>
-                        ))}
-                        <Form.Group controlId="formImage" className="mt-3">
-                            <Form.Label>Profile Image</Form.Label>
-                            <Form.Control type="file" name="image" onChange={handleImageChange} />
-                        </Form.Group>
-                    </Form>
-                </Modal.Body>
-                {isOwner && (
-                    <Modal.Footer>
-                        <Button variant="secondary" onClick={handleClose}>Close</Button>
-                        <Button variant="primary" onClick={handleSave}>Save Changes</Button>
-                    </Modal.Footer>
-                )}
-            </Modal>
-            <ProfileShowPost userId={userId} />
-        </Container>
+                        </Form>
+                    </Modal.Body>
+                    {isOwner && (
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={handleClose}>Close</Button>
+                            <Button variant="primary" onClick={handleSave}>Save Changes</Button>
+                        </Modal.Footer>
+                    )}
+                </Modal>
+                <ProfileShowPost userId={userId} />
+            </Container>
+        </>
     );
 }
 
