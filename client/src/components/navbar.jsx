@@ -55,9 +55,17 @@ const Navbar = (props) => {
       </div>
 
       <ul className="nav-links">
-        {isGuest && <li className="navButton"><Link to="/login">Login</Link></li>}
-        {isGuest && <li className="navButton"><Link to="/SelectRegister">Sign up</Link></li>}
-        {isUser && <li className="navButton"> <ProfilePopup userID={userID} /></li>}
+        {isGuest && <Link to="/login" className="mr-[1rem] my-auto bg-[#a03f85] border border-black rounded-full py-2 px-[1.25rem]">
+          Login
+        </Link>}
+        {isGuest &&
+          <Link to="/SelectRegister" className="mr-[1rem] my-auto bg-[#a03f85] border border-black rounded-full py-2 px-[1.25rem]">
+            Sign up
+          </Link>}
+        {isUser && <div className="mr-[1rem] my-auto">
+          <ProfilePopup userID={userID} />
+        </div>}
+
       </ul>
     </nav>
   );

@@ -62,11 +62,9 @@ app.get('/getUserProfile/:id', (req, res) => {
         const query = `SELECT userID, accName, accDescription, Instagram, X, Line, Phone, Other, profilePic FROM user WHERE userID = ?`;
         pool.query(query, [id], (err, data) => {
             if (err) {
-                console.error('Database query error: ', err);
                 return res.status(500).json({ error: err.message });
             }
             if (data.length === 0) {
-                console.log('No data found for userID:', id);
                 return res.status(404).json({ message: 'User not found' });
             }
             res.status(200).json(data[0]);
@@ -150,7 +148,6 @@ app.get("/getPost/imgs/", (req, res) => {
                     return res.json(err);
                 }
                 photoPaths = photoPaths.concat(data.map(item => item.photoPath));
-                //console.log(photoPaths);
                 return res.json(photoPaths);
             })
         })
@@ -163,7 +160,6 @@ app.get("/getPost/imgs/", (req, res) => {
                 return res.json(err);
             }
             const photoPaths = data.map(item => item.photoPath);
-            //console.log(photoPaths);
             return res.json(photoPaths);
         })
     }
@@ -190,7 +186,6 @@ app.get("/getPost/imgs2/", (req, res) => {
                     return res.json(err);
                 }
                 photoPaths = photoPaths.concat(data.map(item => item.photoPath));
-                //console.log(photoPaths);
                 return res.json(photoPaths);
 
             })
@@ -204,7 +199,6 @@ app.get("/getPost/imgs2/", (req, res) => {
                 return res.json(err);
             }
             const photoPaths = data.map(item => item.photoPath);
-            //console.log(photoPaths);
             return res.json(photoPaths);
         })
     }
@@ -219,7 +213,6 @@ app.get("/getProfile/userID", (req, res) => {
             return res.json(err);
         }
         const userID = data.map(item => item.userID).filter(userID => userID !== '');;
-        //console.log(userID);
         return res.json(userID);
     })
 })
@@ -233,7 +226,6 @@ app.get("/getProfile/imgs", (req, res) => {
             return res.json(err);
         }
         const profilePaths = data.map(item => item.profilePic);
-        //console.log(profilePaths);
         return res.json(profilePaths);
     })
 })
@@ -260,7 +252,6 @@ app.get("/getProfile/name", (req, res) => {
             return res.json(err);
         }
         const userName = data.map(item => item.userName).filter(userName => userName !== '');;
-        //console.log(userName);
         return res.json(userName);
     })
 })
@@ -597,14 +588,11 @@ function createSalt(p) {
 //API for create new account in user database
 //Insert Profile Pic Path Later to be default
 app.post('/registerNonClubMember', (req, res) => {
-    //const defaultProfilePicPath = "Insert Default Path Here"
     const body = req.body
     var ep = createSalt(req.body.password)
-    console.log(ep)
     var queryCommand = `insert into user(userName,passWord,salt,accName,createTime,roleID,profilePic) values(?,"${ep.hp}","${ep.s}",?,NOW(),3,"")`
     pool.query(queryCommand, [body.username, body.accountName], (err, results) => {
         if (err) {
-            console.log(err)
             return res.json({ success: false })
         }
         return res.json({ success: true })
@@ -612,13 +600,11 @@ app.post('/registerNonClubMember', (req, res) => {
 })
 
 app.post('/registerClubMember', (req, res) => {
-    //const defaultProfilePicPath = "Insert Default Path Here"
     const body = req.body
     var ep = createSalt(req.body.password)
     var queryCommand = `insert into user(userName,passWord,salt,accName,createTime,roleID,profilePic) values(?,"${ep.hp}","${ep.s}",?,NOW(),2,"")`
     pool.query(queryCommand, [body.username, body.accountName], (err, results) => {
         if (err) {
-            console.log(err)
             return res.json({ success: false })
         }
         return res.json({ success: true })
@@ -626,12 +612,6 @@ app.post('/registerClubMember', (req, res) => {
 })
 
 app.listen(port, () => { console.log('\x1b[36m%s\x1b[0m is started/updated', `http://localhost:${port}`); })
-
-/*
-
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-});*/
 
 // ดึงโพสต์ทั้งหมดจาก MySQL
 app.get('/getPost', (req, res) => {
@@ -711,7 +691,6 @@ app.post('/addComment', (req, res) => {
                     // ถ้าค่า rating เปลี่ยน → UPDATE ค่าใหม่
                     const updateRatingQuery = `UPDATE rating SET ratingValue = ?, rateTime = NOW() WHERE postID = ? AND userID = ?`;
                     pool.query(updateRatingQuery, [ratingValue, postID, userID], (err, updateResult) => {
-                        console.log("Rating updated successfully!");
                         updateAvgRating(postID, res);
                     });
                 } else {
@@ -728,9 +707,6 @@ app.post('/addComment', (req, res) => {
         });
     }
 });
-
-// Start Server
-//app.listen(port, () => console.log(`Server started at http://localhost:${port}`));
 
 app.post('/addCommentRating', (req, res) => {
     const { postID, commentDescription, ratingValue, userID } = req.body;

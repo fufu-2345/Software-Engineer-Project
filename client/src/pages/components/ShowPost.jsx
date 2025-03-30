@@ -105,8 +105,6 @@ const ShowPost = ({ userId, role }) => {
                 setErrorMessage("");
                 setTitle("");
                 setDescription("");
-            } else {
-                //console.log('Upload failed 1');
             }
         } catch (error) {
             //console.log('Upload failed 2');
@@ -305,11 +303,7 @@ const ShowPost = ({ userId, role }) => {
     const goPostDetail = (img) => {
         if (img) {
             const postId = parseInt(img.split('.')[0]);
-            console.log(userId, postId);
             navigate(`/post`, { state: { userId: userId, postId: postId } });
-        }
-        else {
-            console.log("img null")
         }
     }
 

@@ -57,13 +57,14 @@ const ProfilePopup = (props) => {
   return (
 
     <div className="profile-container">
-
-      <img
-        ref={profileRef}
-        src={`http://localhost:5000/profilePicture/${pic}`}
-        className="profile-icon"
-        onClick={handleClick}
-      />
+      <div className="mt-2">
+        <img
+          ref={profileRef}
+          src={`http://localhost:5000/profilePicture/${pic}`}
+          className="profile-icon"
+          onClick={handleClick}
+        />
+      </div>
 
       {open && (
         <div

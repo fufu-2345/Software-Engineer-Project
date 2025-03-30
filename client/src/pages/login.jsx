@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Popup from "reactjs-popup";
-
 import Loader from "../components/loader";
-
 import "../index.css";
 import Navbar from "../components/navbar";
 
@@ -48,22 +46,6 @@ const Login = () => {
     return
 
   }
-
-  const HandleGoMain = () => {
-    const data = { userId: 20 };
-
-
-    const handleClick = () => {
-      navigate('/Main', { state: data });
-    };
-    return (
-      <>
-        <br /><br />
-        <button onClick={handleClick}> Main </button>
-        <br /><br />
-      </>
-    );
-  };
 
   return (
     <>

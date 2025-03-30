@@ -50,13 +50,7 @@ const RegisterNonClub = () => {
     setuserOtp(e.target.value);
   };
 
-  //Handle Otp Verification Popup Closed
-  const otpCancel = () => {
-    setReOTP("");
-    setPopupStatus(false);
-  };
-
-  var [isLoading,setIsLoading] = useState(false)
+  var [isLoading, setIsLoading] = useState(false)
 
   const navigate = useNavigate();
 
@@ -73,7 +67,7 @@ const RegisterNonClub = () => {
       username: username,
       accountName: name,
       stdID: stdID,
-      email : email
+      email: email
     };
     var response = await axios.post(api, body);
     if (response.data.Status == true) {
@@ -140,17 +134,17 @@ const RegisterNonClub = () => {
     response = await axios.post(api, body);
     var data = {}
     if (response.data.Status == false) {
-      data = {userId : null}
-    }else{
-      data = {userId : response.data.ID}
+      data = { userId: null }
+    } else {
+      data = { userId: response.data.ID }
     }
 
     setCreateAccSuccess(true);
 
     setTimeout(() => {
       navigate("/Main", { state: data });
-  }, 1000);
-  return
+    }, 1000);
+    return
   }
 
   return (
@@ -203,7 +197,7 @@ const RegisterNonClub = () => {
           <button className="registerButton" onClick={submitData}>
             Submit
           </button>
-          {isLoading && <Loader/>}
+          {isLoading && <Loader />}
         </div>
         {/* Username error popup */}
         <Popup
@@ -236,7 +230,7 @@ const RegisterNonClub = () => {
         >
           <div>
             <p>Student ID not match</p>
-            <button onClick={() => setstdIDerror(false)}>Close</button> 
+            <button onClick={() => setstdIDerror(false)}>Close</button>
           </div>
         </Popup>
         {/* OTP sent error popup */}
@@ -254,7 +248,7 @@ const RegisterNonClub = () => {
         {/* OTP entry popup */}
         <Popup
           open={otpEnterStatus}
-          onClose={() =>{ setotpEnterStatus(false); setuserOtp("")}}
+          onClose={() => { setotpEnterStatus(false); setuserOtp("") }}
           modal
           className="popup-content"
         >
@@ -266,7 +260,7 @@ const RegisterNonClub = () => {
               x
             </button>
             We have send an OTP Verification to your email
-            <br/>
+            <br />
             <br></br>
             Please Enter OTP
             <br></br>

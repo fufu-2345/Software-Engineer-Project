@@ -1,21 +1,20 @@
 .profile-container {
-  position: relative; /* Make sure the popup is positioned relative to this */
+  position: relative;
   display: inline-block;
 }
 
 .profile-icon {
-  width: 50px;
-  height: 50px;
+  width: 75px;
+  height: 75px;
   border-radius: 50%;
   cursor: pointer;
   object-fit: cover;
 }
 
-/* Popup box with a fixed location */
 .popup-box {
   position: absolute;
-  top: 60px; /* Adjust as needed (distance from profile picture) */
-  right: 20px; /* Set this for exact positioning */
+  top: 60px;
+  right: 20px;
   background: white;
   padding: 20px;
   border-radius: 10px;

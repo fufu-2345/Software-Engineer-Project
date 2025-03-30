@@ -19,8 +19,6 @@ const ProfileShowPost = ({ userId }) => {
     const startPage = Math.max(1, currentPage - Math.floor(maxVisitPage));
     const endPage = Math.min(totalPage, currentPage + Math.floor(maxVisitPage));
 
-    console.log(userId);
-
     const changePage = (page) => {
         if (page >= 1 && page <= totalPage) {
             setCurrentPage(page);
@@ -151,7 +149,6 @@ const ProfileShowPost = ({ userId }) => {
 
                     {Array.from({ length: endPage - startPage + 1 }, (_, index) => {
                         const page = startPage + index;
-                        console.log(page, startPage, endPage);
 
                         return (
                             <button key={page} onClick={() => changePage(page)} className={`text-black px-3 py-1 rounded-full ${page === currentPage ? "bg-gray-600 text-white" : "hover:bg-gray-500"}`}>

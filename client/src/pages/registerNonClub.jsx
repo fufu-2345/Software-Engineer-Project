@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useReducer } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Popup from "reactjs-popup";
-import { useRef } from "react";
 
 import Navbar from "../components/navbar";
 import Loader from "../components/loader";
@@ -47,13 +46,7 @@ const RegisterNonClub = () => {
     setuserOtp(e.target.value);
   };
 
-  //Handle Otp Verification Popup Closed
-  const otpCancel = () => {
-    setReOTP("");
-    setPopupStatus(false);
-  };
-
-  var [isLoading,setIsLoading] = useState(false)
+  var [isLoading, setIsLoading] = useState(false)
 
   const navigate = useNavigate();
 
@@ -129,21 +122,21 @@ const RegisterNonClub = () => {
     response = await axios.post(api, body);
     var data = {}
     if (response.data.Status == false) {
-      data = {userId : null}
-    }else{
-      data = {userId : response.data.ID}
+      data = { userId: null }
+    } else {
+      data = { userId: response.data.ID }
     }
 
     setCreateAccSuccess(true);
-    
+
     setTimeout(() => {
       navigate("/Main", { state: data });
-  }, 1000);
+    }, 1000);
   }
 
   return (
     <>
-     <Navbar />
+      <Navbar />
       <div className="registerPage">
         <div className="registerBox">
           Register Form
@@ -158,7 +151,7 @@ const RegisterNonClub = () => {
             <br></br>
           </div>
           <div className="registerTopicInputBox">
-           Password
+            Password
             <br></br>
             <input
               type="password"
@@ -191,7 +184,7 @@ const RegisterNonClub = () => {
           <button className="registerButton" onClick={submitData}>
             Submit
           </button>
-          {isLoading && <Loader/>}
+          {isLoading && <Loader />}
         </div>
         {/* Username error popup */}
         <Popup
@@ -231,7 +224,7 @@ const RegisterNonClub = () => {
         {/* OTP entry popup */}
         <Popup
           open={otpEnterStatus}
-          onClose={() =>{ setotpEnterStatus(false); setuserOtp("")}}
+          onClose={() => { setotpEnterStatus(false); setuserOtp("") }}
           modal
           className="popup-content"
         >
@@ -243,7 +236,7 @@ const RegisterNonClub = () => {
               x
             </button>
             We have send an OTP Verification to your email
-            <br/>
+            <br />
             <br></br>
             Please Enter OTP
             <br></br>

@@ -30,8 +30,6 @@ const router = createBrowserRouter([
 
 ]);
 
-////// https://reactrouter.com/en/main/routers/router-provider <-- router
-
 function Frame() {
   return (
     <RouterProvider router={router} />

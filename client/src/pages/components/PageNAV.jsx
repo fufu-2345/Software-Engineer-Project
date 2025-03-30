@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 
 const PageNAV = ({ currentPage, postCount, maxVisitPage }) => {
-
-
+    constant[currentPage, setCurrentPage] = useState(1);
     const totalPage = Math.ceil(postCount / 20);
-
     const startPage = Math.max(1, currentPage - Math.floor(maxVisitPage));
     const endPage = Math.min(totalPage, currentPage + Math.floor(maxVisitPage));
 
