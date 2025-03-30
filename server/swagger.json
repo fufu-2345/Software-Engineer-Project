@@ -1,0 +1,327 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "User, Post, Comment & Rating API",
+        "version": "1.0.0",
+        "description": "API สำหรับจัดการโปรไฟล์ผู้ใช้, โพสต์, การเพิ่มคอมเมนต์และให้คะแนน"
+    },
+    "paths": {
+        "/updateProfile": {
+            "put": {
+                "summary": "อัปเดตโปรไฟล์ผู้ใช้",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "integer"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "profilePicture": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "id"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "อัปเดตสำเร็จ"
+                    },
+                    "400": {
+                        "description": "ข้อมูลไม่ถูกต้อง"
+                    }
+                }
+            }
+        },
+        "/getProfile": {
+            "get": {
+                "summary": "ดึงข้อมูลโปรไฟล์",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ข้อมูลโปรไฟล์"
+                    },
+                    "404": {
+                        "description": "ไม่พบโปรไฟล์"
+                    }
+                }
+            }
+        },
+        "/getPosts": {
+            "get": {
+                "summary": "ดึงโพสต์ทั้งหมดของผู้ใช้",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "รายการโพสต์"
+                    },
+                    "404": {
+                        "description": "ไม่พบโพสต์"
+                    }
+                }
+            }
+        },
+        "/upload": {
+            "post": {
+                "summary": "Upload an image and create a post",
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "image": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "userId": {
+                                        "type": "integer"
+                                    },
+                                    "postName": {
+                                        "type": "string"
+                                    },
+                                    "postDescription": {
+                                        "type": "string"
+                                    },
+                                    "avgRating": {
+                                        "type": "number"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "File uploaded successfully"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/checkUsername": {
+            "post": {
+                "summary": "Check if a username exists",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "username": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Username check result"
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "summary": "User login",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "username": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login successful"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/getPost": {
+            "get": {
+                "summary": "Get all posts",
+                "responses": {
+                    "200": {
+                        "description": "List of posts"
+                    }
+                }
+            }
+        },
+        "/getComment/{id}": {
+            "get": {
+                "summary": "Get comments for a post",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of comments"
+                    }
+                }
+            }
+        },
+        "/addComment": {
+            "post": {
+                "summary": "เพิ่มคอมเมนต์และคะแนน",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "postID": {
+                                        "type": "integer"
+                                    },
+                                    "commentDescription": {
+                                        "type": "string",
+                                        "maxLength": 800
+                                    },
+                                    "ratingValue": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    },
+                                    "userID": {
+                                        "type": "integer"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/addCommentRating": {
+            "post": {
+                "summary": "เพิ่มคอมเมนต์พร้อมคะแนน",
+                "requestBody": {
+                    "$ref": "#/paths/~1addComment/post/requestBody"
+                },
+                "responses": {
+                    "$ref": "#/paths/~1addComment/post/responses"
+                }
+            }
+        },
+        "/getLatestRatings/{postID}": {
+            "get": {
+                "summary": "ดึงคะแนนล่าสุดของโพสต์",
+                "parameters": [
+                    {
+                        "name": "postID",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/getPost/{id}/{userID?}": {
+            "get": {
+                "summary": "ดึงข้อมูลโพสต์และคะแนน",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "userID",
+                        "in": "path",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "404": {
+                        "description": "Post not found"
+                    }
+                }
+            }
+        }
+    }
+}

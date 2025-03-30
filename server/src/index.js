@@ -7,8 +7,10 @@ const app = express();
 const fs = require('fs');
 const path = require('path');
 const { check, validationResult } = require('express-validator');
-require('dotenv').config();
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('../swagger.json');
 
+require('dotenv').config();
 var bcrypt = require('bcryptjs')
 
 const port = 5000;
@@ -18,6 +20,8 @@ app.use(helmet.frameguard({ action: 'deny' }));
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/uploads', express.static(path.join(__dirname, '../profilePicture')));
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 const pool = mysql.createPool({
     host: process.env.HOST,
