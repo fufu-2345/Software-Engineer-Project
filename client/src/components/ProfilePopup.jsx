@@ -23,7 +23,6 @@ const ProfilePopup = (props) => {
       .then(data => {
         if (data !== null) {
           setPic(data[0]);
-          console.log("20", pic);
         }
       })
       .catch(err => console.error("Error fetching profile image:", err));

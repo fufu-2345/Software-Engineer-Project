@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const ProfileShowPost = ({ userId }) => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -8,7 +9,7 @@ const ProfileShowPost = ({ userId }) => {
     const [mode, setMode] = useState(true);
     const [sortMode, setSortMode] = useState(true);
     const [isOpen, setIsOpen] = useState(false);
-
+    const navigate = useNavigate();
     const maxVisitPage = 5;
     const column = 4; // จำนวนคอลัมน์ต่อแถว
     const postPerPage = column * 5;
@@ -108,6 +109,13 @@ const ProfileShowPost = ({ userId }) => {
             });
     }, [userId, sortMode, mode]);
 
+    const goPostDetail = (img) => {
+        if (img) {
+            const postId = parseInt(img.split('.')[0]);
+            navigate(`/post`, { state: { userId: userId, postId: postId } });
+        }
+    }
+
     return (
         <div className='relative w-[90%] mx-auto mt-8'>
 
@@ -127,7 +135,7 @@ const ProfileShowPost = ({ userId }) => {
                         postImgs.slice(start, stop + 1).map((img, index) => (
                             img ? (
                                 <div key={index} className='relative group flex justify-center items-center h-[300px] cursor-pointer'>
-                                    <img src={`http://localhost:5000/imgs/${img}`} alt="postImg" className='w-full h-full object-contain' title={img} />
+                                    <img src={`http://localhost:5000/imgs/${img}`} alt="postImg" className='w-full h-full object-contain' onClick={() => goPostDetail(img)} />
                                 </div>
                             ) : null < img
 

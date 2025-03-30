@@ -54,7 +54,6 @@ const upload2 = multer({ storage: storage2 });
 // ดึงข้อมูลโปรไฟล์ผู้ใช้
 app.get('/getUserProfile/:id', (req, res) => {
     const { id } = req.params;
-    console.log(req.params);
     pool.getConnection((err, connection) => {
         if (err) {
             return res.status(500).json({ error: 'Database connection error' });
@@ -255,7 +254,6 @@ app.get("/getProfile/name", (req, res) => {
         return res.json(userName);
     })
 })
-
 
 app.get("/getRole", (req, res) => {
     const { userId } = req.query;
