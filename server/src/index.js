@@ -7,7 +7,7 @@ const app = express();
 const fs = require('fs');
 const path = require('path');
 const { check, validationResult } = require('express-validator');
-require('dotenv').config({ path: '../.env' });
+require('dotenv').config();
 
 var bcrypt = require('bcryptjs')
 
