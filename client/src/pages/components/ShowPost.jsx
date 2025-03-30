@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import axios from 'axios';
 import { useDropzone } from 'react-dropzone'
 import { useNavigate } from 'react-router-dom';
@@ -16,30 +16,49 @@ const ShowPost = ({ userId, role }) => {
     const [file, setFile] = useState(null);
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
-    //const [picOrProfile, setPicOrProfile] = useState(true);
     const [proCount, setProCount] = useState(0);
     const [proImgs, setProImgs] = useState([]);
     const [profileDropdown, setprofileDropdown] = useState(false);
     const [userName, setUserName] = useState([]);
     const [searchUserId, setsearchUserId] = useState([]);
-
+    const navigate = useNavigate();
     const maxVisitPage = 5;
     const column = 4; // จำนวนคอลัมน์ต่อแถว
     const postPerPage = column * 5;
     const start = (currentPage - 1) * postPerPage;
     const stop = start + postPerPage - 1;
-
     const totalPage = Math.max(1, Math.ceil(postCount / 20));
     const startPage = Math.max(1, currentPage - Math.floor(maxVisitPage));
     const endPage = Math.min(totalPage, currentPage + Math.floor(maxVisitPage));
 
-    const navigate = useNavigate();
+    const profileRef = useRef(null);
+    const profileButtonRef = useRef(null);
 
     const changePage = (page) => {
         if (page >= 1 && page <= totalPage) {
             setCurrentPage(page);
         }
     };
+
+    const handleOutsideClick = (event) => {
+        if (event.target.id === "popup-overlay") {
+            setIsAdding(false);
+            setprofileDropdown(false);
+        }
+    };
+
+    const handleClickOutside = (event) => {
+        if (profileRef.current && !profileRef.current.contains(event.target) && !profileButtonRef.current.contains(event.target)) {
+            setprofileDropdown(false);
+        }
+    }
+
+    useEffect(() => {
+        document.addEventListener("click", handleClickOutside);
+        return () => {
+            document.removeEventListener("click", handleClickOutside);
+        };
+    }, []);
 
     const onDrop = useCallback(acceptedFiles => {
         setErrorMessage("");
@@ -86,13 +105,10 @@ const ShowPost = ({ userId, role }) => {
                 setErrorMessage("");
                 setTitle("");
                 setDescription("");
-                //console.log('Upload successful!');
             } else {
-                //alert('Upload failed.');
                 //console.log('Upload failed 1');
             }
         } catch (error) {
-            //alert('Error uploading file.');
             //console.log('Upload failed 2');
         }
     };
@@ -131,7 +147,6 @@ const ShowPost = ({ userId, role }) => {
         setIsOpen(false);
         setSortMode(true);
         setMode(true);
-        //console.log(mode, sortMode);
 
         const params = {
             sortMode: sortMode ? 'DESC' : 'ASC',
@@ -154,7 +169,6 @@ const ShowPost = ({ userId, role }) => {
         setIsOpen(false);
         setSortMode(true);
         setMode(false);
-        //console.log(mode, sortMode);
 
         const params = {
             sortMode: sortMode ? 'DESC' : 'ASC',
@@ -166,7 +180,6 @@ const ShowPost = ({ userId, role }) => {
             .then(response => {
                 setPostCount(response.data.length);
                 setPostImgs(response.data);
-                //setPicOrProfile(true);
             })
             .catch(error => {
                 console.error("Error getPost/imgs(handleSearch): ", error);
@@ -181,13 +194,8 @@ const ShowPost = ({ userId, role }) => {
             //                               get Profile pic
             axios.get("http://localhost:5000/getProfile/imgs", { params })
                 .then(response => {
-                    //setPostCount(response.data.length);
-                    //setPostImgs(response.data);
                     setProCount(response.data.length);
                     setProImgs(response.data);
-                    //console.log(proImgs);
-                    //console.log(proCount);
-                    //setPicOrProfile(false);
                 })
                 .catch(error => {
                     console.error("Error getPost/imgs(handleSearch): ", error);
@@ -195,9 +203,7 @@ const ShowPost = ({ userId, role }) => {
             //                               get user name 
             axios.get("http://localhost:5000/getProfile/name", { params })
                 .then(response => {
-                    //setPostCount(response.data.length);
                     setUserName(response.data);
-                    //console.log(userName);
                 })
                 .catch(error => {
                     console.error("Error getPost/imgs(handleSearch): ", error);
@@ -207,9 +213,7 @@ const ShowPost = ({ userId, role }) => {
             //                               get user ID
             axios.get("http://localhost:5000/getProfile/userID", { params })
                 .then(response => {
-                    //setPostCount(response.data.length);
                     setsearchUserId(response.data);
-                    //console.log(userName);
                 })
                 .catch(error => {
                     console.error("Error getPost/imgs(handleSearch): ", error);
@@ -237,7 +241,6 @@ const ShowPost = ({ userId, role }) => {
             .then(response => {
                 setPostCount(response.data.length);
                 setPostImgs(response.data);
-                //setPicOrProfile(true);
             })
             .catch(error => {
                 console.error("Error getPost/imgs(handleSearch): ", error);
@@ -293,7 +296,6 @@ const ShowPost = ({ userId, role }) => {
             .then(response => {
                 setPostCount(response.data.length);
                 setPostImgs(response.data);
-                //setPicOrProfile(true);
             })
             .catch(error => {
                 console.error("Error getPost/imgs(handleSearch): ", error);
@@ -313,9 +315,11 @@ const ShowPost = ({ userId, role }) => {
 
     return (
         <>
-            {isAdding && <div className=' content-area fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center bg-red-300 p-4 border-4 w-[80%] h-[90vh] overflow-y-auto mx-auto rounded-lg z-50'>
-                <style>
-                    {`
+            {isAdding &&
+                <div id="popup-overlay" className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-40" onClick={handleOutsideClick} >
+                    <div className=' content-area fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center bg-red-300 p-4 border-4 w-[80%] h-[90vh] overflow-y-auto mx-auto rounded-lg z-50' onClick={(e) => e.stopPropagation()}>
+                        <style>
+                            {`
                         .content-area::-webkit-scrollbar {
                             display: none;
                         }
@@ -323,67 +327,66 @@ const ShowPost = ({ userId, role }) => {
                             overflow-y: scroll;
                         }
                     `}
-                </style>
-                <div {...getRootProps()} className='flex flex-col justify-center items-center bg bg-[#ffd1dd] w-[60%] min-h-[500px] border-2 border-dashed border-gray-500 p-4 cursor-pointer'>
-                    <input {...getInputProps()} />
-                    {isDragActive ?
-                        <p className="mb-4 font-bold">Drop the files here ...</p> : <p className="mb-4 font-bold">Drag & drop your picture here</p>
-                    }
-                    {file && (
-                        <div className='relative  flex justify-center items-center w-full h-full'>
-                            <button onClick={handleClearFile} className="absolute top-2 right-2 w-8 h-8 bg-red-500 text-white text-lg font-bold rounded-full flex items-center justify-center shadow-md hover:bg-red-700">
-                                X
-                            </button>
-                            <img src={file.preview} alt="Uploaded Preview" className='bg-[#ffd1dd] max-w-[300px] max-h-[300px] block p-3 border-3 border-black border-dashed' />
+                        </style>
+                        <div {...getRootProps()} className='flex flex-col justify-center items-center bg bg-[#ffd1dd] w-[60%] min-h-[500px] border-2 border-dashed border-gray-500 p-4 cursor-pointer'>
+                            <input {...getInputProps()} />
+                            {isDragActive ?
+                                <p className="mb-4 font-bold">Drop the files here ...</p> : <p className="mb-4 font-bold">Drag & drop your picture here</p>
+                            }
+                            {file && (
+                                <div className='relative  flex justify-center items-center w-full h-full'>
+                                    <button onClick={handleClearFile} className="absolute top-2 right-2 w-8 h-8 bg-red-500 text-white text-lg font-bold rounded-full flex items-center justify-center shadow-md hover:bg-red-700">
+                                        X
+                                    </button>
+                                    <img src={file.preview} className='bg-[#ffd1dd] max-w-[300px] max-h-[300px] block p-3 border-3 border-black border-dashed' />
+                                </div>
+                            )}
                         </div>
-                    )}
-                </div>
 
-                {errorMessage && (
-                    <div className='text-red-500 text-[20px] mt-4 font-semibold cursor-default'>
-                        {errorMessage}
-                    </div>
-                )}
-
-                <div className='flex flex-col items-center bg-grey-300 bg-clip-padding p-3 w-full'>
-                    {/* input post ชื่อ */}
-                    <div className="relative w-full max-w-lg">
-                        <textarea value={title} onChange={handleTitle} placeholder='Enter your post name' className='w-full p-2 border rounded-md resize-none h-[80px] overflow-y-auto mt-1' />
-                        {title && (
-                            <button onClick={() => setTitle("")} className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white text-lg font-bold rounded-full flex items-center justify-center shadow-md hover:bg-red-700">
-                                X
-                            </button>
+                        {errorMessage && (
+                            <div className='text-red-500 text-[20px] mt-4 font-semibold cursor-default'>
+                                {errorMessage}
+                            </div>
                         )}
-                    </div>
-                    <br />
 
-                    {/* input post description */}
-                    <div className="relative w-full max-w-lg">
-                        <textarea value={description} onChange={handleDescription} placeholder='Enter the description' className='w-full p-2 border rounded-md resize-none h-[225px] overflow-y-auto mt-1' />
-                        {description && (
-                            <button onClick={() => setDescription("")} className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white text-lg font-bold rounded-full flex items-center justify-center shadow-md hover:bg-red-700">
-                                X
-                            </button>
-                        )}
-                    </div>
-                </div>
+                        <div className='flex flex-col items-center bg-grey-300 bg-clip-padding p-3 w-full'>
+                            <div className="relative w-full max-w-lg">
+                                <textarea value={title} onChange={handleTitle} placeholder='Enter your post name' className='w-full p-2 border rounded-md resize-none h-[80px] overflow-y-auto mt-1' />
+                                {title && (
+                                    <button onClick={() => setTitle("")} className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white text-lg font-bold rounded-full flex items-center justify-center shadow-md hover:bg-red-700">
+                                        X
+                                    </button>
+                                )}
+                            </div>
+                            <br />
 
-                <div className='flex flex-col items-center bg-grey-300 bg-clip-padding'>
-                    <div class="flex space-x-4 ">
-                        <div className='w-full flex justify-center'>
-                            <button onClick={handleCancle} className='bg-red-500 hover:bg-red-700  text-white px-4 py-2 m-2 rounded'>
-                                cancle
-                            </button>
+                            <div className="relative w-full max-w-lg">
+                                <textarea value={description} onChange={handleDescription} placeholder='Enter the description' className='w-full p-2 border rounded-md resize-none h-[225px] overflow-y-auto mt-1' />
+                                {description && (
+                                    <button onClick={() => setDescription("")} className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white text-lg font-bold rounded-full flex items-center justify-center shadow-md hover:bg-red-700">
+                                        X
+                                    </button>
+                                )}
+                            </div>
                         </div>
 
-                        <div className='w-full flex justify-center'>
-                            <button onClick={handleUpload} className='bg-green-500 hover:bg-green-700 text-white px-4 py-2 m-2 rounded'>
-                                confirm
-                            </button>
+                        <div className='flex flex-col items-center bg-grey-300 bg-clip-padding'>
+                            <div class="flex space-x-4 ">
+                                <div className='w-full flex justify-center'>
+                                    <button onClick={handleCancle} className='bg-red-500 hover:bg-red-700  text-white px-4 py-2 m-2 rounded'>
+                                        cancle
+                                    </button>
+                                </div>
+
+                                <div className='w-full flex justify-center'>
+                                    <button onClick={handleUpload} className='bg-green-500 hover:bg-green-700 text-white px-4 py-2 m-2 rounded'>
+                                        confirm
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>}
+                </div>}
             <div className='top-0 right-0 fixed position: fixed; flex items-center'>
                 {(role.roleID == 1 || role.roleID == 2) &&
                     <button onClick={handleIsAdding} className="text-white bg-red-500 hover:bg-red-600 rounded-full w-12 h-12 flex items-center justify-center">
@@ -402,17 +405,16 @@ const ShowPost = ({ userId, role }) => {
                 </div>
                 <div className='absolute top-0 left-[37.5%] flex'>
                     <input type="text" value={searchVal} onChange={handleSearchVal} placeholder="type for search here" className="bg-white border-2 w-[275px] border-black rounded-2xl p-2.5" />
-                    <button className='bg-gray-400 hover:bg-gray-500 rounded-2xl p-2.5 ml-2 text-white' onClick={handleSearch}>
+                    <button ref={profileButtonRef} className="bg-gray-400 hover:bg-gray-500 rounded-2xl p-2.5 ml-2 text-white" onClick={(e) => { e.stopPropagation(); handleSearch(); }} >
                         Search
                     </button>
 
-
                     {profileDropdown && (
-                        <div className="absolute left-0 mt-12 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+                        <div className="absolute left-0 mt-12 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10" ref={profileRef} onClick={(e) => e.stopPropagation()}>
                             {proCount > 0 ? (
                                 proImgs.map((profile, index) => (
                                     <div key={index} className="flex items-center p-2 border-b hover:bg-gray-100 cursor-pointer" onClick={() => handleNav(index)}>
-                                        <img src={`http://localhost:5000/profilePicture/${profile}`} alt={profile} className='w-8 h-8 object-cover rounded-full' title={profile} />
+                                        <img src={`http://localhost:5000/profilePicture/${profile}`} className='w-8 h-8 object-cover rounded-full' />
                                         <p className="ml-2 leading-none relative top-[7px]">{userName[index]}</p>
                                     </div>
                                 ))
@@ -433,7 +435,7 @@ const ShowPost = ({ userId, role }) => {
                                 postImgs.slice(start, stop + 1).map((img, index) => (
                                     img ? (
                                         <div key={index} className='relative group flex justify-center items-center h-[300px] cursor-pointer'>
-                                            <img src={`http://localhost:5000/imgs/${img}`} alt="postImg" className='w-full h-full object-contain' title={img} onClick={() => goPostDetail(img)} />
+                                            <img src={`http://localhost:5000/imgs/${img}`} className='w-full h-full object-contain' onClick={() => goPostDetail(img)} />
                                         </div>
                                     ) : null
                                 ))

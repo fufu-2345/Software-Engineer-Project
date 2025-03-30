@@ -247,7 +247,6 @@ app.get("/getProfile/imgs2", (req, res) => {
             return res.json(err);
         }
         const profilePaths = data.map(item => item.profilePic).filter(photoPath => photoPath !== 'Insert Default Path Here');;
-        //console.log(profilePaths);
         return res.json(profilePaths);
     })
 })
