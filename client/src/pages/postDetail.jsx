@@ -17,6 +17,13 @@ const PostDetail = () => {
     const [userID, setUserID] = useState(null);
     const [role, setRole] = useState(0);
     const [storedUserID, setStoredUserID] = useState(null);
+    const [showFullDesc, setShowFullDesc] = useState(false);
+    const [descTooLong, setDescTooLong] = useState(false);
+    const descriptionRef = React.useRef();
+    const postLeftRef = useRef(null);
+    const [commentMaxHeight, setCommentMaxHeight] = useState(null);
+
+
 
     const location = useLocation();
     const { state } = location;
@@ -117,6 +124,22 @@ const PostDetail = () => {
             });
     };
 
+    const handleToggleDescription = () => {
+        const newState = !showFullDesc;
+        setShowFullDesc(newState);
+      
+        setTimeout(() => {
+          if (newState && postLeftRef.current) {
+            const height = postLeftRef.current.offsetHeight;
+            setCommentMaxHeight(height);
+          } else {
+            // ย่อกลับมา default
+            setCommentMaxHeight(null);
+          }
+        }, 200);
+      };
+      
+
     {/*ส่วนของscroll comment ไปล่างสุด */ }
     const commentsRef = useRef(null);
     const scrollToBottom = () => {
@@ -128,6 +151,17 @@ const PostDetail = () => {
         scrollToBottom();
     }, [comments]);
 
+    useEffect(() => {
+        if (descriptionRef.current) {
+          const lineHeight = parseFloat(getComputedStyle(descriptionRef.current).lineHeight);
+          const maxLines = 6;
+          const maxHeight = lineHeight * maxLines;
+          if (descriptionRef.current.scrollHeight > maxHeight) {
+            setDescTooLong(true);
+          }
+        }
+      }, [post]);
+
     if (!post) return <h2>Loading...</h2>;
 
     return (
@@ -137,7 +171,7 @@ const PostDetail = () => {
 
             <div className="post-container">
                 {/*ส่วนของโพสต์ */}
-                <div className="post-left">
+                <div className="post-left" ref={postLeftRef}>
                     <div className="post-header">
                         <div className="post-profile-pic-Link" onClick={goProfile}>
                             <img className="post-profile-pic" src={post.profilePic ? `http://localhost:5000/profilePicture/${post.profilePic}` : `http://localhost:5000/imgs/def-pic.jpg`} />
@@ -149,7 +183,17 @@ const PostDetail = () => {
 
                     <img className="post-image" src={`http://localhost:5000/imgs/${post.photoPath}`} alt={post.postName} />
                     <div className="cursor-default"><strong>PictureName:</strong> {post.postName ? post.postName : "-"}</div>
-                    <div className="post-description"><strong>Description:</strong> {post.postDescription ? post.postDescription : "-"}</div>
+                    <div ref={descriptionRef} className={`post-description ${showFullDesc ? "" : "collapsed"}`}>
+                        {post.postDescription || "-"}
+                    </div>
+
+                    {descTooLong && (
+                        <button onClick={handleToggleDescription} className="read-more-btn">
+                        {showFullDesc ? "-Read less-" : "-Read more-"}
+                        </button>
+                    )}
+
+
                 </div>
 
                 {/*ส่วนของคอมเมนต์ */}
@@ -171,7 +215,7 @@ const PostDetail = () => {
                             </div>
                         </div>
                     </div>
-                    <ul className="comments-list" ref={commentsRef}>
+                    <ul className="comments-list" ref={commentsRef} style={commentMaxHeight ? { maxHeight: `${commentMaxHeight}px` } : {}}>
                         {comments.map((comment, index) => (
                             <li key={index} className="comment-item">
                                 <div className="comment-content">
