@@ -127,7 +127,7 @@ const PostDetail = () => {
                             <img className="post-profile-pic" src={post.profilePic ? `http://localhost:5000/profilePicture/${post.profilePic}` : `http://localhost:5000/imgs/def-pic.jpg`} />
                         </div>
                         <div className="post-username-Link" onClick={goProfile}>
-                            <span className="post-username">{post.userName}</span>
+                            <span className="cursor-pointer text-2xl font-bold text-[#333333]">{post.userName}</span>
                         </div>
                     </div>
 
@@ -160,17 +160,13 @@ const PostDetail = () => {
                             <li key={index} className="comment-item">
                                 <div className="comment-content">
                                     {/* Profile Picture ของผู้ใช้คอมเมนต์ */}
-                                    <Link to={`/profile/${comment.userID}`} className="comment-pic-Link">
+                                    <div className="no-underline cursor-pointer" onClick={goProfile}>
                                         <img className="comment-profile-pic" src={`http://localhost:5000/profilePicture/${comment.profilePic || "def-pic.jpg"}`} alt="Profile" />
-                                    </Link>
+                                    </div>
                                     {/* กล่องคอมเมนต์ */}
                                     <div className="comment-text-box">
-                                        <div className="cursor-default">
-                                            <Link to={`/profile/${comment.userID}`} className="comment-user-Link">
-                                                <strong className="comment-user">{comment.userName}</strong>
-                                            </Link>
-                                            <span className="comment-time">{new Date(comment.commentTime).toLocaleString()}</span>
-                                        </div>
+                                        <strong className="no-underline cursor-pointer text-base font-bold text-[#333] transition-all duration-300 hover:text-shadow-lg hover:text-[1.05rem]" onClick={goProfile}>{comment.userName}</strong>
+                                        <span className="cursor-default text-xs font-normal text-[#888] italic float-right">{new Date(comment.commentTime).toLocaleString()}</span>
                                         <div style={{ whiteSpace: 'pre-wrap' }}>
                                             {comment.commentDescription}
                                         </div>

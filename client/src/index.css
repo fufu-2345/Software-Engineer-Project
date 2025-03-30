@@ -12,7 +12,6 @@ body {
 
 body {
   background-color: #ffd1dd !important;
-
 }
 
 .post-detail-container {
@@ -269,18 +268,6 @@ body {
   text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
 }
 
-.comment-time {
-  font-size: 0.8rem;
-  /* ✅ ทำให้เล็กลง */
-  font-weight: normal;
-  /* ✅ ไม่ตัวหนา */
-  color: #888;
-  /* ✅ สีเทาอ่อน */
-  font-style: italic;
-  /* ✅ เอียงนิดๆ ดูสวยขึ้น */
-  float: right;
-}
-
 .post-header {
   display: flex;
   align-items: center;
@@ -320,13 +307,6 @@ body {
   /* เพิ่มเงา */
   border-color: #000000;
   /* เปลี่ยนสีขอบ */
-}
-
-.post-username {
-  font-size: 2rem;
-  font-weight: bold;
-  color: #333333;
-  /* ✅ สีข้อความ */
 }
 
 .post-username-Link {
@@ -426,21 +406,6 @@ body {
   padding-top: 1.5rem;
 }
 
-.contract_head {
-  width: 100px;
-}
-
-.contract_box {
-  border: solid 3px #ff5a86;
-  border-radius: 15px;
-  width: 300px;
-  padding-left: 0.5rem;
-  background-color: #ffffff;
-  height: 35px;
-}
-
-
-
 /*---------------------------------PART(2)----------------------------------------*/
 .pro_r2 {
   margin: 0.5rem;
@@ -449,12 +414,6 @@ body {
 }
 
 /*---------------------------------PART(3)-----------------------------------------*/
-
-.pro_r3 {
-  margin: 0.5rem;
-  padding: 1rem;
-
-}
 
 .pro_des {
   margin-top: 1rem;
@@ -481,11 +440,6 @@ body {
   align-items: center;
   object-fit: cover;
 }
-
-
-
-
-
 
 /* registerPage */
 /* Centering the register page */
@@ -636,13 +590,6 @@ body {
   font-size: 16px;
   text-align: center;
   outline: none;
-}
-
-.post-username-Link,
-.post-profile-pic-Link,
-.comment-pic-Link,
-.comment-user-Link {
-  text-decoration: none;
 }
 
 .selectRegisterBox {

@@ -36,6 +36,7 @@ p {
 }
 
 .Accname {
+  cursor: default;
   font-size: 1.5rem;
   color: #555;
 }

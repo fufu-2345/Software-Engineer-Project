@@ -36,7 +36,6 @@ const Navbar = (props) => {
 
   useEffect(() => {
     setGuest(false)
-    //setUser(false)
     setUser(true)
     if (userID) {
       fetchData();

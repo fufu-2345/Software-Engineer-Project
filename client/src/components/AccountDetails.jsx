@@ -67,8 +67,8 @@ const AccountDetails = (props) => {
 
       {isUser && <div className="Accname"> {accName}</div>}
       {isUser &&
-        <div className="cursor-pointer mx-auto my-[1rem] center border border-black w-[80%] rounded-full h-[2rem]" onClick={goProfile}>
-          <p className="text-[#555]">Your profile</p>
+        <div className="cursor-pointer text-[#555] mx-auto my-[1rem] center border border-black w-[80%] rounded-full h-[2rem] hover:bg-black hover:text-white transition-all duration-300" onClick={goProfile}>
+          Your profile
         </div>
       }
       {isUser && <button className="logout-btn" onClick={logOut}>Logout</button>}
