@@ -30,7 +30,7 @@ const ProfilePopup = (props) => {
   }, [userID]);
 
   useEffect(() => {
-    if (pic === "" || pic === undefined) {
+    if (pic === "" || pic === undefined || pic === null) {
       setPic("default.png");
     }
   }, [pic]);

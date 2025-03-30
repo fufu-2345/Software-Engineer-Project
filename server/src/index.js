@@ -27,7 +27,7 @@ const pool = mysql.createPool({
 });
 
 app.get('/', (req, res) => {
-    res.json('111111');
+    res.json(process.env.HOST + " " + process.env.USER + " " + process.env.PASSWORD + " " + process.env.DATABASE);
 });
 
 app.get("/test", (req, res) => {
@@ -241,7 +241,7 @@ app.get("/getProfile/imgs", (req, res) => {
 app.get("/getProfile/imgs2", (req, res) => {
     const search = req.query.search;
 
-    a = `select profilePic from user WHERE userName = ${search}`;
+    a = `select profilePic from user WHERE userID = ${search}`;
     pool.query(a, (err, data) => {
         if (err) {
             return res.json(err);
