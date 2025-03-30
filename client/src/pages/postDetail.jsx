@@ -209,7 +209,7 @@ const PostDetail = () => {
                                     </span>
                                 </span>
 
-                                {userID && post.userRating !== null && (
+                                {userID !== null && post.userRating !== null && (
                                     <span className="cursor-default">Your Rating: {post.userRating} ⭐</span>
                                 )}
                             </div>
@@ -220,12 +220,12 @@ const PostDetail = () => {
                             <li key={index} className="comment-item">
                                 <div className="comment-content">
                                     {/* Profile Picture ของผู้ใช้คอมเมนต์ */}
-                                    <div className="no-underline cursor-pointer" onClick={()=> goProfile2(index)}>
+                                    <div className="no-underline cursor-pointer" onClick={() => goProfile2(index)}>
                                         <img className="comment-profile-pic" src={`http://localhost:5000/profilePicture/${comment.profilePic || "def-pic.jpg"}`} alt="Profile" />
                                     </div>
                                     {/* กล่องคอมเมนต์ */}
                                     <div className="comment-text-box">
-                                        <strong className="no-underline cursor-pointer text-base font-bold text-[#333] transition-all duration-300 hover:text-shadow-lg hover:text-[1.05rem]" onClick={()=> goProfile2(index)}>{comment.userName}</strong>
+                                        <strong className="no-underline cursor-pointer text-base font-bold text-[#333] transition-all duration-300 hover:text-shadow-lg hover:text-[1.05rem]" onClick={() => goProfile2(index)}>{comment.userName}</strong>
                                         <span className="cursor-default text-xs font-normal text-[#888] italic float-right">{new Date(comment.commentTime).toLocaleString()}</span>
                                         <div style={{ whiteSpace: 'pre-wrap' }}>
                                             {comment.commentDescription}
