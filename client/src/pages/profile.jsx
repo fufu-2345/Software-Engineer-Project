@@ -29,10 +29,12 @@ function Profile() {
     const [profileImage, setProfileImage] = useState(null);
     const [userId, setUserId] = useState(null);
     const [isOwner, setIsOwner] = useState(false);
+    //loggedInUser= iduser ของ profile 
+    //userid=id คนดู
+
     useEffect(() => {
-        const loggedInUser = state.loggedInUser;
-        setUserId(loggedInUser);
-        if (state.userIdrId !== null && state.userId !== undefined && loggedInUser !== null && loggedInUser !== undefined) {
+        setUserId(state.loggedInUser);
+        if (state.userId !== null && state.userId !== undefined && state.loggedInUser !== null && state.loggedInUser !== undefined) {
             if (state.loggedInUser === state.userId) {
                 setIsOwner(true);
             }
@@ -82,7 +84,7 @@ function Profile() {
             .then(response => response.json())
             .then(data => {
                 if (data.message) {
-                    console.log('Profile updated:', data.message); // Debug log
+
                     setShow(false);
                     setFormData(tempFormData);
                     setProfileImage(null);
@@ -94,7 +96,6 @@ function Profile() {
 
     axios.get("http://localhost:5000/getRole", { params: { userId: state.userId } })
         .then(response => {
-            console.log(response.data);
             if (response.data) {
                 setRole(response.data);
             } else {
@@ -104,7 +105,7 @@ function Profile() {
 
     return (
         <>
-            {role !== 0 ? <Nav userID={userId} /> : <Nav userID={null} />}
+            {role !== 0 ? <Nav userID={state.userId} /> : <Nav userID={null} />}
             <Container className='pagePro'>
                 <button className="back-arrow" onClick={() => navigate(-1)}>←</button>
                 <Row className="pro_r1">

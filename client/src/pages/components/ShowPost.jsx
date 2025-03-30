@@ -423,8 +423,8 @@ const ShowPost = ({ userId, role }) => {
                 </div>
 
                 <br /><br /><br />
-                <div className=' w-[100%] p-3 border'>
-                    <div className='w-[100%] p-3 border'>
+                <div className=' w-[100%] p-3'>
+                    <div className='w-[100%] p-3'>
                         <div className='grid grid-cols-4 gap-3 pb-3'>
                             {Array.isArray(postImgs) && postImgs.length > 0 ? (
                                 postImgs.slice(start, stop + 1).map((img, index) => (
