@@ -85,7 +85,7 @@ const PostDetail = () => {
             });
     };
 
-    const goProfile2 = () => {
+    const goProfile2 = (index) => {
         let loggedInUser;
         const params = {
             id: id
@@ -93,8 +93,8 @@ const PostDetail = () => {
         axios.get(`http://localhost:5000/getUserid`, { params })
             .then(response => {
                 loggedInUser = response.data.userID;
-                console.log(userID, loggedInUser)
-                navigate('/profile', { state: { userId: userID, loggedInUser: loggedInUser } });
+                console.log(userID, comments.userID)
+                navigate('/profile', { state: { userId: userID, loggedInUser: comments[index].userID } });
             })
             .catch(error => {
                 console.error("Error getPost/imgs(handleSearch): ", error);
@@ -127,18 +127,18 @@ const PostDetail = () => {
     const handleToggleDescription = () => {
         const newState = !showFullDesc;
         setShowFullDesc(newState);
-      
+
         setTimeout(() => {
-          if (newState && postLeftRef.current) {
-            const height = postLeftRef.current.offsetHeight;
-            setCommentMaxHeight(height);
-          } else {
-            // ย่อกลับมา default
-            setCommentMaxHeight(null);
-          }
+            if (newState && postLeftRef.current) {
+                const height = postLeftRef.current.offsetHeight;
+                setCommentMaxHeight(height);
+            } else {
+                // ย่อกลับมา default
+                setCommentMaxHeight(null);
+            }
         }, 200);
-      };
-      
+    };
+
 
     {/*ส่วนของscroll comment ไปล่างสุด */ }
     const commentsRef = useRef(null);
@@ -153,14 +153,14 @@ const PostDetail = () => {
 
     useEffect(() => {
         if (descriptionRef.current) {
-          const lineHeight = parseFloat(getComputedStyle(descriptionRef.current).lineHeight);
-          const maxLines = 6;
-          const maxHeight = lineHeight * maxLines;
-          if (descriptionRef.current.scrollHeight > maxHeight) {
-            setDescTooLong(true);
-          }
+            const lineHeight = parseFloat(getComputedStyle(descriptionRef.current).lineHeight);
+            const maxLines = 6;
+            const maxHeight = lineHeight * maxLines;
+            if (descriptionRef.current.scrollHeight > maxHeight) {
+                setDescTooLong(true);
+            }
         }
-      }, [post]);
+    }, [post]);
 
     if (!post) return <h2>Loading...</h2>;
 
@@ -189,7 +189,7 @@ const PostDetail = () => {
 
                     {descTooLong && (
                         <button onClick={handleToggleDescription} className="read-more-btn">
-                        {showFullDesc ? "-Read less-" : "-Read more-"}
+                            {showFullDesc ? "-Read less-" : "-Read more-"}
                         </button>
                     )}
 
@@ -220,12 +220,12 @@ const PostDetail = () => {
                             <li key={index} className="comment-item">
                                 <div className="comment-content">
                                     {/* Profile Picture ของผู้ใช้คอมเมนต์ */}
-                                    <div className="no-underline cursor-pointer" onClick={goProfile2}>
+                                    <div className="no-underline cursor-pointer" onClick={()=> goProfile2(index)}>
                                         <img className="comment-profile-pic" src={`http://localhost:5000/profilePicture/${comment.profilePic || "def-pic.jpg"}`} alt="Profile" />
                                     </div>
                                     {/* กล่องคอมเมนต์ */}
                                     <div className="comment-text-box">
-                                        <strong className="no-underline cursor-pointer text-base font-bold text-[#333] transition-all duration-300 hover:text-shadow-lg hover:text-[1.05rem]" onClick={goProfile2}>{comment.userName}</strong>
+                                        <strong className="no-underline cursor-pointer text-base font-bold text-[#333] transition-all duration-300 hover:text-shadow-lg hover:text-[1.05rem]" onClick={()=> goProfile2(index)}>{comment.userName}</strong>
                                         <span className="cursor-default text-xs font-normal text-[#888] italic float-right">{new Date(comment.commentTime).toLocaleString()}</span>
                                         <div style={{ whiteSpace: 'pre-wrap' }}>
                                             {comment.commentDescription}
