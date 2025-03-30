@@ -2,13 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-
 body {
   @apply bg-bgColor;
 }
-
-
-/*               .= class   #=id                  */
 
 body {
   background-color: #ffd1dd !important;
@@ -137,7 +133,6 @@ body {
   background-color: #ff3399;
 }
 
-
 .comments-list {
   transition: max-height 0.3s ease;
 }
@@ -145,7 +140,6 @@ body {
 .comments-list.expand-comments {
   max-height: none;
 }
-
 
 .rating-container {
   display: flex;
@@ -313,7 +307,6 @@ body {
   /* ✅ เพิ่มระยะห่างระหว่างรูปกับชื่อ */
   background-color: white;
   border-radius: 25px;
-
 }
 
 .post-profile-pic {
@@ -433,7 +426,6 @@ body {
   align-items: center;
   object-fit: cover;
   margin-left: 10rem;
-
 }
 
 .pro_contract .contact-row {
@@ -447,7 +439,6 @@ body {
 .pro_r2 {
   margin: 0.5rem;
   padding: 1rem;
-
 }
 
 /*---------------------------------PART(3)-----------------------------------------*/

@@ -29,8 +29,7 @@ function Profile() {
     const [profileImage, setProfileImage] = useState(null);
     const [userId, setUserId] = useState(null);
     const [isOwner, setIsOwner] = useState(false);
-    //loggedInUser= iduser ของ profile 
-    //userid=id คนดู
+
     useEffect(() => {
         setUserId(state.loggedInUser);
         if (state.userId !== null && state.userId !== undefined && state.loggedInUser !== null && state.loggedInUser !== undefined) {

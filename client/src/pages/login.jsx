@@ -9,13 +9,9 @@ import Navbar from "../components/navbar";
 const Login = () => {
   var [username, setusername] = useState("");
   var [password, setpassword] = useState("");
-
   var [isLoading, setIsLoading] = useState(false)
-
   var [signInError, setSignInError] = useState(false)
-
   var [signInSuccess, setSignInSuccess] = useState(false)
-
   const navigate = useNavigate();
 
   async function submitData() {

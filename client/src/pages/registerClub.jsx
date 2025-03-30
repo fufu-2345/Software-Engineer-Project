@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useReducer } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Popup from "reactjs-popup";
-import { useRef } from "react";
 
 import Navbar from "../components/navbar";
 import Loader from "../components/loader";

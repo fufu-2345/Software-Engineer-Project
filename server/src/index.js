@@ -20,7 +20,6 @@ app.use(helmet.frameguard({ action: 'deny' }));
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/uploads', express.static(path.join(__dirname, '../profilePicture')));
-
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 const pool = mysql.createPool({
@@ -31,7 +30,7 @@ const pool = mysql.createPool({
 });
 
 app.get('/', (req, res) => {
-    res.json(process.env.HOST + " " + process.env.USER + " " + process.env.PASSWORD + " " + process.env.DATABASE);
+    res.json("host: " + process.env.HOST + "    | user: " + process.env.USER + "    | password: " + process.env.PASSWORD + "    | database: " + process.env.DATABASE + "    | servermail: " + process.env.SERVEREMAIL + "    | app_password" + process.env.APP_PASSWORD);
 });
 
 app.get("/test", (req, res) => {
@@ -395,7 +394,6 @@ const checkedPost = [
         })
 ];
 
-//https://express-validator.github.io/docs/guides/getting-started
 app.post('/upload', upload.single('image'), checkedPost, (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) { return res.status(400).json({ success: false, errors: errors.array() }); };
