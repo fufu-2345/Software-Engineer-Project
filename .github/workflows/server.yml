@@ -7,13 +7,13 @@ on:
   workflow_dispatch:
 
 env:
-  HOST=localhost
-  USER=root
-  PASSWORD=${{ secrets.PASSWORD }}
-  DATABASE=${{ secrets.DATABASE }}
-  SERVEREMAIL=${{ secrets.SERVEREMAIL }}
-  APP_PASSWORD=${{ secrets.APP_PASSWORD }}
-  
+  HOST: localhost
+  USER: root
+  PASSWORD: ${{ secrets.PASSWORD }}
+  DATABASE: ${{ secrets.DATABASE }}
+  SERVEREMAIL: ${{ secrets.SERVEREMAIL }}
+  APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
+
 jobs:
   deploy:
     name: Deploy Server
