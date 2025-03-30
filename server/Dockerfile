@@ -4,8 +4,6 @@ WORKDIR /app
 
 COPY . . 
 
-COPY .env /app/.env
-
 RUN npm install
 EXPOSE 5000
 
