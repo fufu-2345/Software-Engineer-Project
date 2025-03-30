@@ -37,7 +37,6 @@ jobs:
           echo "SERVEREMAIL=${{ secrets.SERVEREMAIL }}" >> .env
           echo "APP_PASSWORD=${{ secrets.APP_PASSWORD }}" >> .env
          
-
       - name: Build and push Docker Image
         uses: docker/build-push-action@v3
         with:

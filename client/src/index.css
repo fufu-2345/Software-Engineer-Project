@@ -111,12 +111,12 @@ body {
 }
 
 .post-description.collapsed {
-  display: -webkit-box;
-  display: box;
+  display: flex;
   -webkit-box-orient: vertical;
   box-orient: vertical;
   -webkit-line-clamp: 6;
-  line-clamp: 6; /* มาตรฐาน */
+  line-clamp: 6;
+  /* มาตรฐาน */
   overflow: hidden;
   text-overflow: ellipsis;
 }
