@@ -124,7 +124,7 @@ const ShowPost = ({ userId, role }) => {
         setDescription(event.target.value);
     };
 
-    const handleCancle = () => {
+    const handleCancel = () => {
         setFile(null);
         setErrorMessage("");
         setTitle("");
@@ -368,8 +368,8 @@ const ShowPost = ({ userId, role }) => {
                         <div className='flex flex-col items-center bg-grey-300 bg-clip-padding'>
                             <div class="flex space-x-4 ">
                                 <div className='w-full flex justify-center'>
-                                    <button onClick={handleCancle} className='bg-red-500 hover:bg-red-700  text-white px-4 py-2 m-2 rounded'>
-                                        cancle
+                                    <button onClick={handleCancel} className='bg-red-500 hover:bg-red-700  text-white px-4 py-2 m-2 rounded'>
+                                        cancel
                                     </button>
                                 </div>
 
